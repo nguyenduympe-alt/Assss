@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block head %}Nhận xét học sinh bằng AI{% endblock %}
+{% block crumb %}Từ điểm số hoặc mức độ CHT / HT / HTT → sinh nhận xét cá nhân hoá{% endblock %}
+{% block body %}
+<div class="card">
+<form method="post" enctype="multipart/form-data">
+ <div class="tabs">
+  <button type="button" class="on" onclick="tab(0,this)">📂 Tải file Excel / CSV</button>
+  <button type="button" onclick="tab(1,this)">✍️ Nhập tay</button>
+ </div>
+
+ <div id="t0">
+  <div style="border:2px dashed #cfeafc;background:linear-gradient(135deg,#f8fafc,#ecfdf5);border-radius:14px;
+   padding:26px;text-align:center" id="dz">
+   <div style="font-size:34px">📊</div>
+   <div style="font-weight:700;margin:6px 0 3px">Chọn bảng điểm hoặc bảng nhận xét</div>
+   <p class="muted" style="margin:0 0 14px">Hỗ trợ .xlsx, .xls, .csv — tự nhận diện cột
+    <b>Họ tên</b>, <b>Điểm</b>, <b>Mức độ</b>, <b>Nhận xét của GV</b>, <b>Lớp</b>, <b>Môn</b></p>
+   <input type="file" name="file" accept=".xlsx,.xls,.csv" onchange="document.getElementById('fn').textContent=this.files[0]?.name||''">
+   <div id="fn" style="margin-top:9px;font-weight:600;color:#0d9488"></div>
+   <div style="margin-top:12px"><a class="btn sec sm" href="{{url_for('core.mau_excel', kind='diem')}}">⬇ Tải file mẫu</a></div>
+  </div>
+ </div>
+
+ <div id="t1" style="display:none">
+  <div class="tbl-wrap"><table id="tb">
+   <thead><tr><th style="width:55%">Họ và tên</th><th>Điểm</th><th>Mức độ</th></tr></thead>
+   <tbody>{% for i in range(5) %}<tr>
+    <td><input name="ten[]" style="width:100%" placeholder="Nguyễn Văn A"></td>
+    <td><input name="diem[]" type="number" step="0.1" style="width:96px"></td>
+    <td><select name="md[]"><option value="">Tự động theo điểm</option><option>CHT</option><option>HT</option><option>HTT</option></select></td>
+   </tr>{% endfor %}</tbody></table></div>
+  <button type="button" class="sec sm" style="margin-top:10px" onclick="addRow()">+ Thêm dòng</button>
+ </div>
+
+ <hr class="s">
+ <div class="row">
+  <label class="f">Lớp<input name="lop" style="width:100px" placeholder="5A"></label>
+  <label class="f">Môn<input name="mon" value="{{user['subject'] or ''}}" style="width:140px"></label>
+  <label class="f">Học kỳ<select name="hocky"><option>HK1</option><option>HK2</option><option>Cả năm</option></select></label>
+  <label class="f">Thang điểm<select name="thang"><option value="10">Thang 10</option><option value="100">Thang 100</option><option value="4">Thang 4</option></select></label>
+  <label class="f">Kiểu nhận xét<select name="provider">
+   {% for k,(lb,_) in PROVIDERS.items() %}<option value="{{k}}">{{lb}}</option>{% endfor %}</select></label>
+  <label class="f" style="flex-direction:row;align-items:center;gap:7px;padding-bottom:9px;color:#334155">
+   <input type="checkbox" name="hien_diem" checked style="width:16px;height:16px"> Kèm điểm &amp; xếp loại</label>
+  <button class="ok">✨ Sinh nhận xét</button>
+ </div>
+</form>
+</div>
+
+{% if result is not none %}
+{% set nHTT = result|selectattr('muc_do','equalto','HTT')|list|length %}
+{% set nHT = result|selectattr('muc_do','equalto','HT')|list|length %}
+{% set nCHT = result|selectattr('muc_do','equalto','CHT')|list|length %}
+<div class="kpis">
+ <div class="kpi" style="--c:#0d9488"><div class="ic">👥</div><b>{{result|length}}</b><span>Học sinh xử lý</span></div>
+ <div class="kpi" style="--c:#10b981"><div class="ic">🌟</div><b>{{nHTT}}</b><span>Hoàn thành tốt</span></div>
+ <div class="kpi" style="--c:#06b6d4"><div class="ic">✅</div><b>{{nHT}}</b><span>Hoàn thành</span></div>
+ <div class="kpi" style="--c:#f43f5e"><div class="ic">⚠️</div><b>{{nCHT}}</b><span>Chưa hoàn thành</span></div>
+</div>
+<div class="card">
+ <div class="chead"><h3>Kết quả nhận xét</h3>
+  <div class="row" style="gap:8px">
+   <a class="btn sec sm" href="{{url_for('core.lich_su')}}">Sửa nội dung →</a>
+   {% if is_pro or remaining > 0 %}
+    <a class="btn sm" href="{{url_for('core.xuat_excel')}}">⬇ Xuất Excel{% if not is_pro %} ({{remaining}} lượt){% endif %}</a>
+   {% else %}
+    <a class="btn sm" href="{{url_for('core.nang_cap', need='excel')}}"
+     style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Nâng cấp để tải</a>
+   {% endif %}</div></div>
+ {% if result %}
+ <div class="tbl-wrap"><table>
+  <thead><tr><th style="width:34px">#</th><th>Họ tên</th><th>Điểm</th><th>Mức</th><th>Xếp loại</th><th style="width:46%">Nhận xét</th></tr></thead>
+  <tbody>{% for r in result %}<tr>
+   <td class="muted">{{loop.index}}</td>
+   <td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:8px">
+    <span class="av" style="width:28px;height:28px;flex:0 0 28px;font-size:12px">{{r.ho_ten[0]|upper}}</span>
+    <b>{{r.ho_ten}}</b></div></td>
+   <td>{{ '%g'|format(r.diem) if r.diem is not none else '—' }}</td>
+   <td>{% if r.muc_do %}<span class="badge {{r.muc_do}}">{{r.muc_do}}</span>{% endif %}</td>
+   <td class="muted">{{r.xep_loai}}</td><td>{{r.nhan_xet}}</td></tr>{% endfor %}</tbody></table></div>
+ {% else %}<div class="empty"><span class="e">🤔</span>Không đọc được dòng nào. Hãy kiểm tra cột <b>Họ và tên</b> trong file.</div>{% endif %}
+</div>
+{% endif %}
+
+<script>
+function tab(i,b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ document.getElementById('t0').style.display=i==0?'':'none';document.getElementById('t1').style.display=i==1?'':'none';}
+function addRow(){const t=document.querySelector('#tb tbody');const r=t.insertRow(-1);
+ r.innerHTML='<td><input name="ten[]" style="width:100%"></td><td><input name="diem[]" type="number" step="0.1" style="width:96px"></td><td><select name="md[]"><option value="">Tự động theo điểm</option><option>CHT</option><option>HT</option><option>HTT</option></select></td>';}
+</script>
+{% endblock %}

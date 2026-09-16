@@ -1,0 +1,21 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SECRET_KEY: "${SECRET_KEY:-doi-chuoi-nay-thanh-ngau-nhien}"
+      DB_DIR: /data
+      FREE_QUOTA: "3"
+      PRICE: "100000"
+      BANK_CODE: "agribank"
+      BANK_ACC: "7614215002756"
+      BANK_NAME: "Agribank"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
+    volumes:
+      - eduassist-data:/data      # dữ liệu được giữ lại kể cả khi container bị xoá
+
+volumes:
+  eduassist-data:

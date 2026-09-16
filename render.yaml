@@ -1,0 +1,57 @@
+# Cấu hình triển khai tự động cho Render.com
+services:
+  - type: web
+    name: eduassist
+    runtime: python
+    plan: free                    # đổi thành starter nếu muốn có ổ đĩa lưu trữ bền
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn "app:create_app()" --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true       # Render tự sinh chuỗi bí mật ngẫu nhiên
+      - key: HTTPS_ONLY
+        value: "1"
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      # --- Thu phi (tuy chinh neu can) ---
+      - key: FREE_QUOTA
+        value: "3"
+      - key: PRICE
+        value: "100000"
+      - key: PRICE_LUOT
+        value: "10000"
+      - key: LUOT_MOI_GOI
+        value: "3"
+      - key: BANK_CODE
+        value: "agribank"
+      - key: BANK_ACC
+        value: "7614215002756"
+      - key: BANK_NAME
+        value: "Agribank"
+      # --- Thanh toan tu dong + nhan tin (xem HUONG-DAN-THANH-TOAN-TU-DONG.md) ---
+      - key: BANK_WEBHOOK_TOKEN
+        generateValue: true       # Render tu sinh; copy sang SePay/Casso
+      - key: AUTO_ACTIVATE
+        value: "1"                # 1 = kich hoat ngay khi nhan duoc tien
+      - key: SMS_PROVIDER
+        value: "log"              # doi thanh esms / zns / speedsms / twilio khi da co key
+      - key: ESMS_API_KEY
+        sync: false
+      - key: ESMS_SECRET_KEY
+        sync: false
+      - key: ESMS_BRANDNAME
+        sync: false
+      # --- Dang nhap Google (dan key cua ban vao dashboard Render) ---
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Bỏ dấu # ở 2 dòng dưới nếu bạn dùng gói trả phí có Persistent Disk
+      # - key: DB_DIR
+      #   value: /var/data
+
+# Bỏ dấu # khối dưới nếu dùng gói trả phí — để dữ liệu KHÔNG bị mất khi deploy lại
+#    disk:
+#      name: eduassist-data
+#      mountPath: /var/data
+#      sizeGB: 1
