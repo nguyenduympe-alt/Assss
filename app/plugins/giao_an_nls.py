@@ -21,13 +21,15 @@ from ..modules import nld as NLD
 from ..modules import nld_tich_hop as TH
 from ..modules import chinh_ta_gd as CTG
 from ..modules import ai_provider as AI
+from ..modules import ml_noi_bo as ML
 from .digital import folder, load, save  # dùng lại nơi lưu tạm, có kiểm tra chủ sở hữu
 
 MENU = {'label': 'Giáo án & năng lực số', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
 MAX_BYTES = 8 * 1024 * 1024
-NHAN_NOI_BO = ("Hệ thống chạy hoàn toàn trên máy chủ của trường: bộ luật + kho chỉ báo đã "
-               "kiểm chứng. KHÔNG gửi nội dung giáo án ra Google/Gemini hay dịch vụ AI nào; "
-               "đây cũng KHÔNG phải mô hình AI đã huấn luyện.")
+NHAN_NOI_BO = ("Hệ thống chạy hoàn toàn trên máy chủ của trường: kho chỉ báo đã kiểm chứng, "
+               "bộ luật chính tả và MỘT MÔ HÌNH NHỎ DO EDUASSIST TỰ HUẤN LUYỆN (dò lỗi chính tả). "
+               "KHÔNG gửi nội dung giáo án ra Google/Gemini hay dịch vụ AI nào. "
+               "Mô hình này KHÔNG phải mô hình ngôn ngữ lớn: không sinh nội dung, không hiểu nội dung.")
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -58,7 +60,7 @@ def index():
                 pt['mon'] = mon
 
             chon, canh_bao = TH.chon_tieu_chi(doc, pt, thiet_bi=thiet_bi, toi_da=toi_da)
-            doan = [p.text for p in doc.paragraphs if (p.text or '').strip()]
+            doan = [p.text for p in CTG.cac_doan_van_ban(doc)]   # gồm cả chữ trong bảng
             de_xuat, bo_qua = CTG.soan_bao_cao(doan)
 
             token = save(
@@ -84,7 +86,8 @@ def index():
         return redirect(url_for('giao_an_nls.index'))
 
     return render_template('giao_an_upload.html', nhan=NHAN_NOI_BO,
-                           luat=NLD.thong_ke(), tu_dien=CTG.thong_ke_tu_dien())
+                           luat=NLD.thong_ke(), tu_dien=CTG.thong_ke_tu_dien(),
+                           mo_hinh=ML.thong_tin())
 
 
 @bp.route('/<token>/duyet', methods=['GET'])
@@ -96,7 +99,8 @@ def duyet(token):
         return redirect(url_for('giao_an_nls.index'))
     return render_template('giao_an_duyet.html', ctx=ctx['ctx'], token=token,
                            ten_file=ctx['name'], nhan=NHAN_NOI_BO,
-                           nhan_ct=CTG.nhan_ket_qua(), loi_cu=session.pop('loi_cu', None))
+                           nhan_ct=CTG.nhan_ket_qua(), loi_cu=session.pop('loi_cu', None),
+                           nhan_mh=ML.nhan())
 
 
 @bp.route('/<token>/xuat', methods=['POST'])

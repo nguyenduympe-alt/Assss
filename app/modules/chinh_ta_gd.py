@@ -117,12 +117,21 @@ def doi_chieu_thuat_ngu(d):
     return ""
 
 
+def _tu_dung_da_biet(tu):
+    """Từ có trong từ vựng đã kiểm chứng của mô hình? (nạp muộn, lỗi thì coi như không có)."""
+    try:
+        from . import ml_noi_bo as ML
+        return ML.trong_tu_vung(tu)
+    except Exception:
+        return False
+
+
 def soan_bao_cao(paragraphs, opts=None):
     """Chạy kiểm tra và trả về danh sách đề xuất có trước/sau/lý do/độ tin cậy.
 
     paragraphs: danh sách chuỗi (mỗi đoạn một phần tử).
     """
-    ra, bo_qua = [], {"vung_cam": 0, "ten_rieng": 0, "thuat_ngu": 0}
+    ra, bo_qua = [], {"vung_cam": 0, "ten_rieng": 0, "thuat_ngu": 0, "tu_dung": 0}
     # tầng 1: lỗi rõ ràng theo cụm từ (chắc chắn sai)
     for pi, p in enumerate(paragraphs or []):
         ra += _quet_loi_ro(p or "", pi, len(ra))
@@ -141,6 +150,14 @@ def soan_bao_cao(paragraphs, opts=None):
             bo_qua["thuat_ngu"] += 1
             continue
 
+        # Từ đã có trong TỪ VỰNG ĐÃ KIỂM CHỨNG của mô hình thì coi là đúng và bỏ
+        # qua. Đo trên 500 câu: bỏ được 13 báo nhầm ("giữ gìn", "trước"...) mà
+        # KHÔNG mất lỗi thật nào. KHÔNG áp dụng cho lỗi lặp từ — lặp từ vốn dĩ
+        # xảy ra với từ đúng ("trước trước").
+        if it["kind"] != "lap_tu" and _tu_dung_da_biet(it["word"]):
+            bo_qua["tu_dung"] += 1
+            continue
+
         # Từ 1 ký tự rất dễ là ký hiệu/biến (k, n, S…) -> chỉ gợi ý, không tự sửa
         mot_ky_tu = len(it["word"]) <= 1
         chac = (it["kind"] in CHAC_CHAN) and not mot_ky_tu
@@ -156,6 +173,9 @@ def soan_bao_cao(paragraphs, opts=None):
             "nhan": ("Sửa chắc — giáo viên duyệt để áp dụng" if chac
                      else "Chỉ gợi ý — cần ngữ cảnh, hệ thống không tự sửa"),
         })
+    # tầng 3: MÔ HÌNH NHỎ ĐÃ HUẤN LUYỆN (chỉ gợi ý, không bao giờ "sửa chắc")
+    ra += _quet_mo_hinh(paragraphs, ra)
+
     ra = _loai_chong_lan(ra)
     return ra, bo_qua
 
@@ -285,6 +305,55 @@ def _quet_loi_ro(text, pidx, bat_dau_id):
     return ra
 
 
+def _quet_mo_hinh(paragraphs, da_co):
+    """Dùng mô hình nhỏ đã huấn luyện để tìm thêm lỗi mà bộ luật bỏ sót.
+
+    Mọi đề xuất ở đây đều là `chi_goi_y`: mô hình không chắc bằng luật nên hệ
+    thống KHÔNG tự sửa, chỉ nêu ra kèm lý do để giáo viên quyết định.
+    """
+    try:
+        from . import ml_noi_bo as ML
+    except Exception:
+        return []
+    if not ML.co_mo_hinh():
+        return []
+
+    ra, mh = [], ML.mo_hinh()
+    for pidx, text in enumerate(paragraphs or []):
+        if not (text or "").strip():
+            continue
+        vung = _vung_cam(text)
+        for x in ML.doc_tai_lieu(text):
+            s0, e0 = x["vi_tri_ky_tu"], x["vi_tri_ky_tu"] + len(x["tu"])
+            # đã bị tầng luật bắt rồi thì thôi
+            if any(o["para"] == pidx and not (e0 <= o["start"] or s0 >= o["end"])
+                   for o in da_co):
+                continue
+            # vùng cấm, tên riêng, thuật ngữ, viết tắt: không đụng vào
+            if _trong_vung(s0, e0, vung):
+                continue
+            if _la_ten_rieng(text, s0, e0):
+                continue
+            if la_thuat_ngu(x["tu"]) or la_viet_tat(x["tu"]) or len(x["tu"]) < 3:
+                continue
+            if x["tu"].isupper():                      # viết tắt in hoa: bỏ qua
+                continue
+            ban_sua, do_chac = ML.goi_y_sua(mh, x["tokens"], x["vi_tri_tu"])
+            ra.append({
+                "id": 200000 + len(ra), "para": pidx, "start": s0, "end": e0,
+                "doan_goc": text, "goc": x["tu"], "de_xuat": ban_sua or "",
+                "ly_do": ("Mô hình chính tả của hệ thống chấm từ này có dấu hiệu sai"
+                          f" (điểm {x['diem']:.2f}).") if not ban_sua else
+                         ("Mô hình chính tả của hệ thống cho rằng từ này có dấu hiệu sai"
+                          f" (điểm {x['diem']:.2f}) và đề xuất bản sửa."),
+                "loai_loi": "mo_hinh", "nguon": "mo_hinh",
+                "do_tin_cay": "thap", "che_do": "chi_goi_y",
+                "nhan": ("Mô hình đề xuất — cần thầy/cô xem lại" if ban_sua
+                         else "Mô hình nghi ngờ — chưa tìm được bản sửa, cần thầy/cô xem lại"),
+            })
+    return ra
+
+
 def _loai_chong_lan(ds):
     """Bỏ đề xuất chồng lấn nhau trong cùng đoạn (giữ cái dài hơn).
 
@@ -320,6 +389,8 @@ def ap_dung(paragraphs, de_xuat, chon_ids):
     moi = list(paragraphs)
     da_sua = 0
     for d in sorted(chon, key=lambda x: (x["para"], x["start"]), reverse=True):
+        if not d.get("de_xuat"):
+            continue                      # chỉ nghi ngờ, chưa có bản sửa -> không đụng vào
         if not (0 <= d["para"] < len(moi)):
             continue
         t = moi[d["para"]]
@@ -342,6 +413,23 @@ def thong_ke_tu_dien():
             "so_mau_cam_sua": len(CAMP)}
 
 
+def cac_doan_van_ban(doc):
+    """Mọi đoạn văn bản cần kiểm tra chính tả: đoạn thân bài + đoạn TRONG BẢNG.
+
+    Giáo án Việt Nam gần như luôn có bảng (tiến trình bài dạy), nên nếu bỏ qua
+    bảng thì phần lớn nội dung không được kiểm tra. Dùng chung một hàm cho cả lúc
+    tạo báo cáo và lúc áp dụng sửa, để chỉ số đoạn luôn khớp nhau.
+    """
+    ds = [p for p in doc.paragraphs if (p.text or "").strip()]
+    for t in doc.tables:
+        for row in t.rows:
+            for o in row.cells:
+                for p in o.paragraphs:
+                    if (p.text or "").strip():
+                        ds.append(p)
+    return ds
+
+
 def ap_dung_vao_docx(doc, de_xuat, chon_ids):
     """Áp dụng các sửa chính tả đã chọn vào tài liệu Word.
 
@@ -362,7 +450,7 @@ def ap_dung_vao_docx(doc, de_xuat, chon_ids):
     # Định vị đoạn theo NGUYÊN VĂN, không theo chỉ số: việc chèn mục năng lực số
     # làm các đoạn phía sau dịch chỉ số, nếu dùng chỉ số sẽ sửa nhầm đoạn.
     ung_vien = {}
-    for p in doc.paragraphs:
+    for p in cac_doan_van_ban(doc):
         ung_vien.setdefault((p.text or "").strip(), []).append(p)
     da_dung = {}
     da_sua = 0
@@ -381,7 +469,7 @@ def ap_dung_vao_docx(doc, de_xuat, chon_ids):
 
         # kiểm tra vị trí còn khớp không, rồi dựng danh sách đoạn chữ theo thứ tự
         hop_le = [d for d in sorted(ds, key=lambda x: x["start"])
-                  if text[d["start"]:d["end"]] == d["goc"]]
+                  if d.get("de_xuat") and text[d["start"]:d["end"]] == d["goc"]]
         if not hop_le:
             continue
 

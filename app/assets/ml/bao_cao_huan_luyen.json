@@ -1,0 +1,59 @@
+{
+ "mo_hinh_chinh_ta": {
+  "precision": 0.985,
+  "recall": 0.9339,
+  "f1": 0.9588,
+  "dung_het": 0.9953,
+  "du_doan_dung_tren_tu_sai": 1117,
+  "bo_sot": 79,
+  "bao_dong_nham_tren_tu_dung": 17,
+  "tu_dung": 19395,
+  "so_dac_trung": 5861,
+  "de_xuat_sua": {
+   "so_loi_test": 1196,
+   "so_lan_de_xuat": 963,
+   "de_xuat_dung": 836,
+   "ti_le_tren_so_loi": 0.699,
+   "ti_le_tren_so_da_de_xuat": 0.8681,
+   "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+  }
+ },
+ "mo_hinh_thanh_phan": {
+  "chi_so_24_thanh_phan": {
+   "top1": 0.0804,
+   "top3": 0.1696,
+   "precision_macro": 0.0357,
+   "recall_macro": 0.0338,
+   "f1_macro": 0.0343,
+   "so_dac_trung": 1168
+  },
+  "chi_so_6_mien": {
+   "top1": 0.3839,
+   "top3": 0.7522,
+   "doan_mo": 0.1667
+  },
+  "xuat_ban": false,
+  "ly_do": "KHÔNG XUẤT BẢN: độ chính xác top-1 0.080 gần mức đoán mò 0.042 cho 24 thành phần. Dữ liệu huấn luyện tổng hợp không đủ để khái quát sang cách viết mới. Bảng từ khoá thủ công vẫn chính xác hơn — giữ nguyên, không thay bằng mô hình này.",
+  "du_lieu": {
+   "nguon": "sinh tổng hợp: mẫu câu mô tả hoạt động dạy học cho 24 thành phần",
+   "so_mau_train": 1168,
+   "so_mau_test": 448,
+   "chia_tap": "theo mẫu câu — mẫu vào tập test thì không có trong tập train"
+  },
+  "huan_luyen_luc": "2026-09-20 10:23"
+ },
+ "so_sanh_bo_luat": {
+  "train": {
+   "tong_loi": 3661,
+   "luat_bat": 2944,
+   "mo_hinh_bat": 3661,
+   "hop_bat": 3661
+  },
+  "test": {
+   "tong_loi": 1196,
+   "luat_bat": 872,
+   "mo_hinh_bat": 1117,
+   "hop_bat": 1128
+  }
+ }
+}

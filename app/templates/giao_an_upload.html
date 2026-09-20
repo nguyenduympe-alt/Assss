@@ -46,6 +46,23 @@
  </form>
 </div>
 
+{% if mo_hinh and mo_hinh.co_mo_hinh %}
+<div class="card">
+ <h3>Mô hình chính tả đã huấn luyện</h3>
+ <p>Bên cạnh bộ luật, hệ thống dùng thêm một <b>mô hình nhỏ do chính EduAssist huấn luyện</b> để dò lỗi chính tả
+ (hồi quy logistic trên n-gram ký tự, {{mo_hinh.so_trong_so}} trọng số). Đây <b>không phải mô hình ngôn ngữ lớn</b>:
+ mô hình không sinh nội dung, không hiểu nội dung, chỉ chấm điểm từng từ.</p>
+ <ul>
+  <li>Huấn luyện lúc {{mo_hinh.huan_luyen_luc}} trên dữ liệu tổng hợp (cụm từ ngành + câu nguyên văn văn bản Bộ),
+      từ vựng {{mo_hinh.so_tu_vung}} từ.</li>
+  <li>Tập kiểm tra giữ riêng (từ sai ở tập test không có trong tập train):
+      chính xác <b>{{'%.2f'|format(mo_hinh.chi_so.precision)}}</b>,
+      bắt được <b>{{'%.0f'|format(mo_hinh.chi_so.recall*100)}}%</b> số lỗi,
+      báo nhầm {{mo_hinh.chi_so.bao_dong_nham_tren_tu_dung}}/{{mo_hinh.chi_so.tu_dung}} từ đúng.</li>
+  <li>Mọi đề xuất từ mô hình đều ở mức <b>chỉ gợi ý</b> — hệ thống không tự sửa.</li>
+ </ul>
+</div>
+{% endif %}
 <div class="card">
  <h3>Hệ thống làm gì — và không làm gì</h3>
  <p><b>Có làm:</b> đối chiếu nội dung bài với kho chỉ báo đã kiểm chứng ({{luat.so_mien}} miền,
