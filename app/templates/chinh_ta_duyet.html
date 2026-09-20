@@ -47,9 +47,9 @@
     <td style="padding:6px">
      {% if d.de_xuat %}<input type="checkbox" name="ct_{{d.id}}" value="1" {% if d.che_do=='sua_chac' %}checked{% endif %} style="width:17px">
      {% else %}<span class="muted">—</span>{% endif %}
-     <button type="submit" name="dung_tu_{{d.id}}" value="1" class="muted"
-             style="font-size:11px;padding:1px 5px;margin-top:3px"
-             title="Nếu từ này đúng, bấm để hệ thống thôi bắt oan về sau">từ này đúng</button></td>
+     <button type="submit" name="dung_tu_{{d.id}}" value="1"
+             class="btn sec sm" style="font-size:11px;padding:2px 7px;margin-top:4px;width:auto"
+             title="Nếu từ này đúng, bấm để hệ thống thôi bắt oan về sau">Từ này đúng</button></td>
     <td style="padding:6px">{{d.goc}}</td>
     <td style="padding:6px">{% if d.de_xuat %}<b>{{d.de_xuat}}</b>{% else %}<span class="muted">chưa tìm được bản sửa</span>{% endif %}</td>
     <td style="padding:6px" class="muted">{{d.ly_do}}</td>
