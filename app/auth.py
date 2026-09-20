@@ -62,9 +62,33 @@ def base_tu_request():
         return ''
 
 
+def danh_sach_base():
+    """Các địa chỉ HTTPS đã khai trong Cài đặt (ô 'Địa chỉ website HTTPS').
+
+    Ô này nhận nhiều địa chỉ cách nhau dấu phẩy, ví dụ khi đang chuyển từ
+    tên miền tạm sang tên miền chính mà muốn cả hai cùng chạy được:
+        https://edugiaovien.duckdns.org,https://edugiaovien.com
+    """
+    ra = []
+    for phan in (CFG.get('PUBLIC_BASE_URL', '') or '').split(','):
+        b = _chuan_hoa_base(phan)
+        if b and b not in ra:
+            ra.append(b)
+    return ra
+
+
 def google_base_url():
-    """Địa chỉ gốc dùng để dựng redirect URI: ưu tiên giá trị admin đã khai."""
-    return _chuan_hoa_base(CFG.get('PUBLIC_BASE_URL', '')) or base_tu_request()
+    """Địa chỉ gốc dùng để dựng redirect URI.
+
+    Ưu tiên địa chỉ trùng với tên miền khách đang truy cập, để khi chạy song
+    song hai tên miền thì mỗi bên dùng đúng redirect URI của mình. Nếu khách
+    vào bằng tên miền chưa khai thì lấy địa chỉ khai đầu tiên.
+    """
+    ds = danh_sach_base()
+    hien_tai = base_tu_request()
+    if hien_tai and (hien_tai in ds or not ds):
+        return hien_tai
+    return ds[0] if ds else ''
 
 
 def google_callback_url():
@@ -82,6 +106,7 @@ def google_tinh_trang():
     cid, csec = CFG.get('GOOGLE_CLIENT_ID', ''), CFG.get('GOOGLE_CLIENT_SECRET', '')
     base_khai = CFG.get('PUBLIC_BASE_URL', '')
     base = google_base_url()
+    ds = danh_sach_base()
     return {
         'bat': google_bat(),
         'co_client_id': bool(cid),
@@ -89,7 +114,9 @@ def google_tinh_trang():
         'co_dia_chi': bool(base),
         'dia_chi_khai_bao': base_khai,
         'dia_chi_dang_dung': base,
-        'tu_dong_nhan_dien': bool(base) and not _chuan_hoa_base(base_khai),
+        'danh_sach_dia_chi': ds,
+        'co_dang_doi_ten_mien': len(ds) > 1,
+        'tu_dong_nhan_dien': bool(base) and not ds,
         'callback': google_callback_url(),
         'client_id_rut_gon': (cid[:24] + '…') if len(cid) > 24 else cid,
     }

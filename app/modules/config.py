@@ -104,7 +104,9 @@ DINH_NGHIA = [
 
     # --- Google ---
     Muc("PUBLIC_BASE_URL", "Địa chỉ website HTTPS", "", nhom="dang_nhap",
-        mo_ta="Ví dụ https://truong.example.vn — cần tên miền và chứng chỉ HTTPS, không dùng địa chỉ IP."),
+        mo_ta="Ví dụ https://truong.example.vn — cần tên miền và chứng chỉ HTTPS, không dùng địa chỉ IP. "
+              "Muốn chạy nhiều tên miền cùng lúc thì ngăn cách bằng dấu phẩy, "
+              "ví dụ https://edugiaovien.duckdns.org,https://edugiaovien.com"),
     Muc("GOOGLE_CLIENT_ID", "Google Client ID", "", "password", "dang_nhap", bimat=True),
     Muc("GOOGLE_CLIENT_SECRET", "Google Client Secret", "", "password", "dang_nhap", bimat=True),
 ]
