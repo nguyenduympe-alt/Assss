@@ -12,12 +12,15 @@ tuyệt đối không ghép mã mới hay gán bừa quy định.
 import copy
 import re
 
+from docx.oxml.ns import qn
+
 from . import nld
 from .giao_an import (DO, NHAN_AI, doan_mau, gon, khong_dau,
                        phan_tich, _xoa_muc_nld_cu)
 
 NHAN_QD = "[QUY ĐỊNH]"
-RE_HOAT_DONG_BANG = re.compile(r"^\s*Hoạt động tích hợp năng lực số\s*\(", re.I)
+# So khớp trên văn bản ĐÃ BỎ DẤU (khong_dau) nên mẫu cũng phải viết không dấu.
+RE_HOAT_DONG_BANG = re.compile(r"^\s*hoat\s*dong\s*tich\s*hop\s*nang\s*luc\s*so\s*\(", re.I)
 NHAN_DX = "[ĐỀ XUẤT]"
 
 # ---------------------------------------------------------------- ánh xạ nội dung
@@ -549,9 +552,11 @@ def chen_muc_tieu(doc, pt, chon, ten_bai="", mon=""):
         if neo is not None:
             neo._p.addnext(p._p)     # đưa đoạn mới ra sau neo, giữ thứ tự
 
-    diem = {"trong_muc_nang_luc": "cuối phần Năng lực (ngay trước mục Phẩm chất)",
-            "truoc_pham_chat": "ngay trước mục Phẩm chất (bài không có mục Năng lực riêng)",
-            "cuoi_muc_tieu": "cuối phần MỤC TIÊU"}[cach]
+    _nhan = (mt.get("nhan") or "MỤC TIÊU")
+    diem = {"trong_muc_nang_luc": f"cuối phần Năng lực (ngay trước mục Phẩm chất) trong “{_nhan}”",
+            "truoc_pham_chat": f"ngay trước mục Phẩm chất trong “{_nhan}” "
+                               f"(bài không có mục Năng lực riêng)",
+            "cuoi_muc_tieu": f"cuối phần “{_nhan}”"}[cach]
     return {"da_chen": True, "so_muc": so, "so_tieu_chi": len(chon),
             "cach_chen": cach, "diem_chèn": diem,
             "trong_muc_nang_luc": cach == "trong_muc_nang_luc"}
@@ -586,6 +591,35 @@ def chen_hoat_dong(doc, pt, hd):
     return _chen_duoi_muc_tieu(doc, pt, hd)
 
 
+def _dong_gop(row):
+    """Dòng có ô bị gộp (các ô trỏ về cùng một ô thật) hay không."""
+    return len({id(c._tc) for c in row.cells}) < len(row.cells)
+
+
+def _la_tieu_de_hoat_dong(row):
+    """Dòng mở đầu một hoạt động lớn, ví dụ “4. VẬN DỤNG (5’)”.
+
+    Loại trừ mục con “2.1.” bằng cách bắt buộc sau dấu chấm là ký tự KHÔNG phải số.
+    """
+    o_dau = gon(row.cells[0].text) if row.cells else ""
+    return bool(re.match(r"^\s*\d+\.\s*(?!\d)\S", o_dau))
+
+
+def _dong_mau_bang(table, tu_dong):
+    """Chọn dòng làm mẫu để chèn: phải là dòng KHÔNG gộp ô.
+
+    Giáo án thật hay gộp ô cho các dòng tiêu đề hoạt động (“4. VẬN DỤNG (5’)” trải rộng
+    3 cột). Nếu chép nguyên dòng gộp rồi ghi nội dung vào từng cột thì mọi nội dung dồn
+    vào một ô, hoạt động mới hiện sai chỗ.
+    """
+    n = len(table.rows)
+    for d in range(0, n):
+        for i in (tu_dong + d, tu_dong - d):
+            if 0 <= i < n and not _dong_gop(table.rows[i]):
+                return table.rows[i]
+    return table.rows[tu_dong]
+
+
 def _chen_vao_bang(doc, tt, hd):
     """Chèn một dòng hoạt động vào bảng tiến trình, sau hoạt động phù hợp nhất.
 
@@ -596,15 +630,16 @@ def _chen_vao_bang(doc, tt, hd):
     cot = tt["cot"]
     da_xoa = 0
     for row in list(table.rows):
-        dau = next((gon(c.text) for c in row.cells if gon(c.text)), "")
-        if RE_HOAT_DONG_BANG.match(dau or ""):
+        # Soi MỌI ô trong dòng: bảng thật có cột gộp và cột "Hỗ trợ HSKT", tên hoạt động
+        # có thể nằm ở bất kỳ ô nào — chỉ soi ô đầu sẽ bỏ sót và chèn trùng.
+        if any(RE_HOAT_DONG_BANG.match(khong_dau(gon(c.text)) or "") for c in row.cells):
             row._tr.getparent().remove(row._tr)
             da_xoa += 1
     hang = table.rows
     if len(hang) < 2:
         return {"da_chen": False, "ly_do": "Bảng tiến trình chưa có dòng dữ liệu nào."}
 
-    # chọn vị trí: ưu tiên ngay sau hoạt động có nội dung khớp từ khoá;
+    # chọn vị trí: ưu tiên hoạt động có nội dung khớp từ khoá;
     # nếu không khớp thì đặt trước dòng cuối (thường là vận dụng/tổng kết)
     vitri = None
     for ri in range(len(hang) - 1, 0, -1):
@@ -617,16 +652,30 @@ def _chen_vao_bang(doc, tt, hd):
         vitri = len(hang) - 2 if len(hang) > 2 else 1
     vitri = max(1, vitri)
 
-    mau_tr = hang[vitri]._tr
-    moi = copy.deepcopy(mau_tr)
-    mau_tr.addnext(moi)
-    from docx.table import _Row
-    row = _Row(moi, table)
+    # Không được cắt ngang khối hoạt động của giáo viên: nếu vị trí chọn được là DÒNG TIÊU ĐỀ
+    # hoạt động ("4. VẬN DỤNG") thì phải chèn SAU toàn bộ nội dung của hoạt động đó.
+    sau = vitri
+    while sau + 1 < len(hang) and not _la_tieu_de_hoat_dong(hang[sau + 1]):
+        sau += 1
 
+    mau = _dong_mau_bang(table, sau)
+    moi_tr = copy.deepcopy(mau._tr)
+    hang[sau]._tr.addnext(moi_tr)
+    from docx.table import _Row
+    row = _Row(moi_tr, table)
+
+    da_ghi = set()          # ô gộp: chỉ ghi một lần cho mỗi ô thật
     for ci, cell in enumerate(row.cells):
+        if id(cell._tc) in da_ghi:
+            continue
+        da_ghi.add(id(cell._tc))
         _dat_o(cell, _noi_dung_o(ci, cot, hd))
-    return {"da_chen": True, "kieu": "bang", "vi_tri_dong": vitri, "da_thay_dong_cu": da_xoa,
-            "so_dong": len(table.rows), "diem_chèn": f"sau dòng {vitri} của bảng tiến trình"}
+    for ci, cell in enumerate(row.cells):
+        if id(cell._tc) in da_ghi and ci not in (cot.get("ho_tro") or []):
+            continue
+    return {"da_chen": True, "kieu": "bang", "vi_tri_dong": sau, "da_thay_dong_cu": da_xoa,
+            "so_dong": len(table.rows),
+            "diem_chèn": f"sau dòng {sau} của bảng tiến trình (cuối hoạt động đã chọn)"}
 
 
 def _noi_dung_o(ci, cot, hd):
@@ -635,9 +684,16 @@ def _noi_dung_o(ci, cot, hd):
     if cot.get("hoat_dong") == ci:
         return [hd["ten"], f"Mục tiêu: {hd['muc_tieu']}"]
     if cot.get("gv") == ci:
-        return [hd["gv"]]
+        dong = [hd["gv"]]
+        # Bảng không có cột "Hoạt động" riêng (ví dụ bảng GV | HS | Hỗ trợ HSKT):
+        # ghi tên hoạt động ngay đầu cột GV, đúng như cách giáo án vẫn trình bày.
+        if cot.get("hoat_dong") is None:
+            dong = [hd["ten"], f"Mục tiêu: {hd['muc_tieu']}"] + dong
+        return dong
     if cot.get("hs") == ci:
         return [hd["hs"]]
+    if ci in (cot.get("ho_tro") or []):
+        return ["Giáo viên quan sát, gợi ý thêm cho học sinh cần hỗ trợ."]
     return [hd["ten"]] if ci == 0 else [""]
 
 
@@ -713,7 +769,8 @@ def _chen_duoi_muc_tieu(doc, pt, hd, them_dong=None):
         (f"Sản phẩm học tập: {hd['san_pham']}", "n"),
         (f"Tiêu chí đánh giá: {hd['danh_gia']}", "n"),
         (f"({NHAN_AI} Không nhận diện được phần TIẾN TRÌNH BÀI DẠY nên hoạt động được đặt ngay "
-         f"sau MỤC TIÊU — giáo viên vui lòng chuyển vào đúng vị trí.)", "ghichu"),
+         f"sau phần “{pt['muc_tieu'].get('nhan') or 'MỤC TIÊU'}” — "
+         f"giáo viên vui lòng chuyển vào đúng vị trí.)", "ghichu"),
     ]
     for text, loai in reversed(dong):
         p = doan_mau(doc, neo, text, do=True, in_dam=(loai == "tieude"))
@@ -754,9 +811,11 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
     # 2. đã chèn vào đúng chỗ chưa
     if ket_qua.get("muc_tieu", {}).get("da_chen"):
         dat.append("Đã chèn mục “Tích hợp năng lực số” ở %s."
-                   % ket_qua["muc_tieu"].get("diem_chèn", "trong phần MỤC TIÊU"))
+                   % ket_qua["muc_tieu"].get("diem_chèn", "trong phần mục tiêu"))
     else:
-        loi.append("Chưa chèn được mục năng lực số vào phần MỤC TIÊU."); cung.append(loi[-1])
+        _ten_muc = (pt.get("muc_tieu") or {}).get("nhan") or "mục tiêu"
+        loi.append(f"Chưa chèn được mục năng lực số vào phần “{_ten_muc}” ({ket_qua['muc_tieu'].get('ly_do', '')}).")
+        cung.append(loi[-1])
     if ket_qua.get("hoat_dong", {}).get("da_chen"):
         dat.append(f"Đã chèn hoạt động: {ket_qua['hoat_dong'].get('diem_chèn', '')}")
         if ket_qua["hoat_dong"].get("kieu") == "du_phong":
@@ -853,10 +912,33 @@ def trang_thai_mau_goc(doc):
     return ra
 
 
+def _cac_doan_moi(doc):
+    """Mọi đoạn văn cần soi màu: đoạn thân bài VÀ đoạn trong ô bảng.
+
+    Không được chỉ soi doc.paragraphs: hoạt động mới được chèn vào BẢNG tiến trình,
+    nếu bỏ qua bảng thì hệ thống tưởng "không có nội dung mới nào được tô đỏ"
+    và chặn xuất file oan (đã gặp với giáo án tiểu học thật).
+    """
+    ds = list(doc.paragraphs)
+    for t in doc.tables:
+        for row in t.rows:
+            for o in row.cells:
+                ds.extend(o.paragraphs)
+    # chữ trong hộp văn bản (textbox) — một số giáo án dùng mẫu có khung
+    try:
+        from docx.text.paragraph import Paragraph
+        for box in doc.element.body.iter(qn("w:txbxContent")):
+            for pel in box.iter(qn("w:p")):
+                ds.append(Paragraph(pel, doc))
+    except Exception:  # noqa: BLE001
+        pass
+    return ds
+
+
 def _dem_mau(doc):
-    """Đếm số đoạn có chữ đỏ và tổng số đoạn."""
+    """Đếm số đoạn có chữ đỏ và tổng số đoạn — tính cả chữ trong bảng."""
     do_moi = tong = 0
-    for p in doc.paragraphs:
+    for p in _cac_doan_moi(doc):
         co = False
         for r in p.runs:
             try:
@@ -900,6 +982,12 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
         bao_cao["buoc"].append(f"Đã xoá {da_xoa} đoạn của mục năng lực số do lần chạy trước "
                                "để tránh trùng nội dung.")
         pt = phan_tich_an_toan(doc)      # phân tích lại vì tài liệu đã đổi
+        # PHẢI điền lại lớp/môn giáo viên đã chọn: nhiều giáo án thật không ghi “Lớp:” trong
+        # văn bản, phân tích lại sẽ xoá mất lớp và hệ thống không chọn được tiêu chí nào.
+        if lop_ghi_de:
+            pt["lop"] = lop_ghi_de
+        if mon_ghi_de:
+            pt["mon"] = mon_ghi_de
 
     ten_bai = lay_ten_bai(doc)
     chon, canh_bao = chon_tieu_chi(doc, pt, thiet_bi=thiet_bi, toi_da=toi_da,
@@ -916,6 +1004,9 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
     if not chon:
         bao_cao["thong_diep"] = ("Chưa chọn được tiêu chí nào. Cần bổ sung thông tin: "
                                  "lớp, môn, tên bài và nội dung chính của bài.")
+        bao_cao["kiem_tra"] = {
+            "xuat_duoc": False, "dat": [], "loi": list(canh_bao) or [bao_cao["thong_diep"]],
+            "loi_cung": ["Chưa chọn được tiêu chí năng lực số nên chưa có nội dung để chèn."]}
         return doc, bao_cao
 
     kq_mt = chen_muc_tieu(doc, pt, chon, ten_bai=ten_bai, mon=pt["mon"])

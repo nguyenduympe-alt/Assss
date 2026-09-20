@@ -62,8 +62,15 @@ def doc_word(data):
 
 
 # --------------------------------------------------- nhận diện tiêu đề mục
-RE_MUC_TIEU = re.compile(r"^(?:phan\s+)?(?:[ivx]+|\d+|[a-z])?\s*[.)]?\s*muc\s*tieu", re.I)
-RE_MUC_TIEU_2 = re.compile(r"muc\s*tieu\s*(?:bai|day|cua\s*bai)", re.I)
+# Tên mục "phần mục tiêu" rất khác nhau giữa các bộ sách và cấp học:
+#   - "I. MỤC TIÊU" (THCS/THPT, Công văn 5512)
+#   - "I. YÊU CẦU CẦN ĐẠT" (tiểu học theo Chương trình GDPT 2018)
+#   - "MỤC TIÊU BÀI HỌC", "I. MỤC ĐÍCH YÊU CẦU" (bản cũ)
+# Nhận diện đủ các cách gọi này, nếu không giáo án thật sẽ bị báo thiếu mục.
+_TEN_MUC_MUC_TIEU = (r"(?:muc\s*tieu|yeu\s*cau\s*can\s*dat|muc\s*dich\s*yeu\s*cau|"
+                     r"ket\s*qua\s*can\s*dat)")
+RE_MUC_TIEU = re.compile(r"^(?:phan\s+)?(?:[ivx]+|\d+|[a-z])?\s*[.)]?\s*" + _TEN_MUC_MUC_TIEU, re.I)
+RE_MUC_TIEU_2 = re.compile(r"(?:" + _TEN_MUC_MUC_TIEU + r"|muc\s*tieu)\s*(?:bai|day|cua\s*bai|mon)", re.I)
 
 
 def _la_tieu_de_muc_tieu(t):
@@ -122,7 +129,12 @@ def _muc_con_trong(paras, tu, den):
 
 
 def _dau_bang(ten, *cums):
-    t = " ".join(ten.split())
+    """Tên mục có khớp một trong các cách gọi không.
+
+    Giáo án thật hay viết kèm dấu câu: "2. Năng lực." hoặc "2. Năng lực:" —
+    phải bỏ dấu ở cuối trước khi so, nếu không sẽ bỏ sót mục Năng lực.
+    """
+    t = " ".join(ten.split()).rstrip(".:;,·-–— ").strip()
     return any(t == c or t.startswith(c + ":") or t.startswith(c + " ") for c in cums)
 
 
@@ -176,7 +188,10 @@ def _la_tieu_de_khac(t):
         r"(thiet\s*bi|do\s*dung|tien\s*trinh|hoat\s*dong|to\s*chuc|tien\s*trinh\s*day\s*hoc|"
         r"noi\s*dung\s*bai|chuan\s*bi|phuong\s*phap|hinh\s*thuc|dan\s*y|"
         r"ket\s*thuc|cung\s*co|dan\s*do|tong\s*ket|ru\s*kinh\s*nghiem|ghi\s*chu|"
-        r"tai\s*lieu|hoc\s*lieu|muc\s*tieu\s*day\s*hoc)", n))
+        r"tai\s*lieu|hoc\s*lieu|muc\s*tieu\s*day\s*hoc|"
+        # bổ sung theo giáo án thật: tiểu học thường có các mục này ngay sau phần mục tiêu
+        r"phuong\s*tien|cac\s*hoat\s*dong|hoat\s*dong\s*day|day\s*-?\s*hoc|"
+        r"do\s*dung\s*day|thoi\s*gian|phan\s*bo|ke\s*hoach\s*day)", n))
 
 
 def _so_ke_tiep(kieu, da_co):
@@ -207,7 +222,8 @@ _RE_MON = re.compile(r"\bmon\s*(?:hoc)?\s*[:\-]\s*(.{2,60}?)(?=\s*(?:lop|tuan|ti
 _RE_LOP = re.compile(r"\blop\s*[:\-]?\s*(\d{1,2})\b", re.I)
 _RE_TIET = re.compile(r"\b(?:thoi\s*luong|so\s*tiet|tiet)\s*[:\-]?\s*(\d{1,3})\b", re.I)
 _RE_TUAN = re.compile(r"\btuan\s*[:\-]?\s*(\d{1,2})\b", re.I)
-_RE_PHUT = re.compile(r"(\d{1,3})\s*(?:phút|phut)")
+# Giáo án thật ghi thời lượng rất nhiều kiểu: "5 phút", "(5’)", "5'", "5 ph". 
+_RE_PHUT = re.compile(r"(\d{1,3})\s*(?:phút|phut|ph\b|['’′])")
 _RE_HD = re.compile(r"^\s*(?:hoạt\s*động|hoat\s*dong)\s*(\d+)?\s*[:\-]?\s*(.*)$", re.I)
 RE_NLD = re.compile(r"tich\s*hop\s*nang\s*luc\s*so", re.I)
 
@@ -249,6 +265,7 @@ def phan_tich(doc):
                     cuoi = j
                     break
             ra["muc_tieu"] = {"co": True, "vi_tri": i, "kieu_so": tt["kieu_so"],
+                              "nhan": tt["tieu_de"][:60],
                               "tieu_de": tt["tieu_de"], "ket_thuc": cuoi,
                               "cac_muc_con": _danh_so_muc_con(doc, i, cuoi),
                               "nang_luc": tim_muc_nang_luc(paras, i + 1, cuoi),
@@ -290,9 +307,21 @@ def phan_tich(doc):
                 cot["hs"] = ci
             elif ("hoat dong" in h or "ten hoat dong" in h or "noi dung" in h) and ci == 0:
                 cot.setdefault("hoat_dong", ci)
-        # bảng 4 cột thường là: Hoạt động | GV | HS | Thời gian
+            elif re.search(r"ho tro|hskt|khuyet tat|tang cuong|ghi chu", h):
+                cot.setdefault("ho_tro", []).append(ci)
+        # Bảng 4 cột thường là: Hoạt động | GV | HS | Thời gian.
+        # Nhưng KHÔNG được gán bừa cột còn thừa thành "hoạt động": giáo án thật có bảng
+        # "Hoạt động của GV | Hoạt động của HS | Hỗ trợ HSKT" — cột 3 là hỗ trợ học sinh
+        # khuyết tật, gán thành cột hoạt động sẽ làm tên hoạt động rơi vào ô sai.
         if "hoat_dong" not in cot and cot:
-            cot["hoat_dong"] = min(set(range(len(tieu_de))) - set(cot.values()))
+            da_dung = {ci for k, v in cot.items()
+                       if k != "ho_tro" and isinstance(v, int)}
+            da_dung |= set(cot.get("ho_tro") or [])
+            con_lai = sorted(set(range(len(tieu_de))) - da_dung)
+            if len(con_lai) == 1:
+                h = tieu_de[con_lai[0]]
+                if not re.search(r"ho tro|hskt|khuyet tat|tang cuong|ghi chu|thiet bi|phuong tien", h):
+                    cot["hoat_dong"] = con_lai[0]
         if len(cot) >= 2:
             ra["tien_trinh"] = {"kieu": "bang", "vi_tri": ti, "cot": cot,
                                 "so_hoat_dong": max(0, len(t.rows) - 1), "hoat_dong": hd}
@@ -312,6 +341,16 @@ def phan_tich(doc):
             nguon = ["bảng tiến trình"]
             for r in doc.tables[ra["tien_trinh"]["vi_tri"]].rows[1:]:
                 tong += _phut_trong(gon(r.cells[ci].text)) if ci < len(r.cells) else 0
+        else:
+            # Bảng không có cột "Thời gian": nhiều giáo án (nhất là tiểu học) ghi thời lượng
+            # ngay trong ô đầu của mỗi hoạt động, ví dụ "1. KHỞI ĐỘNG (5’)".
+            tong, nguon = 0, ["bảng tiến trình (trong tên hoạt động)"]
+            for r in doc.tables[ra["tien_trinh"]["vi_tri"]].rows[1:]:
+                o_dau = gon(r.cells[0].text) if r.cells else ""
+                # Chỉ cộng hoạt động lớn ("2. HÌNH THÀNH KIẾN THỨC (16’)"); bỏ mục con
+                # ("2.1. Thông tin và quyết định (8’)") vì thời lượng đã nằm trong hoạt động lớn.
+                if re.match(r"^\s*\d+\.\s*(?!\d)\S", o_dau) or "hoat dong" in khong_dau(o_dau)[:14]:
+                    tong += _phut_trong(o_dau)
     ra["thoi_luong"] = {"tong_phut": tong, "nguon": nguon}
 
     if ra["tien_trinh"]["kieu"] == "khong":
