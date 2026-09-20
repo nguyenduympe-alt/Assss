@@ -20,7 +20,15 @@ body{margin:0;min-height:100vh;display:flex;font-family:"Inter",system-ui,"Segoe
 .fe{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;max-width:430px}
 .fe i{font-style:normal;width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;
  background:rgba(255,255,255,.09);font-size:17px}
-.fe b{display:block;font-size:14px;margin-bottom:2px}
+.fe b{display:block;font-size:14px;margin-bottom:2px;display:flex;align-items:center;gap:7px}
+.fe .moi{font-size:9.5px;font-weight:800;letter-spacing:.05em;background:linear-gradient(135deg,#f59e0b,#f97316);
+ color:#fff;padding:2px 7px;border-radius:999px}
+.fe.hot i{background:linear-gradient(135deg,rgba(245,158,11,.35),rgba(20,184,166,.28));
+ box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}
+.left .tinchay{display:flex;align-items:center;gap:8px;margin-top:20px;padding:10px 14px;max-width:430px;
+ border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+ color:#c9e7de;font-size:12.2px;line-height:1.5}
+.left .tinchay b{color:#fff}
 .fe span{color:#8aa8a1;font-size:12.5px;line-height:1.5}
 .right{width:470px;flex:0 0 470px;display:flex;align-items:center;justify-content:center;padding:32px}
 .box{width:100%;max-width:370px}
@@ -51,10 +59,27 @@ button:hover{filter:brightness(1.07);transform:translateY(-1px)}
 <div class="left">
  <div class="lg"><span class="mk">🎓</span>EduAssist</div>
  <h2>Trợ lý số cho<br>giáo viên hiện đại</h2>
- <p>Quản lý phân phối chương trình, thời khoá biểu, xuất lịch báo giảng chuẩn mẫu và nhận xét học sinh tự động bằng AI.</p>
- <div class="fe"><i>🖨️</i><div><b>Lịch báo giảng tự động</b><span>Ghép TKB × PPCT, xuất PDF A4 đúng biểu mẫu nhà trường</span></div></div>
- <div class="fe"><i>🤖</i><div><b>Nhận xét học sinh bằng AI</b><span>Từ điểm số hoặc CHT / HT / HTT, sinh nhận xét cá nhân hoá</span></div></div>
- <div class="fe"><i>📊</i><div><b>Dashboard thống kê</b><span>Phổ điểm, tỉ lệ hoàn thành, chất lượng theo từng lớp</span></div></div>
+ <p>Tải giáo án lên là có bản tích hợp năng lực số, kiểm tra chính tả, xuất lịch báo giảng và nhận xét học sinh —
+ tất cả trên một trang, dùng được cho <b style="color:#fff">lớp 1 đến lớp 12</b>.</p>
+ <div class="fe hot"><i>📝</i><div><b>Giáo án &amp; năng lực số <span class="moi">MỚI</span></b>
+  <span>Tải file Word → hệ thống thêm mục “Tích hợp năng lực số” đúng vị trí, giữ nguyên bố cục gốc,
+  phần máy viết được tô đỏ, giáo viên duyệt rồi tải bản .docx</span></div></div>
+ <div class="fe hot"><i>🧠</i><div><b>Trợ lý tự học từ chính giáo viên <span class="moi">MỚI</span></b>
+  <span>Mỗi lần thầy/cô duyệt hoặc bỏ qua một đề xuất, hệ thống ghi lại một quyết định (không lưu cả bài giảng)
+  và học ngay: từ bị bắt oan sẽ thôi bị bắt, cặp sửa được duyệt sẽ được nhắc lại</span></div></div>
+ <div class="fe hot"><i>🔤</i><div><b>Kiểm tra chính tả có duyệt <span class="moi">MỚI</span></b>
+  <span>Dò cả chữ trong bảng biểu, nêu lý do và nguồn của từng đề xuất; không đụng tới câu đúng,
+  thuật ngữ, tên riêng, công thức</span></div></div>
+ <div class="fe"><i>🧩</i><div><b>Kho năng lực số &amp; STEM</b>
+  <span>137 chỉ báo đã đối chiếu văn bản của Bộ, tra theo khối lớp: CB1 · CB2 · TC1 · TC2 · NC1</span></div></div>
+ <div class="fe"><i>🖨️</i><div><b>Lịch báo giảng tự động</b>
+  <span>Ghép TKB × PPCT, xuất PDF A4 đúng biểu mẫu nhà trường chỉ trong vài giây</span></div></div>
+ <div class="fe"><i>🤖</i><div><b>Nhận xét học sinh bằng AI</b>
+  <span>Từ điểm số hoặc CHT / HT / HTT, sinh nhận xét cá nhân hoá và xuất Excel cả lớp</span></div></div>
+ <div class="fe"><i>📊</i><div><b>Bảng điều khiển &amp; thống kê</b>
+  <span>Phổ điểm, tỉ lệ hoàn thành, chất lượng theo từng lớp, tiến độ phân phối chương trình</span></div></div>
+ <div class="tinchay"><span style="font-size:16px">🔒</span><div><b>Không gửi bài của thầy/cô ra ngoài.</b>
+  Toàn bộ xử lý chạy trên máy chủ của trường — không đưa nội dung giáo án lên Gemini hay bất kỳ dịch vụ AI bên ngoài.</div></div>
 </div>
 <div class="right"><form class="box" method="post">
 <input type="hidden" name="csrf_token" value="{{csrf_token()}}">

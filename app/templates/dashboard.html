@@ -15,6 +15,10 @@
     </div>
   </div>
   <div class="row" style="gap:9px">
+    {% if 'giao_an_nls.index' in cong_cu|map(attribute='endpoint')|list %}
+    <a class="btn" style="background:#fff;color:#047857;box-shadow:0 8px 22px -12px rgba(0,0,0,.5)"
+       href="{{url_for('giao_an_nls.index')}}">📝 Soạn giáo án năng lực số</a>
+    {% endif %}
     <a class="btn sec" href="{{url_for('core.bao_giang')}}">🖨️ Xuất lịch báo giảng</a>
     <a class="btn" style="background:rgba(255,255,255,.2);box-shadow:none" href="{{url_for('core.nhan_xet')}}">✨ Nhận xét AI</a>
   </div>
@@ -30,6 +34,157 @@
   <div class="kpi" style="--c:#f59e0b"><div class="ic">🗓️</div><b>{{stats.tkb}}</b><span>Tiết dạy mỗi tuần</span>
     <span class="tag">{{hom_nay|length}} hôm nay</span></div>
 </div>
+
+
+<!-- ============ TÍNH NĂNG MỚI ============ -->
+<div class="chead" style="margin:22px 0 12px">
+  <div><h3 style="font-size:17px;margin:0">Có gì mới trên EduAssist</h3>
+   <p class="sub" style="margin:3px 0 0">Ba tính năng vừa được đưa vào bản chạy chính thức</p></div>
+</div>
+<div class="g3" style="margin-bottom:22px">
+  {% if 'giao_an_nls.index' in cong_cu|map(attribute='endpoint')|list %}
+  <div class="card" style="margin:0;border-left:4px solid #0d9488">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:26px">📝</span>
+      <b style="font-size:15.5px;flex:1">Giáo án &amp; năng lực số</b>
+      <span class="chip" style="background:#ccfbf1;color:#0f766e">MỚI</span>
+    </div>
+    <p class="sub" style="margin:0 0 10px">Tải giáo án Word lên: hệ thống giữ nguyên bố cục, bảng biểu, hình ảnh;
+    thêm mục <b>“Tích hợp năng lực số”</b> cuối phần MỤC TIÊU và hoạt động vào <b>đúng vị trí</b> trong tiến trình
+    bài dạy. Phần do máy viết được <b style="color:#dc2626">tô đỏ</b> để phân biệt với nội dung gốc của thầy/cô.</p>
+    <div class="row" style="gap:6px;margin-bottom:11px">
+      <span class="chip">Lớp 1–12</span><span class="chip">CB1 · TC1 · NC1</span><span class="chip">Tải bản .docx</span></div>
+    <a class="btn sm" href="{{url_for('giao_an_nls.index')}}">Dùng ngay →</a>
+  </div>
+  {% endif %}
+
+  <div class="card" style="margin:0;border-left:4px solid #7c3aed">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:26px">🧠</span>
+      <b style="font-size:15.5px;flex:1">Trợ lý tự học từ chính thầy/cô</b>
+      <span class="chip" style="background:#ede9fe;color:#6d28d9">MỚI</span>
+    </div>
+    <p class="sub" style="margin:0 0 10px">Mỗi lần thầy/cô duyệt hoặc bỏ qua một đề xuất, hệ thống ghi lại
+    <b>một quyết định</b> (chỉ ghi từ và 1 từ mỗi bên làm ngữ cảnh — <b>không lưu cả bài giảng</b>) rồi học ngay:
+    bấm <b>“từ này đúng”</b> thì thôi bắt oan từ đó; cặp “từ sai → từ đúng” được duyệt 2 lần thành <b>“sửa chắc”</b>.
+    Định kỳ hệ thống huấn luyện lại mô hình và <b>chỉ công bố khi chất lượng tốt hơn</b>.</p>
+    <div class="row" style="gap:6px;margin-bottom:11px">
+      <span class="chip">Mô hình {{ ai.mo_hinh.phien_ban or '1.1' }}</span>
+      {% if ai.hoc %}<span class="chip">{{ ai.hoc.so_phan_hoi }} quyết định đã ghi</span>
+      <span class="chip">{{ ai.hoc.so_tu_dung + ai.hoc.so_cap_sua }} điều đã học</span>{% endif %}
+    </div>
+    <a class="btn sec sm" href="#tro-ly-ai">Xem trợ lý học được gì →</a>
+  </div>
+
+  <div class="card" style="margin:0;border-left:4px solid #06b6d4">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:26px">🔤</span>
+      <b style="font-size:15.5px;flex:1">Kiểm tra chính tả có duyệt</b>
+      <span class="chip" style="background:#cffafe;color:#0e7490">NÂNG CẤP</span>
+    </div>
+    <p class="sub" style="margin:0 0 10px">Mỗi đề xuất đều nêu <b>lý do</b> và <b>nguồn</b> (bộ luật, mô hình, hay
+    đã được giáo viên duyệt trước đây). Nay hệ thống dò cả <b>chữ trong bảng biểu</b> của giáo án, và
+    <b>không đụng</b> tới câu đúng, thuật ngữ, tên riêng, công thức, mã chỉ báo.</p>
+    <div class="row" style="gap:6px;margin-bottom:11px">
+      {% if ai.mo_hinh.chi_so %}<span class="chip">Bắt được {{ '%.0f'|format(ai.mo_hinh.chi_so.recall*100) }}% lỗi</span>
+      <span class="chip">Báo nhầm {{ ai.mo_hinh.chi_so.bao_dong_nham_tren_tu_dung }}/{{ ai.mo_hinh.chi_so.tu_dung }} từ đúng</span>{% endif %}
+      <span class="chip">Có duyệt trước khi sửa</span>
+    </div>
+    <a class="btn sec sm" href="{{url_for('core.chinh_ta')}}">Kiểm tra chính tả →</a>
+  </div>
+</div>
+
+<!-- ============ CÔNG CỤ ============ -->
+<div class="card">
+  <div class="chead"><div><h3>Công cụ của thầy/cô</h3>
+    <p class="sub" style="margin:2px 0 0">Tất cả tính năng của EduAssist — bấm vào để dùng</p></div>
+    <span class="chip">{{ cong_cu|length }} công cụ</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+    {% for t in cong_cu %}
+    <a href="{{url_for(t.endpoint)}}" style="border:1px solid var(--line);border-radius:14px;padding:13px 15px;
+      background:linear-gradient(135deg,#fbfefd,#fff);display:flex;flex-direction:column;gap:7px;transition:.16s">
+      <div style="display:flex;align-items:center;gap:9px">
+        <span style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:17px;
+          background:color-mix(in srgb,{{t.mau}} 13%,#fff);color:{{t.mau}};flex:0 0 34px">{{t.icon}}</span>
+        <b style="flex:1;font-size:14px">{{t.ten}}</b>
+        {% if t.moi %}<span class="chip" style="background:#ccfbf1;color:#0f766e;font-size:10.5px">MỚI</span>{% endif %}
+      </div>
+      {% if t.mo_ta %}<span class="muted" style="font-size:12.3px;line-height:1.45">{{t.mo_ta}}</span>{% endif %}
+      {% if t.the %}<span class="row" style="gap:5px">{% for c in t.the %}<span class="chip"
+        style="font-size:10.5px;background:#f1f5f9;color:#475569">{{c}}</span>{% endfor %}</span>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ============ TRỢ LÝ AI ĐANG HỌC ============ -->
+{% if ai %}
+<div class="card" id="tro-ly-ai" style="border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf8ff,#fff)">
+  <div class="chead">
+    <div><h3>🧠 Trợ lý AI của trường đang tự học</h3>
+      <p class="sub" style="margin:2px 0 0">Học từ chính quyết định của giáo viên trong trường, không gửi dữ liệu đi đâu</p></div>
+    <span class="chip" style="background:{{'#d1fae5' if ai.hoc and ai.hoc.bat else '#fee2e2'}};
+      color:{{'#047857' if ai.hoc and ai.hoc.bat else '#b91c1c'}}">
+      {{ 'Đang học' if ai.hoc and ai.hoc.bat else 'Đang tắt việc học' }}</span>
+  </div>
+
+  <div class="kpis" style="margin-bottom:14px">
+    <div class="kpi" style="--c:#7c3aed"><div class="ic">🏷️</div><b>{{ ai.mo_hinh.phien_ban or '—' }}</b>
+      <span>Phiên bản mô hình chính tả</span>
+      <span class="tag">{{ ai.mo_hinh.so_trong_so }} trọng số</span></div>
+    <div class="kpi" style="--c:#0d9488"><div class="ic">🎯</div>
+      <b>{% if ai.mo_hinh.chi_so %}{{ '%.0f'|format(ai.mo_hinh.chi_so.recall*100) }}%{% else %}—{% endif %}</b>
+      <span>Bắt được lỗi chính tả</span>
+      <span class="tag">tập kiểm tra giữ riêng</span></div>
+    <div class="kpi" style="--c:#f59e0b"><div class="ic">📥</div>
+      <b>{{ ai.hoc.so_phan_hoi if ai.hoc else 0 }}</b><span>Quyết định giáo viên đã ghi</span>
+      <span class="tag">{{ ai.hoc.so_nhan if ai.hoc else 0 }} duyệt</span></div>
+    <div class="kpi" style="--c:#10b981"><div class="ic">🎓</div>
+      <b>{{ (ai.hoc.so_tu_dung + ai.hoc.so_cap_sua) if ai.hoc else 0 }}</b>
+      <span>Điều học được từ thầy/cô</span>
+      <span class="tag">{{ ai.hoc.so_cap_sua if ai.hoc else 0 }} cặp sửa</span></div>
+  </div>
+
+  {% if ai.hoc %}
+  <div class="g2" style="gap:14px">
+    <div>
+      <p style="margin:0 0 8px">Hệ thống học ngay, không cần khởi động lại máy chủ:</p>
+      <ul style="margin:0 0 10px;padding-left:18px;line-height:1.75">
+        <li>Bấm nút <b>“từ này đúng”</b> khi máy bắt oan → <b>thôi bắt oan</b> từ đó ngay lần sau.
+            Đã học <b>{{ ai.hoc.so_tu_dung }}</b> từ như vậy.</li>
+        <li>Cặp “từ sai → từ đúng” được duyệt <b>{{ ai.hoc.nguong_nhan }}</b> lần → thành “sửa chắc”,
+            <b>tích sẵn</b> cho thầy/cô. Đã học <b>{{ ai.hoc.so_cap_sua }}</b> cặp sửa.</li>
+        <li>Một từ bị bỏ qua <b>{{ ai.hoc.nguong_bo }}</b> lần (không tích) cũng được coi là từ đúng —
+            tín hiệu ngầm nên cần nhiều lần hơn tín hiệu rõ ràng.</li>
+      </ul>
+      <p class="muted" style="font-size:12.5px;margin:0">
+        {% if ai.hoc.cap_nhat %}Cập nhật kiến thức lần cuối: {{ ai.hoc.cap_nhat }}. {% endif %}
+        Chỉ ghi <b>từ</b> và 1 từ mỗi bên làm ngữ cảnh; <b>không lưu cả bài giảng</b>, dữ liệu nằm trên máy chủ
+        của trường. Thầy/cô tắt được việc học bất cứ lúc nào.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;justify-content:center">
+      <div style="border:1px dashed var(--line);border-radius:12px;padding:13px 15px;background:#fff">
+        <b style="font-size:13.5px">Nói thẳng về giới hạn</b>
+        <p class="muted" style="font-size:12.3px;margin:6px 0 0;line-height:1.5">
+          Đây <b>không phải mô hình ngôn ngữ lớn</b>: mô hình không đọc hiểu bài giảng, chỉ chấm điểm từng từ
+          để gợi ý chỗ sai. Mọi đề xuất đều ở mức <b>gợi ý</b> — giáo viên duyệt trước khi sửa.</p>
+      </div>
+      {% if ai.co_toggle %}
+      <form method="post" action="{{url_for('giao_an_nls.bat_tat_hoc')}}"
+            onsubmit="return confirm('{{'Tắt' if ai.hoc.bat else 'Bật'}} việc học từ quyết định của giáo viên?')">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <input type="hidden" name="next" value="/">
+        <button class="{{'sec' if ai.hoc.bat else ''}}" style="width:100%">
+          {{ 'Tắt việc học' if ai.hoc.bat else 'Bật việc học' }}</button>
+      </form>
+      {% endif %}
+      <a class="btn sec sm" href="{{url_for('giao_an_nls.index') if 'giao_an_nls.index' in cong_cu|map(attribute='endpoint')|list else url_for('core.chinh_ta')}}"
+         style="justify-content:center">Xem chi tiết việc học →</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
 
 <div class="g2">
   <!-- Pho diem -->

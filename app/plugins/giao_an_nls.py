@@ -39,6 +39,11 @@ def bat_tat_hoc():
     """Bật/tắt việc ghi phản hồi để học. Mặc định bật; dữ liệu chỉ nằm trên máy chủ này."""
     HOC.dat_bat(not HOC.bat())
     flash('Đã %s việc học từ quyết định của giáo viên.' % ('BẬT' if HOC.bat() else 'TẮT'), 'ok')
+    # Cho phép quay lại đúng trang đã bấm (trang chủ cũng có nút này). Chỉ nhận đường dẫn
+    # nội bộ, không nhận địa chỉ ngoài để tránh bị lợi dụng làm trang chuyển hướng giả.
+    quay_lai = (request.form.get('next') or '').strip()
+    if quay_lai.startswith('/') and not quay_lai.startswith('//'):
+        return redirect(quay_lai)
     return redirect(url_for('giao_an_nls.index'))
 
 

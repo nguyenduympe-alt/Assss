@@ -19,6 +19,72 @@ from .modules import config as CFG
 
 bp = Blueprint("core", __name__)
 
+def _cong_cu():
+    """Danh sách công cụ hiển thị ở mục “Công cụ” trên trang chủ.
+
+    Chỉ hiện công cụ nào thật sự có endpoint — plugin có thể không được cài, khi đó
+    trang chủ vẫn chạy bình thường chứ không lỗi.
+    """
+    ds = [
+        {"icon": "📝", "ten": "Giáo án & năng lực số", "endpoint": "giao_an_nls.index", "mau": "#0d9488",
+         "mo_ta": "Tải giáo án Word → chèn mục “Tích hợp năng lực số” vào đúng vị trí, "
+                  "giữ nguyên định dạng gốc, duyệt rồi tải bản .docx",
+         "the": ["Lớp 1–12", "Phần máy tạo tô đỏ"], "moi": True},
+        {"icon": "🤖", "ten": "Nhận xét AI", "endpoint": "core.nhan_xet", "mau": "#059669",
+         "mo_ta": "Sinh nhận xét học sinh theo mẫu của Bộ, xuất file Excel cho cả lớp",
+         "the": ["Thông tư 27/2020"], "moi": False},
+        {"icon": "🔤", "ten": "Kiểm tra chính tả có duyệt", "endpoint": "core.chinh_ta", "mau": "#06b6d4",
+         "mo_ta": "Dò lỗi bằng mô hình nhỏ + bộ luật, nêu lý do và bản sửa để thầy/cô duyệt từng chỗ",
+         "the": ["Dò cả trong bảng biểu"], "moi": True},
+        {"icon": "🧩", "ten": "Năng lực số & STEM", "endpoint": "digital.index", "mau": "#8b5cf6",
+         "mo_ta": "Kho chỉ báo năng lực số đã kiểm chứng theo văn bản Bộ; gợi ý bài học STEM",
+         "the": ["137 chỉ báo"], "moi": False},
+        {"icon": "🖨️", "ten": "Lịch báo giảng", "endpoint": "core.bao_giang", "mau": "#f59e0b",
+         "mo_ta": "Xuất lịch báo giảng cả năm ra PDF hoặc Word chỉ trong vài giây",
+         "the": ["35 tuần"], "moi": False},
+        {"icon": "📘", "ten": "Phân phối chương trình", "endpoint": "core.ppct", "mau": "#0ea5e9",
+         "mo_ta": "Nhập và quản lý phân phối chương trình theo tuần, theo bài",
+         "the": [], "moi": False},
+        {"icon": "🗓️", "ten": "Thời khoá biểu", "endpoint": "core.tkb", "mau": "#6366f1",
+         "mo_ta": "Xếp thời khoá biểu theo buổi, tiết, phòng học",
+         "the": [], "moi": False},
+        {"icon": "🎋", "ten": "Lịch nghỉ", "endpoint": "core.lich_nghi", "mau": "#ec4899",
+         "mo_ta": "Ngày nghỉ, ngày lễ để tính đúng số tuần thực dạy",
+         "the": [], "moi": False},
+    ]
+    from flask import current_app
+    co = set(current_app.view_functions)
+    for m in (current_app.jinja_env.globals.get("PLUGIN_MENUS") or []):
+        ep = m.get("endpoint")
+        if ep and ep not in {x["endpoint"] for x in ds}:
+            ds.append({"icon": m.get("icon") or "🧩", "ten": m.get("label") or "Tính năng",
+                       "endpoint": ep, "mau": "#64748b", "mo_ta": "", "the": [], "moi": False})
+    return [x for x in ds if x["endpoint"] in co]
+
+
+def _trang_thai_ai():
+    """Trạng thái trợ lý AI: mô hình đang chạy + việc học từ quyết định của giáo viên.
+
+    Bọc kỹ trong try/except: thiếu tệp mô hình hay thiếu bảng cũng không được làm
+    trang chủ lỗi — khi đó trả về None và giao diện tự ẩn phần này.
+    """
+    out = {}
+    try:
+        from .modules import ml_noi_bo as ML
+        out["mo_hinh"] = ML.thong_tin()
+    except Exception:
+        out["mo_hinh"] = {}
+    try:
+        from .modules import hoc_tu_nguoi_dung as HOC
+        out["hoc"] = HOC.thong_ke()
+    except Exception:
+        out["hoc"] = None
+    from flask import current_app
+    out["co_toggle"] = "giao_an_nls.bat_tat_hoc" in current_app.view_functions
+    return out if (out["mo_hinh"] or out["hoc"]) else None
+
+
+
 
 @bp.app_context_processor
 def inject():
@@ -140,6 +206,7 @@ def dashboard():
     lmax = max(list(load.values()) or [1])
     recent = db.execute("SELECT * FROM danhgia WHERE teacher_id=? ORDER BY id DESC LIMIT 6", (uid,)).fetchall()
     return render_template("dashboard.html", stats=stats, recent=recent, donut=donut, tong=sum(dist.values()),
+                           cong_cu=_cong_cu(), ai=_trang_thai_ai(),
                            hist=hist, avg=avg, per_lop=per_lop, spark=spark, pts=pts, smax=smax,
                            hom_nay=hom_nay, load=load, lmax=lmax, today=today, thu=thu, dist=dist)
 
