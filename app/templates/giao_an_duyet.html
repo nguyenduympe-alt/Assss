@@ -18,8 +18,13 @@
  <p>Tên bài: <b>{{ctx.ten_bai or 'chưa nhận diện được'}}</b></p>
  {% if ctx.pt_canh_bao %}<ul style="color:#a16207">{% for c in ctx.pt_canh_bao %}<li>{{c}}</li>{% endfor %}</ul>{% endif %}
  <p class="muted">Bản gốc được giữ nguyên; kết quả tải về là một BẢN SAO .docx.</p>
- <p class="muted">Công cụ này chỉ làm phần <b>tích hợp năng lực số</b>. Nếu thầy/cô cũng muốn dò chính tả,
+ <p class="muted">Công cụ này làm hai phần: <b>tích hợp năng lực số</b> (Thông tư 02/2025/TT-BGDĐT) và
+  <b>tích hợp giáo dục trí tuệ nhân tạo (AI)</b> (Quyết định 2422/QĐ-BGDĐT). Nếu thầy/cô cũng muốn dò chính tả,
   hãy dùng công cụ riêng <a href="{{url_for('chinh_ta.index')}}">Kiểm tra chính tả</a> — chỉ chạy khi thầy/cô cần.</p>
+ <p class="muted">Trong file Word tải về: nội dung <b style="color:#c00">tích hợp năng lực số tô ĐỎ</b>,
+  nội dung <b style="color:#00f">tích hợp giáo dục AI tô XANH DƯƠNG</b> — thầy/cô nhìn màu là biết phần nào
+  do hệ thống thêm vào. Phần chèn vào file chỉ gồm mã/mạch, mục tiêu, minh chứng và hoạt động —
+  <b>không</b> kèm khối trích dẫn quy định hay phần đề xuất dài dòng.</p>
 </div>
 
 <form method="post" action="{{url_for('giao_an_nls.xuat', token=token)}}">
@@ -46,12 +51,12 @@
       {% if x.can_duyet %}bài học chưa nêu hoạt động số nào, hệ thống KHÔNG tự gán — chỉ tích nếu thầy/cô thật sự tổ chức hoạt động này{% else %}khớp với từ khoá “{{x.tu_khoa_khop}}”{% endif %}</span></span>
    </label>
    <div style="margin:10px 0 6px;padding:10px 12px;background:#f6f9f8;border-radius:10px">
-    <b>[QUY ĐỊNH]</b> Nguyên văn văn bản của Bộ — hệ thống không sửa phần này:<br>
+    <b>Nguyên văn văn bản của Bộ</b> — để thầy/cô đối chiếu, <i>không in vào file Word</i>:<br>
     {{x.chi_bao.verbatim_full_muc or x.chi_bao.verbatim}}
     <div class="muted" style="margin-top:6px">Nguồn: {{x.chi_bao.source}} — {{x.chi_bao.source_location}}</div>
    </div>
    <div style="padding:0 12px">
-    <b>[ĐỀ XUẤT]</b> Nội dung cho bài này — thầy/cô sửa lại nếu cần:<br>
+    <b>Nội dung cho bài này</b> — phần này được in vào file Word (tô đỏ), thầy/cô sửa lại nếu cần:<br>
     <span class="muted">Mục tiêu:</span> {{x.chi_bao.code}} — {{x.ten_hoat_dong}}<br>
     <span class="muted">Hoạt động:</span> {{x.ten_hoat_dong}}<br>
     <span class="muted">Sản phẩm học tập:</span> {{x.san_pham}}<br>
@@ -84,12 +89,12 @@
      <span class="muted">{% if x.co_so %}{{x.co_so}}{% else %}bài học chưa nêu hoạt động nào liên quan tới AI — hệ thống KHÔNG tự gán, chỉ tích nếu thầy/cô thật sự tổ chức hoạt động này{% endif %}</span></span>
    </label>
    <div style="margin:10px 0 6px;padding:10px 12px;background:#f6f9f8;border-radius:10px">
-    <b>[QUY ĐỊNH]</b> Trích văn bản của Bộ — hệ thống không sửa phần này:<br>
+    <b>Trích văn bản của Bộ</b> — để thầy/cô đối chiếu, <i>không in vào file Word</i>:<br>
     {% for q in x.quy_dinh %}<i>“{{q.verbatim}}”</i> <span class="muted">({{q.nguon}})</span><br>{% endfor %}
     <div class="muted" style="margin-top:6px">Nguồn: {{x.nguon}}</div>
    </div>
    <div style="padding:0 12px">
-    <b>[ĐỀ XUẤT]</b> Nội dung cho bài này — thầy/cô sửa lại nếu cần:<br>
+    <b>Nội dung cho bài này</b> — phần này được in vào file Word (tô xanh dương), thầy/cô sửa lại nếu cần:<br>
     <span class="muted">Mục tiêu:</span> {{x.de_xuat.muc_tieu}}<br>
     <span class="muted">Hoạt động:</span> {{x.de_xuat.hoat_dong}}<br>
     <span class="muted">Sản phẩm học tập:</span> {{x.de_xuat.san_pham}}<br>

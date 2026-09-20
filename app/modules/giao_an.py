@@ -27,7 +27,9 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.shared import RGBColor
 
-DO = RGBColor(0xFF, 0x00, 0x00)          # đỏ FF0000 cho nội dung mới
+DO = RGBColor(0xFF, 0x00, 0x00)          # đỏ FF0000: nội dung TÍCH HỢP NĂNG LỰC SỐ
+XANH = RGBColor(0x00, 0x00, 0xFF)        # xanh dương 0000FF: nội dung TÍCH HỢP GIÁO DỤC AI
+MAU_MOI = (DO, XANH)                     # mọi màu dùng cho nội dung hệ thống chèn
 NHAN_AI = "[AI đề xuất – cần giáo viên duyệt]"
 
 # ------------------------------------------------------------------ tiện ích
@@ -373,7 +375,7 @@ def _xoa_ruan(p):
         r._r.getparent().remove(r._r)
 
 
-def doan_mau(doc, mau, text, do=True, in_dam=False, le=0, style=None):
+def doan_mau(doc, mau, text, do=True, in_dam=False, le=0, style=None, mau_chu=None):
     """Tạo đoạn mới bám theo định dạng của một đoạn có sẵn (giữ bố cục tài liệu)."""
     if mau is not None:
         p = copy.deepcopy(mau._p)
@@ -391,7 +393,7 @@ def doan_mau(doc, mau, text, do=True, in_dam=False, le=0, style=None):
     if le:
         new.paragraph_format.left_indent = le
     r = new.add_run(text)
-    r.font.color.rgb = DO if do else None
+    r.font.color.rgb = ((mau_chu or DO) if do else None)
     r.bold = in_dam
     return new
 
@@ -429,6 +431,8 @@ RE_HOAT_DONG_HE_THONG = re.compile(
 
 RE_DONG_DO_HE_THONG = re.compile(
     r"^\s*(?:\d+\s*\.\s*(?:Tiêu chí|Mạch)|·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
+    r"·\s*(?:Mục tiêu|Minh chứng đánh giá|Căn cứ chọn mạch|Hoạt động gợi ý|Nội dung lớp|"
+    r"CẦN GIÁO VIÊN DUYỆT)|Nguồn:|"
     r"Hoạt động tích hợp (?:năng lực số|giáo dục AI)|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
     r"Nhiệm vụ của giáo viên:|Nhiệm vụ của học sinh:|Sản phẩm học tập:|"
     r"Tiêu chí đánh giá:|\()")

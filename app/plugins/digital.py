@@ -104,6 +104,11 @@ def review(token):
                     flash('Một ô nội dung vượt quá 5.000 ký tự.', 'err')
                     return render_template('digital_review.html', ctx=ctx, token=token)
                 row['_merge'] = original.get('_merge', {})
+                # ô nào do hệ thống đề xuất (file gốc để trống) -> tô màu khi xuất:
+                # năng lực số đỏ FF0000, giáo dục AI xanh dương 0000FF
+                _goc = original.get('original') or {}      # giá trị THẬT trong file giáo viên tải lên
+                row['_themmoi'] = {k: bool(row[k].strip()) and not (_goc.get(k) or '').strip()
+                                   for k in ('digital', 'ai', 'stem')}
                 rows.append(row)
             data = (folder() / (token + '.docx')).read_bytes()
             output = DP.export(data, ctx['mode'], rows, ctx['grade'], ctx['subject'])

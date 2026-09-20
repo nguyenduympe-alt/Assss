@@ -6,11 +6,26 @@ import unicodedata
 import zipfile
 from pathlib import Path
 from docx import Document
-from docx.shared import Pt
+from docx.shared import Pt, RGBColor
 
 from . import ai_giao_duc as AIGD
 
 SOURCE = 'https://congbao.chinhphu.vn/van-ban/thong-tu-so-02-2025-tt-bgddt-44148.htm'
+# Màu phân biệt nội dung hệ thống đề xuất: năng lực số đỏ FF0000, giáo dục AI xanh dương 0000FF
+DO = RGBColor(0xFF, 0x00, 0x00)
+XANH = RGBColor(0x00, 0x00, 0xFF)
+MAU_COT = {'digital': DO, 'ai': XANH}
+
+
+def _to_mau(cell, key, item):
+    """Tô màu ô vừa ghi nếu là cột năng lực số / AI do hệ thống đề xuất (không tô nội dung gốc)."""
+    mau = MAU_COT.get(key)
+    if mau is None or not item.get('_themmoi', {}).get(key):
+        return
+    for p in cell.paragraphs:
+        for run in p.runs:
+            if (run.text or '').strip():
+                run.font.color.rgb = mau
 DOMAINS = ['Khai thác dữ liệu và thông tin', 'Giao tiếp và hợp tác trong môi trường số',
            'Sáng tạo nội dung số', 'An toàn', 'Giải quyết vấn đề', 'Ứng dụng trí tuệ nhân tạo']
 TEMPLATE = Path(__file__).resolve().parents[1] / 'assets' / 'khgd-template.docx'
@@ -188,6 +203,7 @@ def export(data, mode, rows, grade, subject):
                     for run in p.runs:
                         run.font.name = 'Times New Roman'
                         run.font.size = Pt(11)
+                _to_mau(cell, key, item)      # đỏ: năng lực số, xanh dương: giáo dục AI
         keys = ('week','topic','title','periods','digital','ai','stem','notes')
         # Recreate source vertical merges only if the teacher kept matching values.
         groups = {}
@@ -201,6 +217,11 @@ def export(data, mode, rows, grade, subject):
                 ci = keys.index(key)
                 cell = table.cell(first+2, ci).merge(table.cell(last+2, ci))
                 cell.text = rows[first].get(key,'')
+                for p in cell.paragraphs:
+                    for run in p.runs:
+                        run.font.name = 'Times New Roman'
+                        run.font.size = Pt(11)
+                _to_mau(cell, key, rows[first])
     else:
         doc = read_word(data)
         # Append a reviewed integration section so original lesson tables/runs remain intact.
@@ -210,7 +231,11 @@ def export(data, mode, rows, grade, subject):
             for label, key in (('Năng lực số','digital'),('Trí tuệ nhân tạo (AI)','ai'),('STEM/STEAM','stem'),('Tổ chức và đánh giá','notes')):
                 if item.get(key):
                     doc.add_heading(label, level=2)
-                    doc.add_paragraph(item[key])
+                    p = doc.add_paragraph()
+                    run = p.add_run(item[key])
+                    mau = MAU_COT.get(key)
+                    if mau is not None and item.get('_themmoi', {}).get(key):
+                        run.font.color.rgb = mau
     doc.add_paragraph('Tham chiếu Thông tư 02/2025/TT-BGDĐT và hướng dẫn theo khối lớp tại Công văn 3456/BGDĐT-GDPT (mã năng lực số). Mã giáo dục AI lấy theo Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026 (Khung nội dung giáo dục AI cho học sinh phổ thông; quy ước mã [Lớp].[Mã chủ đề].[Số thứ tự], nội dung mở rộng thêm tiền tố “MR”) và hướng dẫn triển khai tại Công văn 5588/BGDĐT-GDPT ngày 19/8/2026. Các mã và hoạt động tích hợp cần được giáo viên rà soát theo thực tế lớp học.')
     output = io.BytesIO()
     doc.save(output)

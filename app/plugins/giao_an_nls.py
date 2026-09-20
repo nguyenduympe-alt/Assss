@@ -13,7 +13,8 @@ Trung thực về bản chất công cụ:
   - Không gửi nội dung giáo án ra dịch vụ AI bên ngoài (xem modules/ai_provider.py,
     mọi lời gọi ra ngoài đều bị chặn cho tới khi giáo viên đồng ý rõ ràng).
   - Không chạy macro; chỉ đọc/ghi bằng python-docx trên file .docx.
-  - Mọi đề xuất đều ghi rõ [QUY ĐỊNH] (nguyên văn văn bản Bộ + nguồn) hay [ĐỀ XUẤT]
+  - Nội dung chèn vào file chỉ gồm mã/mạch, mục tiêu, minh chứng, hoạt động (kèm nguồn văn bản);
+    KHÔNG in khối trích dẫn quy định hay phần đề xuất dài vào file Word
     (do hệ thống soạn, giáo viên phải duyệt).
 """
 import io
