@@ -14,13 +14,19 @@ import re
 
 from docx.oxml.ns import qn
 
+from . import ai_giao_duc as AIGD
 from . import nld
-from .giao_an import (DO, NHAN_AI, doan_mau, gon, khong_dau,
-                       phan_tich, _xoa_muc_nld_cu)
+from .giao_an import (DO, NHAN_AI, RE_DONG_DO_HE_THONG, RE_HOAT_DONG_HE_THONG, RE_TIEU_DE_AI,
+                       doan_mau, gon, khong_dau, la_tieu_de_ai,
+                       la_tieu_de_nld, phan_tich, _xoa_muc_nld_cu)
 
 NHAN_QD = "[QUY ĐỊNH]"
 # So khớp trên văn bản ĐÃ BỎ DẤU (khong_dau) nên mẫu cũng phải viết không dấu.
 RE_HOAT_DONG_BANG = re.compile(r"^\s*hoat\s*dong\s*tich\s*hop\s*nang\s*luc\s*so\s*\(", re.I)
+# Dòng hoạt động GIÁO DỤC AI do hệ thống chèn (khác dòng hoạt động năng lực số).
+RE_HOAT_DONG_AI_BANG = re.compile(
+    r"^\s*hoat\s*dong\s*tich\s*hop\s*giao\s*duc\s*ai\s*\(", re.I)
+NHAN_AI_TIEU_DE = "Tích hợp giáo dục trí tuệ nhân tạo (AI)"
 NHAN_DX = "[ĐỀ XUẤT]"
 
 # ---------------------------------------------------------------- ánh xạ nội dung
@@ -393,7 +399,10 @@ def soan_muc_tieu(ten_bai, lop, mon, chon):
             dong.append((f"   · {NHAN_DX} (CẦN GIÁO VIÊN DUYỆT — bài chưa nêu hoạt động số nào; "
                          f"chỉ giữ nếu thầy/cô thật sự tổ chức hoạt động này)", "can_duyet"))
         dong.append((f"   · {NHAN_DX} Mục tiêu cụ thể: {muc_tieu}", "dexuat"))
-        dong.append((f"   · {NHAN_DX} Minh chứng đánh giá: {x['minh_chung']}.", "dexuat"))
+        _mc = (x["minh_chung"] or "").rstrip()
+        if _mc and _mc[-1] not in ".!?…:":
+            _mc += "."
+        dong.append((f"   · {NHAN_DX} Minh chứng đánh giá: {_mc}", "dexuat"))
     return dong
 
 
@@ -578,14 +587,180 @@ def _so_tiep_theo(mt, doc):
     return str(len(mt.get("cac_muc_con") or []) + 1)
 
 
-def chen_hoat_dong(doc, pt, hd):
+# ------------------------------------------------------- GIÁO DỤC AI (QĐ 2422)
+def _nhan_muc_ai(so_nld):
+    """Nhãn tiêu đề mục AI: đứng ngay sau mục năng lực số (c. → d.)."""
+    t = gon(so_nld or "")
+    m = re.match(r"^\s*([a-z])\s*[.)]", t, re.I)
+    if m:
+        sau = chr(ord(m.group(1).lower()) + 1)
+        if sau <= "z":
+            return f"{sau}. {NHAN_AI_TIEU_DE}"
+    return NHAN_AI_TIEU_DE
+
+
+def soan_muc_tieu_ai(ten_bai, lop, mon, chon_ai):
+    """Soạn các dòng cho mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)”.
+
+    Mọi câu [QUY ĐỊNH] là trích dẫn văn bản có thật; phần [ĐỀ XUẤT] ghi rõ là diễn giải.
+    Khung không có mã chỉ báo nên hệ thống KHÔNG tự đặt mã — chỉ gọi đúng tên mạch.
+    """
+    dong = []
+    for i, x in enumerate(chon_ai, 1):
+        dx = x.get("de_xuat") or {}
+        dong.append((f"{i}. Mạch “{x['ten_mach']}” — Khung nội dung giáo dục AI "
+                     f"({x.get('ten_cap', '')}, lớp {lop or '…'})", "tieuchi"))
+        if x.get("can_duyet"):
+            dong.append(("   · (CẦN GIÁO VIÊN DUYỆT — bài học chưa nêu hoạt động nào liên quan "
+                         "tới AI; chỉ giữ nếu thầy/cô thật sự tổ chức hoạt động này)", "can_duyet"))
+        dong.append((f"   · {NHAN_QD} Tên mạch lấy nguyên văn trong Khung: “{x['ten_mach']}”.", "quydinh"))
+        dong.append((f"   · {NHAN_QD} Nguồn: {x['nguon']}.", "quydinh"))
+        for qd in (x.get("quy_dinh") or [])[:2]:
+            dong.append((f"   · {NHAN_QD} “{qd['verbatim']}” ({qd['nguon']})", "quydinh"))
+        dong.append((f"   · {NHAN_DX} (Diễn giải, không phải trích dẫn) Hướng của "
+                     f"{x.get('ten_cap', '').lower()}: {x.get('huong_cap', '')}", "dexuat"))
+        if x.get("noi_dung_theo_lop"):
+            dong.append((f"   · {NHAN_DX} (Diễn giải theo Khung) Nội dung lớp {lop}: "
+                         f"{x['noi_dung_theo_lop']}", "dexuat"))
+        if dx.get("muc_tieu"):
+            dong.append((f"   · {NHAN_DX} Mục tiêu cụ thể của bài: {dx['muc_tieu']}", "dexuat"))
+        if dx.get("minh_chung"):
+            _mc = dx["minh_chung"].rstrip()
+            if _mc[-1:] not in ".!?…:":
+                _mc += "."
+            # nguồn căn cứ của mạch: [#] để giáo viên thấy rõ phần nào là diễn giải
+            dong.append((f"   · {NHAN_DX} Minh chứng đánh giá: {_mc}", "dexuat"))
+        if x.get("co_so"):
+            dong.append((f"   · {NHAN_DX} Căn cứ chọn mạch này cho bài: {x['co_so']}.", "dexuat"))
+    return dong
+
+
+def _het_toan_do(p):
+    """Đoạn do hệ thống chèn (mọi run có chữ đều đỏ FF0000)."""
+    chu = [r for r in p.runs if (r.text or "").strip()]
+    return bool(chu) and all(r.font.color is not None and r.font.color.rgb == DO for r in chu)
+
+
+def _neo_cuoi_muc_nld(doc):
+    """Đoạn CUỐI của mục năng lực số đã chèn trong tài liệu (nếu có).
+
+    Dùng neo thật trong file thay vì chỉ số đoạn, vì chèn mục năng lực số làm
+    dịch chỉ số và số thứ tự mục con có thể khiến hệ thống đoán sai vị trí.
+    """
+    i = next((k for k, p in enumerate(doc.paragraphs) if la_tieu_de_nld(p.text)), None)
+    if i is None:
+        return None, ""
+    cuoi = i
+    for k in range(i + 1, len(doc.paragraphs)):
+        p = doc.paragraphs[k]
+        if (p.text or "").strip() and not _het_toan_do(p):
+            break
+        cuoi = k
+    return doc.paragraphs[cuoi], doc.paragraphs[i].text
+
+
+def chen_muc_ai(doc, pt, chon_ai, ten_bai="", mon="", so_nld="", thoi_luong=5):
+    """Chèn mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” ngay SAU mục năng lực số,
+    vẫn ở cuối phần Năng lực (trước mục Phẩm chất). Toàn bộ nội dung mới tô đỏ.
+    """
+    mt = pt["muc_tieu"]
+    if not mt.get("co") or not chon_ai:
+        return {"da_chen": False,
+                "ly_do": "Không có phần mục tiêu hoặc không có nội dung giáo dục AI."}
+    nl = mt.get("nang_luc") or {}
+    cach = nl.get("cach_chen") or "cuoi_muc_tieu"
+    vi_tri_chen = int(nl.get("ket_thuc", mt["ket_thuc"]))
+    vi_tri_chen = max(mt["vi_tri"] + 1, min(vi_tri_chen, len(doc.paragraphs)))
+    mau = doc.paragraphs[vi_tri_chen - 1] if vi_tri_chen > 0 else None
+    # neo ưu tiên: đoạn cuối của mục năng lực số (nội dung AI đứng NGAY SAU mục đó)
+    neo_nld, tieu_de_nld = _neo_cuoi_muc_nld(doc)
+    if neo_nld is not None:
+        neo, cach = neo_nld, "sau_muc_nld"
+        diem = ("ngay sau toàn bộ nội dung mục năng lực số, cuối phần Năng lực "
+                "(trước mục Phẩm chất)")
+    else:
+        neo = mau
+        diem = "cuối phần Năng lực (trước mục Phẩm chất)"
+
+    so = _nhan_muc_ai(so_nld or tieu_de_nld)
+    ds = [(so, "tieude")] + soan_muc_tieu_ai(ten_bai, pt.get("lop"), mon, chon_ai)
+    ds.append((f"({NHAN_AI} Mục này chèn theo hình thức LỒNG GHÉP nội dung giáo dục AI; "
+               f"không làm thay đổi hoặc gia tăng yêu cầu cần đạt của môn học. "
+               f"Nội dung cốt lõi 12 tiết/lớp/năm học do nhà trường bố trí trong kế hoạch giáo dục. "
+               f"Thời lượng lồng ghép đề xuất ở hoạt động: {thoi_luong} phút.)", "ghichu"))
+    for text, loai in reversed(ds):
+        p = doan_mau(doc, mau, text, do=True, in_dam=(loai == "tieude"))
+        if neo is not None:
+            neo._p.addnext(p._p)
+    _nhan = (mt.get("nhan") or "MỤC TIÊU")
+    return {"da_chen": True, "so_muc": so, "so_mach": len(chon_ai), "cach_chen": cach,
+            "diem_chèn": f"{diem} trong “{_nhan}”"}
+
+
+def _neo_khoi_hoat_dong(doc):
+    """Đoạn cuối khối hoạt động hệ thống đã chèn (nếu có) — để chèn hoạt động AI sau đó."""
+    cuoi = None
+    for p in doc.paragraphs:
+        if RE_HOAT_DONG_HE_THONG.match(gon(p.text) or ""):
+            cuoi = p
+    if cuoi is None:
+        return None
+    j = list(doc.paragraphs).index(cuoi)
+    while j + 1 < len(doc.paragraphs):
+        t = gon(doc.paragraphs[j + 1].text)
+        if t and not RE_DONG_DO_HE_THONG.match(t):
+            break
+        j += 1
+    return doc.paragraphs[j]
+
+
+def _chen_doan_sau(doc, neo, hd, ghi_chu=""):
+    dong = [
+        (hd["ten"], "tieude"),
+        (f"Mục tiêu: {hd['muc_tieu']}", "n"),
+        (f"Thời lượng: {hd['thoi_luong']} phút", "n"),
+        (f"Công cụ: {hd['cong_cu']}", "n"),
+        (f"Các bước: {hd['cac_buoc']}", "n"),
+        (f"Nhiệm vụ của giáo viên: {hd['gv']}", "n"),
+        (f"Nhiệm vụ của học sinh: {hd['hs']}", "n"),
+        (f"Sản phẩm học tập: {hd['san_pham']}", "n"),
+        (f"Tiêu chí đánh giá: {hd['danh_gia']}", "n"),
+        (f"({ghi_chu or NHAN_AI})", "ghichu"),
+    ]
+    for text, loai in reversed(dong):
+        p = doan_mau(doc, neo, text, do=True, in_dam=(loai == "tieude"))
+        neo._p.addnext(p._p)
+
+
+def chen_hoat_dong_ai(doc, pt, hd):
+    """Chèn hoạt động giáo dục AI vào tiến trình — ngay sau hoạt động năng lực số nếu có."""
+    tt = pt["tien_trinh"]
+    if tt.get("kieu") == "bang":
+        return _chen_vao_bang(doc, tt, hd, mau=None, neo_mau=RE_HOAT_DONG_BANG)
+    neo = _neo_khoi_hoat_dong(doc)
+    if neo is not None:
+        _chen_doan_sau(doc, neo, hd)
+        return {"da_chen": True, "kieu": "doan",
+                "diem_chèn": "ngay sau khối hoạt động năng lực số"}
+    if tt.get("kieu") == "doan" and tt.get("hoat_dong"):
+        return _chen_sau_doan(doc, tt, hd)
+    return _chen_duoi_muc_tieu(doc, pt, hd)
+
+
+def chon_muc_ai(doc, pt, mach_chon=None, toi_da=2):
+    """Chọn mạch nội dung giáo dục AI cho bài (dữ liệu có nguồn, xem ai_giao_duc)."""
+    return AIGD.goi_y(pt.get("lop"), mon=pt.get("mon"), ten_bai=lay_ten_bai(doc),
+                      van_ban=noi_dung_bai(doc), toi_da=toi_da, mach_chon=mach_chon)
+
+
+def chen_hoat_dong(doc, pt, hd, mau=RE_HOAT_DONG_BANG):
     """Chèn hoạt động vào đúng chỗ trong TIẾN TRÌNH BÀI DẠY, tô đỏ nội dung mới."""
     if not hd:
         return {"da_chen": False, "ly_do": "Chưa soạn được hoạt động."}
     tt = pt["tien_trinh"]
 
     if tt["kieu"] == "bang":
-        return _chen_vao_bang(doc, tt, hd)
+        return _chen_vao_bang(doc, tt, hd, mau=mau)
     if tt["kieu"] == "doan" and tt["hoat_dong"]:
         return _chen_sau_doan(doc, tt, hd)
     return _chen_duoi_muc_tieu(doc, pt, hd)
@@ -620,7 +795,20 @@ def _dong_mau_bang(table, tu_dong):
     return table.rows[tu_dong]
 
 
-def _chen_vao_bang(doc, tt, hd):
+def _xoa_dong_bang(doc, tt, *mau):
+    """Xoá các dòng do hệ thống chèn trong bảng tiến trình (theo từng loại dòng)."""
+    if not mau or tt.get("kieu") != "bang":
+        return 0
+    table = doc.tables[tt["vi_tri"]]
+    n = 0
+    for row in list(table.rows):
+        if any(any(m.match(khong_dau(gon(c.text)) or "") for m in mau) for c in row.cells):
+            row._tr.getparent().remove(row._tr)
+            n += 1
+    return n
+
+
+def _chen_vao_bang(doc, tt, hd, mau=RE_HOAT_DONG_BANG, neo_mau=None):
     """Chèn một dòng hoạt động vào bảng tiến trình, sau hoạt động phù hợp nhất.
 
     Nếu lần chạy trước đã chèn dòng hoạt động tích hợp thì XOÁ dòng cũ trước khi chèn
@@ -628,16 +816,30 @@ def _chen_vao_bang(doc, tt, hd):
     """
     table = doc.tables[tt["vi_tri"]]
     cot = tt["cot"]
-    da_xoa = 0
-    for row in list(table.rows):
-        # Soi MỌI ô trong dòng: bảng thật có cột gộp và cột "Hỗ trợ HSKT", tên hoạt động
-        # có thể nằm ở bất kỳ ô nào — chỉ soi ô đầu sẽ bỏ sót và chèn trùng.
-        if any(RE_HOAT_DONG_BANG.match(khong_dau(gon(c.text)) or "") for c in row.cells):
-            row._tr.getparent().remove(row._tr)
-            da_xoa += 1
+    da_xoa = _xoa_dong_bang(doc, tt, mau) if mau else 0
     hang = table.rows
     if len(hang) < 2:
         return {"da_chen": False, "ly_do": "Bảng tiến trình chưa có dòng dữ liệu nào."}
+
+    # NEO: chèn ngay sau dòng đã chỉ định (dùng khi ghép hoạt động AI ngay sau hoạt động
+    # năng lực số), miễn là tìm thấy dòng đó trong bảng.
+    if neo_mau is not None:
+        for ri, row in enumerate(hang):
+            if any(neo_mau.match(khong_dau(gon(c.text)) or "") for c in row.cells):
+                mau_tr = row._tr
+                moi_tr = copy.deepcopy(_dong_mau_bang(table, ri)._tr)
+                mau_tr.addnext(moi_tr)
+                from docx.table import _Row
+                row_moi = _Row(moi_tr, table)
+                da_ghi = set()
+                for ci, cell in enumerate(row_moi.cells):
+                    if id(cell._tc) in da_ghi:
+                        continue
+                    da_ghi.add(id(cell._tc))
+                    _dat_o(cell, _noi_dung_o(ci, cot, hd))
+                return {"da_chen": True, "kieu": "bang", "vi_tri_dong": ri + 1,
+                        "da_thay_dong_cu": da_xoa, "so_dong": len(table.rows),
+                        "diem_chèn": f"ngay sau dòng {ri} (hoạt động năng lực số) trong bảng tiến trình"}
 
     # chọn vị trí: ưu tiên hoạt động có nội dung khớp từ khoá;
     # nếu không khớp thì đặt trước dòng cuối (thường là vận dụng/tổng kết)
@@ -823,8 +1025,51 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
     else:
         loi.append("Chưa chèn được hoạt động."); cung.append(loi[-1])
 
+    # 2b. mục GIÁO DỤC AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT)
+    kq_ai = (ket_qua or {}).get("ai") or {}
+    if kq_ai.get("chon"):
+        ai_mt = kq_ai.get("muc_tieu") or {}
+        if ai_mt.get("da_chen"):
+            dat.append("Đã chèn mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” ở %s."
+                       % ai_mt.get("diem_chèn", "trong phần mục tiêu"))
+        else:
+            loi.append("Chưa chèn được mục giáo dục AI: %s." % ai_mt.get("ly_do", ""))
+            cung.append(loi[-1])
+        ai_hd = kq_ai.get("hoat_dong") or {}
+        if ai_hd.get("da_chen"):
+            dat.append(f"Đã chèn hoạt động giáo dục AI: {ai_hd.get('diem_chèn', '')}")
+        else:
+            loi.append("Chưa chèn được hoạt động giáo dục AI (hoạt động năng lực số vẫn giữ nguyên).")
+        dem_ai = sum(1 for p in doc.paragraphs if la_tieu_de_ai(p.text))
+        if dem_ai > 1:
+            loi.append(f"Phát hiện {dem_ai} tiêu đề “Tích hợp giáo dục trí tuệ nhân tạo (AI)” "
+                       f"— bị chèn trùng, cần xoá bớt.")
+            cung.append(loi[-1])
+        elif dem_ai == 1:
+            dat.append("Mục giáo dục AI chèn đúng một lần.")
+        # vị trí: SAU mục năng lực số và TRƯỚC mục Phẩm chất
+        i_nld = next((i for i, p in enumerate(doc.paragraphs) if la_tieu_de_nld(p.text)), None)
+        i_ai = next((i for i, p in enumerate(doc.paragraphs) if la_tieu_de_ai(p.text)), None)
+        i_pc = next((i for i, p in enumerate(doc.paragraphs)
+                     if re.match(r"^\s*(?:\d+|[ivx]+|[a-z])\s*[.)]?\s*pham chat",
+                                 khong_dau(gon(p.text)))), None)
+        if i_ai is not None and i_nld is not None and i_ai < i_nld:
+            loi.append("Mục giáo dục AI bị đặt TRƯỚC mục năng lực số — sai thứ tự.")
+            cung.append(loi[-1])
+        if i_ai is not None and i_pc is not None and i_ai > i_pc:
+            loi.append("Mục giáo dục AI bị đặt SAU mục Phẩm chất — sai vị trí.")
+            cung.append(loi[-1])
+        if i_ai is not None and (i_nld is None or i_ai > i_nld) and (i_pc is None or i_ai < i_pc):
+            dat.append("Mục giáo dục AI nằm sau mục năng lực số và trước mục Phẩm chất.")
+        # mọi nội dung AI phải ghi rõ nguồn văn bản (không tự bịa căn cứ)
+        if any("2422/QĐ-BGDĐT" in p.text for p in doc.paragraphs):
+            dat.append("Nội dung giáo dục AI có ghi nguồn văn bản (Quyết định 2422/QĐ-BGDĐT) "
+                       "và Công văn 5588/BGDĐT-GDPT ngay trong mục tiêu.")
+        else:
+            loi.append("Nội dung giáo dục AI thiếu ghi nguồn văn bản — không được xuất.")
+            cung.append(loi[-1])
+
     # 3. không chèn trùng mục (chỉ tính TIÊU ĐỀ mục, không tính câu có nhắc tới)
-    from .giao_an import la_tieu_de_nld
     dem = sum(1 for p in doc.paragraphs if la_tieu_de_nld(p.text))
     if dem > 1:
         loi.append(f"Phát hiện {dem} tiêu đề “Tích hợp năng lực số” — bị chèn trùng, cần xoá bớt.")
@@ -846,7 +1091,8 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
         dat.append("Không đoạn nội dung gốc nào bị tô đỏ.")
 
     # 5. tổng thời lượng
-    them = (ket_qua.get("hoat_dong") or {}).get("thoi_luong", 0)
+    them = ((ket_qua.get("hoat_dong") or {}).get("thoi_luong", 0)
+            + ((ket_qua.get("ai") or {}).get("hoat_dong") or {}).get("thoi_luong", 0))
     tong_phut = pt["thoi_luong"]["tong_phut"]
     if tong_phut:
         if tong_phut + them > 50:
@@ -955,7 +1201,7 @@ def _dem_mau(doc):
 
 # ------------------------------------------------------------------ pipeline
 def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de="",
-          goc_doan=None, chon_ma=None, sua_chinh_ta=None):
+          goc_doan=None, chon_ma=None, sua_chinh_ta=None, chon_ai=None, ai_thoi_luong=5):
     # sua_chinh_ta: {"de_xuat": [...], "chon": [id, ...]} — chỉ áp dụng mục đã duyệt
     """Chạy trọn quy trình trên một tài liệu Word đã đọc sẵn.
 
@@ -989,6 +1235,12 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
         if mon_ghi_de:
             pt["mon"] = mon_ghi_de
 
+    # dọn DÒNG HOẠT ĐỘNG do lần chạy trước (cả năng lực số lẫn giáo dục AI)
+    if pt["tien_trinh"].get("kieu") == "bang":
+        _xoa = _xoa_dong_bang(doc, pt["tien_trinh"], RE_HOAT_DONG_BANG, RE_HOAT_DONG_AI_BANG)
+        if _xoa:
+            bao_cao["buoc"].append(f"Đã xoá {_xoa} dòng hoạt động của lần chạy trước để không trùng.")
+
     ten_bai = lay_ten_bai(doc)
     chon, canh_bao = chon_tieu_chi(doc, pt, thiet_bi=thiet_bi, toi_da=toi_da,
                                    chon_ma=chon_ma)
@@ -1012,10 +1264,34 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
     kq_mt = chen_muc_tieu(doc, pt, chon, ten_bai=ten_bai, mon=pt["mon"])
     hd = soan_hoat_dong(ten_bai, pt["lop"], pt["mon"], chon,
                         thoi_luong=thoi_luong, thiet_bi=thiet_bi)
-    kq_hd = chen_hoat_dong(doc, pt, hd) if hd else {"da_chen": False}
+    kq_hd = chen_hoat_dong(doc, pt, hd, mau=None) if hd else {"da_chen": False}
     kq_hd["thoi_luong"] = thoi_luong if kq_hd.get("da_chen") else 0
     bao_cao["ket_qua"] = {"muc_tieu": kq_mt, "hoat_dong": kq_hd, "hoat_dong_chi_tiet": hd}
     bao_cao["buoc"].append("Đã chèn mục mục tiêu và hoạt động, tô đỏ toàn bộ nội dung mới.")
+
+    # ---- GIÁO DỤC AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT) ----
+    # Chèn NGAY SAU mục năng lực số, vẫn ở cuối phần Năng lực (trước mục Phẩm chất).
+    kq_ai_mt = {"da_chen": False, "ly_do": "giáo viên không chọn nội dung giáo dục AI"}
+    kq_ai_hd = {"da_chen": False}
+    if chon_ai:
+        pt_sau = phan_tich_an_toan(doc)      # chỉ số đoạn đã dịch sau khi chèn mục năng lực số
+        kq_ai_mt = chen_muc_ai(doc, pt_sau, chon_ai, ten_bai=ten_bai, mon=pt["mon"],
+                               so_nld=kq_mt.get("so_muc", ""), thoi_luong=ai_thoi_luong)
+        pt_sau2 = phan_tich_an_toan(doc)     # mục AI vừa chèn lại dịch chỉ số đoạn phía sau
+        hd_ai = AIGD.soan_hoat_dong(ten_bai, pt["lop"], pt["mon"], chon_ai,
+                                    thoi_luong=ai_thoi_luong)
+        kq_ai_hd = chen_hoat_dong_ai(doc, pt_sau2, hd_ai) if hd_ai else {"da_chen": False}
+        kq_ai_hd["thoi_luong"] = ai_thoi_luong if kq_ai_hd.get("da_chen") else 0
+        bao_cao["buoc"].append("Đã chèn mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” và hoạt động "
+                               "lồng ghép theo Quyết định 2422/QĐ-BGDĐT — Công văn 5588/BGDĐT-GDPT.")
+    bao_cao["ket_qua"]["ai"] = {"chon": [{"id": x["id"], "ten_mach": x["ten_mach"],
+                                          "can_duyet": x["can_duyet"], "co_so": x["co_so"]}
+                                         for x in (chon_ai or [])],
+                                "muc_tieu": kq_ai_mt, "hoat_dong": kq_ai_hd,
+                                "hoat_dong_chi_tiet": (AIGD.soan_hoat_dong(ten_bai, pt["lop"],
+                                                                           pt["mon"], chon_ai,
+                                                                           thoi_luong=ai_thoi_luong)
+                                                       if chon_ai else None)}
 
     # Sửa chính tả: CHỈ áp dụng những đề xuất giáo viên đã tích chọn ở trang duyệt.
     if sua_chinh_ta:

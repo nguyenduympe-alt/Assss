@@ -1,9 +1,11 @@
-"""Trợ lý giáo án: TÍCH HỢP NĂNG LỰC SỐ, có bước giáo viên duyệt.
+"""Trợ lý giáo án: TÍCH HỢP NĂNG LỰC SỐ và GIÁO DỤC AI, có bước giáo viên duyệt.
 
 Luồng: tải giáo án Word → hệ thống phân tích cấu trúc và đề xuất tiêu chí →
 giáo viên tích chọn từng mục → xuất BẢN SAO .docx, nội dung mới tô đỏ FF0000.
 
-PHẠM VI: công cụ này CHỈ làm phần tích hợp năng lực số. Phần dò/sửa chính tả đã
+PHẠM VI: công cụ này làm 2 phần — (1) tích hợp năng lực số (Thông tư 02/2025/TT-BGDĐT)
+và (2) tích hợp giáo dục AI dạng lồng ghép (Quyết định 2422/QĐ-BGDĐT,
+Công văn 5588/BGDĐT-GDPT). Giáo viên tích chọn từng phần; bỏ tích là không chèn. Phần dò/sửa chính tả đã
 tách thành công cụ riêng (“Kiểm tra chính tả”, app/plugins/chinh_ta.py) để giáo
 viên chỉ chạy khi thật sự cần — không tự chạy kèm khi soạn giáo án.
 
@@ -24,14 +26,18 @@ from ..auth import login_required, current_user
 from ..modules import giao_an as GA
 from ..modules import nld as NLD
 from ..modules import nld_tich_hop as TH
+from ..modules import ai_giao_duc as AIGD
 from ..modules import ai_provider as AI
 from .digital import folder, load, save  # dùng lại nơi lưu tạm, có kiểm tra chủ sở hữu
 
-MENU = {'label': 'Giáo án & năng lực số', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
+MENU = {'label': 'Giáo án, năng lực số & AI', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
 MAX_BYTES = 8 * 1024 * 1024
+AI_THOI_LUONG = 5          # phút lồng ghép giáo dục AI đề xuất mỗi tiết
 NHAN_NOI_BO = ("Hệ thống chạy hoàn toàn trên máy chủ của trường: kho chỉ báo năng lực số đã kiểm chứng "
-               "theo văn bản Bộ GDĐT. KHÔNG gửi nội dung giáo án ra Google/Gemini hay dịch vụ AI nào. "
-               "Công cụ này không dò chính tả — việc đó nằm ở công cụ riêng “Kiểm tra chính tả”.")
+               "theo Thông tư 02/2025/TT-BGDĐT; nội dung giáo dục AI theo Khung ban hành kèm "
+               "Quyết định 2422/QĐ-BGDĐT và Công văn 5588/BGDĐT-GDPT. KHÔNG gửi nội dung giáo án ra "
+               "Google/Gemini hay dịch vụ AI nào. Công cụ này không dò chính tả — việc đó nằm ở "
+               "công cụ riêng “Kiểm tra chính tả”.")
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -62,6 +68,8 @@ def index():
                 pt['mon'] = mon
 
             chon, canh_bao = TH.chon_tieu_chi(doc, pt, thiet_bi=thiet_bi, toi_da=toi_da)
+            # giáo dục AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT)
+            chon_ai, canh_bao_ai = TH.chon_muc_ai(doc, pt, toi_da=2)
 
             token = save(
                 name=(file.filename or 'giao-an.docx')[:200],
@@ -74,6 +82,7 @@ def index():
                     'tong_phut': pt['thoi_luong']['tong_phut'],
                     'pt_canh_bao': pt.get('canh_bao', []),
                     'chon': chon, 'canh_bao': canh_bao,
+                    'chon_ai': chon_ai, 'canh_bao_ai': canh_bao_ai, 'ai_thoi_luong': AI_THOI_LUONG,
                     'thiet_bi': thiet_bi, 'thoi_luong': thoi_luong, 'toi_da': toi_da,
                     'doan_goc': TH.trang_thai_mau_goc(doc),
                 })
@@ -114,13 +123,17 @@ def xuat(token):
         return redirect(url_for('giao_an_nls.index'))
     c = ctx['ctx']
     chon_ma = [code for code in request.form.getlist('ma')]
+    # Nội dung giáo dục AI: CHỈ chèn những mạch giáo viên tích ở trang duyệt
+    ma_ai = [x for x in request.form.getlist('ma_ai')]
+    chon_ai = [x for x in (c.get('chon_ai') or []) if x.get('id') in ma_ai]
 
     try:
         doc = GA.doc_word(open(folder() / (token + '.docx'), 'rb').read())
         doc_out, bao_cao = TH.xu_ly(
             doc, thiet_bi=c['thiet_bi'], toi_da=c['toi_da'], thoi_luong=c['thoi_luong'],
             lop_ghi_de=c['lop'] or '', mon_ghi_de=c['mon'] or '',
-            goc_doan=c['doan_goc'], chon_ma=chon_ma)
+            goc_doan=c['doan_goc'], chon_ma=chon_ma,
+            chon_ai=chon_ai, ai_thoi_luong=c.get('ai_thoi_luong') or AI_THOI_LUONG)
     except Exception:
         flash('Không tạo được bản Word. File gốc có thể đã hỏng — hãy lưu lại bằng Word rồi thử lại.', 'err')
         return redirect(url_for('giao_an_nls.duyet', token=token))
@@ -135,6 +148,7 @@ def xuat(token):
     out = io.BytesIO()
     doc_out.save(out)
     out.seek(0)
-    ten = 'Giao-an-tich-hop-NLS-%s.docx' % (c['lop'] or 'khong-ro-lop')
+    ten = 'Giao-an-tich-hop-%s-%s.docx' % ('NLS-va-AI' if chon_ai else 'NLS',
+                                           c['lop'] or 'khong-ro-lop')
     return send_file(out, as_attachment=True, download_name=ten,
                      mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')

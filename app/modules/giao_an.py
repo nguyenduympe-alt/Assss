@@ -411,13 +411,25 @@ def la_tieu_de_nld(text):
     return bool(RE_TIEU_DE_NLD.match(khong_dau(gon(text))))
 
 
+# Mục GIÁO DỤC AI do hệ thống chèn (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT).
+RE_TIEU_DE_AI = re.compile(
+    r"^(?:\s*(?:\d+|[ivx]+|[a-z])\s*[.)]\s*)?"
+    r"tich hop giao duc (?:tri tue nhan tao|ai)(?:\s*\(ai\))?\s*:?\s*$", re.I)
+
+
+def la_tieu_de_ai(text):
+    """Đúng là TIÊU ĐỀ mục 'Tích hợp giáo dục trí tuệ nhân tạo (AI)'."""
+    return bool(RE_TIEU_DE_AI.match(khong_dau(gon(text))))
+
+
 # Các dòng con hệ thống sinh ra trong mục "Tích hợp năng lực số"
 # và trong khối hoạt động dự phòng — dùng để dọn khi chạy lại.
-RE_HOAT_DONG_HE_THONG = re.compile(r"^\s*Hoạt động tích hợp năng lực số\s*\(", re.I)
+RE_HOAT_DONG_HE_THONG = re.compile(
+    r"^\s*Hoạt động tích hợp (?:năng lực số|giáo dục AI)\s*\(", re.I)
 
 RE_DONG_DO_HE_THONG = re.compile(
-    r"^\s*(?:\d+\s*\.\s*Tiêu chí|·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
-    r"Hoạt động tích hợp năng lực số|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
+    r"^\s*(?:\d+\s*\.\s*(?:Tiêu chí|Mạch)|·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
+    r"Hoạt động tích hợp (?:năng lực số|giáo dục AI)|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
     r"Nhiệm vụ của giáo viên:|Nhiệm vụ của học sinh:|Sản phẩm học tập:|"
     r"Tiêu chí đánh giá:|\()")
 
@@ -444,10 +456,10 @@ def _xoa_muc_nld_cu(doc, mt):
             if not RE_DONG_DO_HE_THONG.match(t2):
                 break
             _xoa_doan(doc.paragraphs[j]); xoa += 1
-    # Lượt 2: dọn mục "Tích hợp năng lực số" trong MỤC TIÊU
+    # Lượt 2: dọn mục "Tích hợp năng lực số" và mục "Tích hợp giáo dục AI" trong MỤC TIÊU
     for i in range(len(doc.paragraphs) - 1, -1, -1):
         p = doc.paragraphs[i]
-        if not la_tieu_de_nld(p.text):
+        if not (la_tieu_de_nld(p.text) or la_tieu_de_ai(p.text)):
             continue
         _xoa_doan(p)
         xoa += 1
@@ -458,7 +470,8 @@ def _xoa_muc_nld_cu(doc, mt):
             if not t:
                 _xoa_doan(doc.paragraphs[j]); xoa += 1; continue
             kd = khong_dau(t)
-            if la_tieu_de_nld(t) or _la_tieu_de_khac(t) or re.match(r"^\s*hoat\s*dong\s*\d", kd):
+            if (la_tieu_de_nld(t) or la_tieu_de_ai(t) or _la_tieu_de_khac(t)
+                    or re.match(r"^\s*hoat\s*dong\s*\d", kd)):
                 break
             # Chỉ xoá dòng ĐÚNG do hệ thống sinh ra (tiêu chí, [QUY ĐỊNH]/[ĐỀ XUẤT], các dòng
             # của khối hoạt động, ghi chú). Dòng nào không khớp thì coi là nội dung của giáo

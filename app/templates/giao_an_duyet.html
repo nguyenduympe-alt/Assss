@@ -28,7 +28,8 @@
  <div class="card">
   <h3>Tiêu chí năng lực số đưa vào bài</h3>
   <p class="sub">Mục “Tích hợp năng lực số” sẽ được chèn vào <b>cuối phần Năng lực</b> trong MỤC TIÊU
-   (ngay trước mục Phẩm chất) — nếu bài không có mục Năng lực thì chèn ngay trước mục Phẩm chất.</p>
+   (ngay trước mục Phẩm chất) — nếu bài không có mục Năng lực thì chèn ngay trước mục Phẩm chất.
+   Mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” (nếu thầy/cô tích ở dưới) chèn ngay sau mục đó.</p>
   <p class="sub">Bỏ tích nếu thầy/cô thấy tiêu chí chưa phù hợp. Chỉ những tiêu chí được tích mới vào file.
    Tiêu chí ghi <b>CẦN GIÁO VIÊN DUYỆT</b> mặc định không tích, vì hệ thống chưa có căn cứ trong bài.</p>
   {% if not ctx.chon %}
@@ -58,6 +59,45 @@
   </div>
   {% endfor %}
   {% for c in ctx.canh_bao %}<p style="color:#a16207">{{c}}</p>{% endfor %}
+ </div>
+
+ <div class="card">
+  <h3>Tích hợp giáo dục trí tuệ nhân tạo (AI)</h3>
+  <p class="sub">Căn cứ: Khung nội dung giáo dục AI cho học sinh phổ thông (Quyết định 2422/QĐ-BGDĐT
+   ngày 18/8/2026) và hướng dẫn triển khai (Công văn 5588/BGDĐT-GDPT ngày 19/8/2026) — áp dụng đại trà
+   từ năm học 2026-2027. Phần chèn vào bài này theo hình thức <b>lồng ghép trong môn học</b>:
+   <b>không làm thay đổi hoặc gia tăng yêu cầu cần đạt</b> của môn học (theo đúng văn bản).
+   Mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” được chèn <b>ngay sau mục năng lực số</b>, vẫn ở cuối
+   phần Năng lực (trước mục Phẩm chất), và thêm một dòng hoạt động vào bảng tiến trình.</p>
+  {% if not ctx.chon_ai %}
+   <p style="color:#a16207">Chưa chọn được nội dung giáo dục AI. {% for c in ctx.canh_bao_ai %}{{c}} {% endfor %}</p>
+  {% endif %}
+  {% for x in ctx.chon_ai %}
+  <div style="border:1px solid #e2e8e6;border-radius:12px;padding:14px;margin:12px 0">
+   <label style="display:flex;gap:10px;align-items:flex-start">
+    <input type="checkbox" name="ma_ai" value="{{x.id}}" {% if not x.can_duyet %}checked{% endif %} style="width:18px;margin-top:3px">
+    <span><b>Mạch “{{x.ten_mach}}”</b> — {{x.ten_cap}} (lớp {{ctx.lop or '…'}})
+     {% if x.can_duyet %}<b style="color:#b45309">· CẦN GIÁO VIÊN DUYỆT</b>{% endif %}<br>
+     <span class="muted">{% if x.co_so %}{{x.co_so}}{% else %}bài học chưa nêu hoạt động nào liên quan tới AI — hệ thống KHÔNG tự gán, chỉ tích nếu thầy/cô thật sự tổ chức hoạt động này{% endif %}</span></span>
+   </label>
+   <div style="margin:10px 0 6px;padding:10px 12px;background:#f6f9f8;border-radius:10px">
+    <b>[QUY ĐỊNH]</b> Trích văn bản của Bộ — hệ thống không sửa phần này:<br>
+    {% for q in x.quy_dinh %}<i>“{{q.verbatim}}”</i> <span class="muted">({{q.nguon}})</span><br>{% endfor %}
+    <div class="muted" style="margin-top:6px">Nguồn: {{x.nguon}}</div>
+   </div>
+   <div style="padding:0 12px">
+    <b>[ĐỀ XUẤT]</b> Nội dung cho bài này — thầy/cô sửa lại nếu cần:<br>
+    <span class="muted">Mục tiêu:</span> {{x.de_xuat.muc_tieu}}<br>
+    <span class="muted">Hoạt động:</span> {{x.de_xuat.hoat_dong}}<br>
+    <span class="muted">Sản phẩm học tập:</span> {{x.de_xuat.san_pham}}<br>
+    <span class="muted">Minh chứng đánh giá:</span> {{x.de_xuat.minh_chung}}
+   </div>
+  </div>
+  {% endfor %}
+  {% if ctx.chon_ai %}
+  <p class="sub">Thời lượng lồng ghép đề xuất: <b>{{ctx.ai_thoi_luong or 5}} phút</b>. Nội dung cốt lõi
+   12 tiết/lớp/năm học do nhà trường bố trí trong kế hoạch giáo dục — phần chèn ở đây chỉ là phần lồng ghép.</p>
+  {% endif %}
  </div>
 
  <div class="card">

@@ -1,15 +1,20 @@
 {% extends 'base.html' %}
-{% block head %}Giáo án &amp; năng lực số{% endblock %}
+{% block head %}Giáo án, năng lực số &amp; giáo dục AI{% endblock %}
 {% block crumb %}Tải giáo án Word → hệ thống đề xuất → giáo viên duyệt → tải bản sao .docx{% endblock %}
 {% block body %}
 <div class="card">
- <h3>Trợ lý soạn giáo án tích hợp năng lực số</h3>
- <p class="sub">Công cụ này <b>chỉ làm phần tích hợp năng lực số</b>. Việc dò chính tả nằm ở
+ <h3>Trợ lý soạn giáo án tích hợp năng lực số &amp; giáo dục AI</h3>
+ <p class="sub">Công cụ này làm <b>hai phần</b>: (1) <b>tích hợp năng lực số</b> theo Thông tư
+ 02/2025/TT-BGDĐT, và (2) <b>tích hợp giáo dục trí tuệ nhân tạo (AI)</b> theo Khung nội dung giáo dục AI
+ (Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026) và hướng dẫn triển khai (Công văn 5588/BGDĐT-GDPT ngày
+ 19/8/2026) — chèn dạng <b>lồng ghép trong môn học</b>, không làm thay đổi hoặc gia tăng yêu cầu cần đạt.
+ Thầy/cô tích chọn từng phần ở bước duyệt; bỏ tích là không chèn. Việc dò chính tả nằm ở
  <a href="{{url_for('chinh_ta.index')}}">công cụ riêng “Kiểm tra chính tả”</a> — chỉ chạy khi thầy/cô cần,
  không tự chạy kèm ở đây.</p>
  <p class="sub">Tải lên giáo án Word (.docx) — dùng được cho <b>lớp 1 đến lớp 12</b> (tiểu học, THCS, THPT).
- Hệ thống giữ nguyên toàn bộ nội dung, bảng biểu và định dạng gốc, rồi đề xuất phần “Tích hợp năng lực số”
- và chèn vào đúng vị trí. Giáo viên duyệt từng tiêu chí trước khi tải file.</p>
+ Hệ thống giữ nguyên toàn bộ nội dung, bảng biểu và định dạng gốc, rồi chèn mục “Tích hợp năng lực số” và
+ (nếu thầy/cô chọn) mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” vào <b>cuối phần Năng lực, ngay trước mục
+ Phẩm chất</b>. Giáo viên duyệt từng tiêu chí, từng mạch nội dung AI trước khi tải file.</p>
  <p class="sub">Mức năng lực số tra theo khối lớp: lớp 1–3 mức CB1, lớp 4–5 mức CB2, lớp 6–7 mức TC1,
  lớp 8–9 mức TC2, lớp 10–12 mức NC1. Lời đề xuất hoạt động được viết theo lứa tuổi: lớp nhỏ thì
  giáo viên làm mẫu và học sinh quan sát, nói lại; lớp lớn thì học sinh tự thực hiện và phản biện.</p>
@@ -57,10 +62,16 @@
  nội dung do hệ thống tạo; giữ nguyên định dạng, bảng biểu, hình ảnh và số thứ tự của bản gốc.</p>
  <p>Bài chưa có hoạt động số nào (ví dụ bài tập đọc thuần giấy ở tiểu học) sẽ được đánh dấu
  <b>“cần giáo viên duyệt”</b> và mặc định không tích — hệ thống không gán tiêu chí tràn lan.</p>
+ <p><b>Riêng phần giáo dục AI:</b> Khung nội dung giáo dục AI gồm <b>4 mạch</b> — Tư duy lấy con người làm
+ trung tâm · Đạo đức AI · Các kỹ thuật và ứng dụng AI · Thiết kế hệ thống AI; nội dung cốt lõi
+ <b>12 tiết/lớp/năm học</b> do nhà trường bố trí theo kế hoạch giáo dục, phần chèn vào bài dạy là
+ <b>lồng ghép</b>. Hệ thống <b>không tự đặt mã</b> cho các mạch (văn bản của Bộ không quy định mã mạch) và
+ không gán nội dung AI cho bài học một cách máy móc: mạch nào bài học chưa có căn cứ sẽ ghi rõ
+ <b>cần giáo viên duyệt</b>.</p>
  <p><b>Không làm:</b> không dò chính tả (hãy dùng công cụ riêng “Kiểm tra chính tả”);
  không gửi bài của thầy/cô ra Google/Gemini hay bất kỳ dịch vụ AI bên ngoài;
  không chạy macro trong file Word; không tự sửa câu đúng hoặc thuật ngữ, tên riêng, công thức,
- mã chỉ báo; không tự tạo mã chỉ báo nếu kho không có.</p>
+ mã chỉ báo; không tự tạo mã chỉ báo nếu kho không có; không bịa mã cho các mạch giáo dục AI.</p>
  <p class="muted">{{nhan}}</p>
 </div>
 {% endblock %}

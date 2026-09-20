@@ -1,0 +1,223 @@
+{
+  "version": "1.0",
+  "ten": "Khung nội dung giáo dục trí tuệ nhân tạo cho học sinh phổ thông",
+  "can_cu": [
+    {
+      "van_ban": "Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026",
+      "noi_dung": "Ban hành Khung nội dung giáo dục trí tuệ nhân tạo (AI) cho học sinh phổ thông",
+      "hieu_luc": "có hiệu lực từ ngày ký"
+    },
+    {
+      "van_ban": "Công văn 5588/BGDĐT-GDPT ngày 19/8/2026",
+      "noi_dung": "Hướng dẫn triển khai thực hiện nội dung giáo dục AI cho học sinh phổ thông từ năm học 2026-2027",
+      "hieu_luc": "thực hiện đại trà từ năm học 2026-2027"
+    }
+  ],
+  "nguon_kiem_chung": [
+    "Cổng thông tin điện tử Chính phủ (chinhphu.vn) — giới thiệu Quyết định 2422/QĐ-BGDĐT và Công văn 5588/BGDĐT-GDPT",
+    "Cổng thông tin điện tử Bộ GDĐT (moet.gov.vn) — toàn văn Quyết định 2422/QĐ-BGDĐT"
+  ],
+  "quy_dinh": [
+    {
+      "khoa": "thoi_luong",
+      "verbatim": "Nội dung cốt lõi có thời lượng 12 tiết/lớp/năm học, trang bị cho học sinh những kiến thức và kĩ năng AI tối thiểu, thiết yếu, có thể vận dụng trực tiếp để hỗ trợ việc học các môn học và tham gia các hoạt động giáo dục theo Chương trình GDPT.",
+      "nguon": "Quyết định 2422/QĐ-BGDĐT (18/8/2026)",
+      "muc_do": "nguyên văn"
+    },
+    {
+      "khoa": "long_ghep",
+      "verbatim": "Lồng ghép trong các môn học, hoạt động giáo dục là hình thức củng cố, vận dụng nội dung cốt lõi và có thể triển khai một phần nội dung mở rộng, không làm thay đổi hoặc gia tăng yêu cầu cần đạt của môn học.",
+      "nguon": "Quyết định 2422/QĐ-BGDĐT (18/8/2026) — nội dung Công văn 5588/BGDĐT-GDPT hướng dẫn triển khai",
+      "muc_do": "nguyên văn"
+    },
+    {
+      "khoa": "vua_suc",
+      "verbatim": "Nội dung, phương pháp và hình thức tổ chức hoạt động giáo dục AI phải phù hợp với tâm lí lứa tuổi, yêu cầu cần đạt, nhu cầu và khả năng tiếp cận công nghệ của học sinh ở từng cấp học, lớp học.",
+      "nguon": "Quyết định 2422/QĐ-BGDĐT (18/8/2026)",
+      "muc_do": "nguyên văn"
+    },
+    {
+      "khoa": "khong_tai_khoan",
+      "verbatim": "…không yêu cầu học sinh phải sử dụng tài khoản cá nhân hoặc công cụ chưa được rà soát.",
+      "nguon": "Quyết định 2422/QĐ-BGDĐT (18/8/2026)",
+      "muc_do": "nguyên văn"
+    },
+    {
+      "khoa": "an_toan_du_lieu",
+      "verbatim": "…tuân thủ quy định pháp luật về bảo vệ dữ liệu cá nhân, sở hữu trí tuệ và an toàn thông tin; xây dựng quy trình tiếp nhận, xử lí và báo cáo sự cố liên quan.",
+      "nguon": "Quyết định 2422/QĐ-BGDĐT (18/8/2026)",
+      "muc_do": "nguyên văn"
+    },
+    {
+      "khoa": "khong_qua_tai",
+      "verbatim": "Việc triển khai phải bảo đảm tính khoa học, sư phạm, vừa sức, không làm thay đổi mục tiêu hoặc gây quá tải khi thực hiện Chương trình giáo dục phổ thông (GDPT).",
+      "nguon": "Quyết định 2422/QĐ-BGDĐT (18/8/2026)",
+      "muc_do": "nguyên văn"
+    },
+    {
+      "khoa": "danh_gia",
+      "verbatim": "Nội dung giáo dục AI không có bài kiểm tra và đầu điểm riêng.",
+      "nguon": "Tóm tắt Quyết định 2422/QĐ-BGDĐT trên báo chính luận (LuatVietnam, 18/8/2026)",
+      "muc_do": "thầy/cô đối chiếu văn bản gốc trước khi trích dẫn trong hồ sơ"
+    }
+  ],
+  "mach": [
+    {
+      "id": "M1",
+      "ten": "Tư duy lấy con người làm trung tâm",
+      "tom_tat": "AI do con người tạo ra và phục vụ con người; học sinh biết xác định khi nào nên dùng AI, nhận biết giới hạn của AI và giữ vai trò quyết định, kiểm soát của con người.",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT)"
+    },
+    {
+      "id": "M2",
+      "ten": "Đạo đức AI",
+      "tom_tat": "Bảo vệ dữ liệu cá nhân, quyền riêng tư, bản quyền, trung thực học thuật; nhận biết thông tin sai, thiên vị, tác động của AI đối với con người và xã hội.",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT)"
+    },
+    {
+      "id": "M3",
+      "ten": "Các kỹ thuật và ứng dụng AI",
+      "tom_tat": "Từ nhận biết AI → hiểu dữ liệu → hiểu thuật toán, mô hình → sử dụng công cụ AI → kiểm chứng kết quả → đánh giá hiệu quả của AI.",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT)"
+    },
+    {
+      "id": "M4",
+      "ten": "Thiết kế hệ thống AI",
+      "tom_tat": "Từ sử dụng AI → hiểu AI → xác định vấn đề → đề xuất giải pháp → thiết kế → thử nghiệm → đánh giá → cải tiến.",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT)"
+    }
+  ],
+  "theo_cap": {
+    "1-5": {
+      "ten_cap": "Cấp tiểu học",
+      "huong": "Làm quen, trải nghiệm, hình thành nhận thức: nhận biết AI trong cuộc sống, hiểu AI do con người tạo ra, AI có thể sai, không chia sẻ dữ liệu cá nhân, tôn trọng sản phẩm và bản quyền của người khác.",
+      "phuong_phap": "trực quan, sinh động, gần gũi: kể chuyện, tranh, trò chơi, đóng vai, quan sát, xử lí tình huống đơn giản",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT) và Công văn 5588/BGDĐT-GDPT"
+    },
+    "6-9": {
+      "ten_cap": "Cấp trung học cơ sở",
+      "huong": "Hiểu, sử dụng và kiểm chứng: hiểu khái niệm cơ bản về dữ liệu, thuật toán, mô hình AI; dùng công cụ AI tạo sản phẩm số đơn giản; biết kiểm tra, đánh giá và điều chỉnh sản phẩm theo phản hồi; ghi lại nguồn dữ liệu, câu lệnh và kết quả thử nghiệm.",
+      "phuong_phap": "thực hành có hướng dẫn, thảo luận nhóm, sản phẩm số đơn giản, xử lí tình huống về dữ liệu và quyền riêng tư",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT)"
+    },
+    "10-12": {
+      "ten_cap": "Cấp trung học phổ thông",
+      "huong": "Phân tích, phản biện và kiến tạo: phân tích dữ liệu và mô hình, đánh giá rủi ro, phản biện phương án, đề xuất giải pháp, thiết kế và thử nghiệm sản phẩm AI, đánh giá tác động, từng bước tìm hiểu nghề nghiệp liên quan đến AI.",
+      "phuong_phap": "nghiên cứu trường hợp, tranh biện, phân tích dữ liệu, dự án, đánh giá rủi ro và đề xuất giải pháp",
+      "muc_do": "diễn giải theo Khung (QĐ 2422/QĐ-BGDĐT)"
+    }
+  },
+  "theo_lop_tieu_hoc": {
+    "1": "Làm quen với AI; nhận biết sự khác nhau giữa con người và AI (con người có cảm xúc, AI thì không); nhận diện AI trong cuộc sống; hiểu máy thông minh có thể học từ ví dụ do con người cung cấp.",
+    "2": "Nhận biết khi nào nên và không nên sử dụng AI; hiểu thêm về AI trong gia đình và cuộc sống.",
+    "3": "Kiểm tra kết quả do AI đưa ra; dữ liệu dùng để máy học; các ứng dụng AI trong trường học.",
+    "4": "Sử dụng AI trong học tập; vai trò của con người; bắt đầu kiểm tra, phản biện kết quả của AI.",
+    "5": "Trách nhiệm của con người khi dùng AI; AI vì lợi ích chung; dữ liệu, thuật toán; bước đầu cải tiến hệ thống AI."
+  },
+  "goi_y_hoat_dong": {
+    "M1": {
+      "1-5": {
+        "muc_tieu": "Nêu được vì sao cần kiểm tra lại câu trả lời của AI trước khi tin và sử dụng câu trả lời đó.",
+        "hoat_dong": "Giáo viên trình chiếu một câu trả lời của công cụ AI (đã chuẩn bị trước, có một chỗ sai) về nội dung đang học; học sinh đối chiếu với sách giáo khoa và nêu chỗ chưa chính xác.",
+        "san_pham": "Ý kiến của học sinh về chỗ sai và cách kiểm tra lại.",
+        "minh_chung": "Học sinh chỉ ra được ít nhất một chỗ cần kiểm chứng và nêu được nguồn đối chiếu."
+      },
+      "6-9": {
+        "muc_tieu": "Xác định được khi nào nên và không nên dùng AI cho một nhiệm vụ học tập; kiểm chứng được kết quả do AI cung cấp bằng nguồn tin cậy.",
+        "hoat_dong": "Học sinh nhận một kết quả do AI tạo cho nhiệm vụ của bài, đối chiếu với sách giáo khoa và nguồn tham khảo, ghi lại chỗ đúng, chỗ sai và cách xử lí.",
+        "san_pham": "Bảng kiểm chứng thông tin (chỗ AI nêu — nguồn đối chiếu — kết luận).",
+        "minh_chung": "Bảng kiểm chứng có đủ nguồn đối chiếu và kết luận rõ ràng."
+      },
+      "10-12": {
+        "muc_tieu": "Phân tích được ưu điểm và giới hạn của AI trong nhiệm vụ học tập; giữ vai trò quyết định của con người khi dùng kết quả do AI tạo ra.",
+        "hoat_dong": "Học sinh nhận xét, phản biện một sản phẩm do AI tạo cho nội dung bài học; đề xuất cách sửa và nêu rõ phần nào do các em quyết định.",
+        "san_pham": "Bản nhận xét — phản biện kèm phương án chỉnh sửa.",
+        "minh_chung": "Chỉ ra được giới hạn của AI và phần học sinh tự quyết định."
+      }
+    },
+    "M2": {
+      "1-5": {
+        "muc_tieu": "Không cung cấp thông tin cá nhân cho công cụ AI; tôn trọng sản phẩm của người khác.",
+        "hoat_dong": "Xử lí tình huống đóng vai: một trang web/công cụ AI hỏi họ tên đầy đủ, địa chỉ, số điện thoại — học sinh thảo luận và nói cách xử lí an toàn.",
+        "san_pham": "Câu trả lời của học sinh về cách xử lí tình huống.",
+        "minh_chung": "Nêu được thông tin nào không nên cung cấp và vì sao."
+      },
+      "6-9": {
+        "muc_tieu": "Bảo vệ dữ liệu cá nhân, tôn trọng bản quyền và trung thực khi sử dụng AI trong học tập.",
+        "hoat_dong": "Thảo luận nhóm: phân biệt “dùng AI hỗ trợ học tập” với “dùng AI làm thay nhiệm vụ”; liệt kê những việc cần khai báo khi có sử dụng AI.",
+        "san_pham": "Bộ quy tắc ngắn của nhóm về sử dụng AI trong học tập.",
+        "minh_chung": "Bộ quy tắc nêu được giới hạn và việc khai báo khi dùng AI."
+      },
+      "10-12": {
+        "muc_tieu": "Phân tích được vấn đề đạo đức, pháp lí khi sử dụng AI và đề xuất cách ứng xử phù hợp.",
+        "hoat_dong": "Phân tích tình huống về thông tin sai lệch/nội dung do AI tạo ra trong học tập; tranh luận và đề xuất cách ứng xử, cách ghi nguồn.",
+        "san_pham": "Bản đề xuất cách ứng xử của nhóm.",
+        "minh_chung": "Lập luận được căn cứ pháp lí, đạo đức và biện pháp cụ thể."
+      }
+    },
+    "M3": {
+      "1-5": {
+        "muc_tieu": "Nhận biết một số ứng dụng AI quen thuộc (nhận diện hình ảnh, nhận diện giọng nói, trợ lý ảo) và bước đầu hiểu AI có thể đưa ra kết quả chưa đúng.",
+        "hoat_dong": "Giáo viên cho học sinh quan sát (do giáo viên thao tác, học sinh không cần tài khoản riêng) một ứng dụng AI đơn giản phục vụ nội dung bài; học sinh nêu việc ứng dụng đó đã làm được và chưa làm được.",
+        "san_pham": "Ý kiến của học sinh về việc AI làm được và chưa làm được.",
+        "minh_chung": "Kể tên được ứng dụng AI đã quan sát và nêu một hạn chế của nó."
+      },
+      "6-9": {
+        "muc_tieu": "Hiểu ở mức cơ bản dữ liệu, thuật toán, mô hình của AI; dùng công cụ AI tạo được sản phẩm số đơn giản và điều chỉnh theo phản hồi.",
+        "hoat_dong": "Học sinh dùng công cụ AI do giáo viên/nhà trường đã rà soát để làm một sản phẩm số đơn giản cho bài học (ví dụ: đoạn giới thiệu, sơ đồ), ghi lại câu lệnh đã dùng và kết quả để đối chiếu.",
+        "san_pham": "Sản phẩm số đơn giản kèm ghi chú câu lệnh đã dùng.",
+        "minh_chung": "Sản phẩm có phần ghi chú rõ ràng và được chỉnh sửa sau phản hồi."
+      },
+      "10-12": {
+        "muc_tieu": "Phân tích được dữ liệu, mô hình ở mức phù hợp; đánh giá độ tin cậy của kết quả và cải tiến được sản phẩm có ứng dụng AI.",
+        "hoat_dong": "Dự án nhỏ: chọn một nhiệm vụ học tập, thử nghiệm với công cụ AI được nhà trường cho phép, so sánh kết quả khi thay đổi dữ liệu/câu lệnh, rút ra kết luận.",
+        "san_pham": "Báo cáo thử nghiệm ngắn (nhiệm vụ — cách làm — kết quả — kết luận).",
+        "minh_chung": "Báo cáo so sánh được kết quả và nêu được kết luận có căn cứ."
+      }
+    },
+    "M4": {
+      "1-5": {
+        "muc_tieu": "Nhận biết AI học từ dữ liệu do con người cung cấp; nêu được ví dụ dữ liệu tốt giúp máy làm việc tốt hơn.",
+        "hoat_dong": "Trò chơi “dạy máy”: học sinh đưa ví dụ (dữ liệu) để phân loại đồ vật trong bài học; khi giáo viên bỏ bớt ví dụ, học sinh nhận ra máy đoán sai.",
+        "san_pham": "Bộ ví dụ của nhóm và nhận xét sau khi bớt dữ liệu.",
+        "minh_chung": "Nêu được dữ liệu ít/không rõ thì máy dễ đoán sai."
+      },
+      "6-9": {
+        "muc_tieu": "Xác định được tình huống phù hợp để ứng dụng AI; lập được kế hoạch và tạo sản phẩm AI đơn giản.",
+        "hoat_dong": "Học sinh chọn một việc trong bài (ví dụ: tóm tắt, gợi ý bài tập), nêu vấn đề, cách làm có AI hỗ trợ và thử làm bản mẫu.",
+        "san_pham": "Kế hoạch ngắn và bản mẫu sản phẩm có sự hỗ trợ của AI.",
+        "minh_chung": "Xác định được vấn đề, cách làm và nêu được vai trò của con người."
+      },
+      "10-12": {
+        "muc_tieu": "Thiết kế, thử nghiệm, đánh giá và cải tiến được một giải pháp/sản phẩm có ứng dụng AI ở mức phù hợp.",
+        "hoat_dong": "Học sinh xác định một vấn đề thực tiễn của môn học, đề xuất giải pháp có ứng dụng AI, thử nghiệm và đánh giá kết quả.",
+        "san_pham": "Hồ sơ giải pháp: vấn đề — phương án — thử nghiệm — đánh giá — cải tiến.",
+        "minh_chung": "Hồ sơ thể hiện được vòng thiết kế — thử nghiệm — cải tiến."
+      }
+    }
+  },
+  "vi_du_long_ghep_theo_mon": {
+    "nguon": "Ví dụ do Công văn 5588/BGDĐT-GDPT nêu trong phần hướng dẫn lồng ghép (diễn giải lại)",
+    "tieng_viet": "Cho học sinh nhận xét một đoạn văn do AI tạo ra: câu nào phù hợp, câu nào chưa chính xác, thông tin nào cần kiểm chứng.",
+    "khoa_hoc_tnxh": "Xem AI đưa ra một câu trả lời về hiện tượng tự nhiên rồi cùng giáo viên kiểm tra tính chính xác.",
+    "hoat_dong_giao_duc": "Thảo luận về việc không chia sẻ thông tin cá nhân cho các công cụ trực tuyến."
+  },
+  "tu_khoa_goi_y": {
+    "M1": ["kiem chung", "doi chieu", "sach giao khoa", "tin cay", "kiem tra lai", "phan bien", "nhan xet", "nhan xét", "danh gia ket qua", "nguon tham khao", "thong tin sai"],
+    "M2": ["thong tin ca nhan", "du lieu ca nhan", "quyen rieng tu", "an toan", "bao mat", "ban quyen", "trung thuc", "dao duc", "khong chia se", "mat khau"],
+    "M3": ["tri tue nhan tao", "ai", "tro ly ao", "nhan dien hinh anh", "nhan dien giong noi", "chatbot", "cong cu", "thiet bi thong minh", "may tinh", "dien thoai", "internet", "phan mem", "ung dung", "bai giang dien tu", "hoc lieu so"],
+    "M4": ["thiet ke", "san pham so", "du an", "giai phap", "mo hinh", "thu nghiem", "cai tien", "lap trinh", "robot", "stem", "mo phong", "y tuong"]
+  },
+  "goi_y_theo_mon": {
+    "tieng viet": ["M1", "M2"],
+    "ngu van": ["M1", "M2"],
+    "tin hoc": ["M3", "M4"],
+    "cong nghe": ["M3", "M4"],
+    "dao duc": ["M2", "M1"],
+    "giao duc cong dan": ["M2"],
+    "khoa hoc": ["M1", "M3"],
+    "tu nhien va xa hoi": ["M1", "M2"],
+    "hoat dong trai nghiem": ["M2", "M4"]
+  },
+  "ghi_chu_ve_muc_do_tin_cay": "Phần [QUY ĐỊNH] trích văn bản có thật (đã kiểm chứng). Phần [ĐỀ XUẤT] do hệ thống soạn cho từng bài — là GỢI Ý, giáo viên duyệt trước khi dùng. Hệ thống không tạo mã chỉ báo mới và không gán nội dung AI cho bài học một cách máy móc: tiêu chí nào bài học chưa có căn cứ sẽ được đánh dấu CẦN GIÁO VIÊN DUYỆT và mặc định không tích."
+}
