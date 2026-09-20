@@ -60,6 +60,11 @@
   <h3>2. Chính tả cần sửa ({{ctx.de_xuat|length}} chỗ)</h3>
   <p class="sub">“Sửa chắc” là lỗi rõ ràng, đã tích sẵn. “Chỉ gợi ý” cần thầy/cô xem ngữ cảnh — hệ thống
   không tự sửa. Tên riêng, công thức, mã chỉ báo, thuật ngữ và viết tắt (GV, HS, SGK…) đã được loại khỏi danh sách.</p>
+  {% set so_hoc = ctx.de_xuat | selectattr('nguon', 'equalto', 'hoc_tu_nguoi_dung') | list | length %}
+  {% if so_hoc %}
+  <p class="sub">Có <b>{{so_hoc}}</b> chỗ dựa trên <b>bản sửa mà giáo viên trong trường đã duyệt trước đây</b>
+   — những chỗ này đáng tin hơn gợi ý của máy; chỗ đã được duyệt từ {{hoc_nguong_nhan}} lần trở lên thì đã tích sẵn.</p>
+  {% endif %}
   {% set so_mh = ctx.de_xuat | selectattr('nguon', 'equalto', 'mo_hinh') | list | length %}
   {% if so_mh %}
   <p class="sub">Trong đó <b>{{so_mh}}</b> chỗ do <b>mô hình nhỏ đã huấn luyện</b> đề xuất —
@@ -72,9 +77,13 @@
    <tr style="text-align:left"><th style="padding:6px">Chọn</th><th style="padding:6px">Hiện tại</th><th style="padding:6px">Đề xuất</th><th style="padding:6px">Lý do</th></tr>
    {% for d in ctx.de_xuat %}
    <tr style="border-top:1px solid #eef2f1">
-    <td style="padding:6px">{% if d.de_xuat %}<input type="checkbox" name="ct_{{d.id}}" value="1" {% if d.che_do=='sua_chac' %}checked{% endif %} style="width:17px">{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td style="padding:6px">{% if d.de_xuat %}<input type="checkbox" name="ct_{{d.id}}" value="1" {% if d.che_do=='sua_chac' %}checked{% endif %} style="width:17px">{% else %}<span class="muted">—</span>{% endif %}
+      <button type="submit" name="dung_tu_{{d.id}}" value="1" class="muted"
+              style="font-size:11px;padding:1px 5px;margin-top:3px"
+              title="Nếu từ này đúng, bấm để hệ thống thôi bắt oan về sau">từ này đúng</button></td>
     <td style="padding:6px">{{d.goc}}
-     {% if d.nguon == 'mo_hinh' %}<br><span class="muted" style="font-size:11px">mô hình</span>{% endif %}</td>
+     {% if d.nguon == 'mo_hinh' %}<br><span class="muted" style="font-size:11px">mô hình</span>{% endif %}
+     {% if d.nguon == 'hoc_tu_nguoi_dung' %}<br><span class="muted" style="font-size:11px">đã được giáo viên duyệt trước đây</span>{% endif %}</td>
     <td style="padding:6px">{% if d.de_xuat %}<b>{{d.de_xuat}}</b>{% else %}<span class="muted">chưa tìm được bản sửa</span>{% endif %}</td>
     <td style="padding:6px" class="muted">{{d.ly_do}} — {{d.nhan}}</td>
    </tr>

@@ -1,0 +1,233 @@
+[
+ {
+  "luc": "2026-09-20 10:49:31",
+  "so_phan_hoi": 72,
+  "so_cau_hoc": 132,
+  "ket_qua": "khong_dat",
+  "ly_do": [
+   "F1 giảm: 0.9588 -> 0.9528",
+   "báo nhầm tăng: 17 -> 25"
+  ],
+  "chi_so_cu": {
+   "precision": 0.985,
+   "recall": 0.9339,
+   "f1": 0.9588,
+   "dung_het": 0.9953,
+   "du_doan_dung_tren_tu_sai": 1117,
+   "bo_sot": 79,
+   "bao_dong_nham_tren_tu_dung": 17,
+   "tu_dung": 19395,
+   "so_dac_trung": 5861,
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 963,
+    "de_xuat_dung": 836,
+    "ti_le_tren_so_loi": 0.699,
+    "ti_le_tren_so_da_de_xuat": 0.8681,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  },
+  "chi_so_moi": {
+   "precision": 0.978,
+   "recall": 0.9289,
+   "f1": 0.9528,
+   "dung_het": 0.9947,
+   "du_doan_dung_tren_tu_sai": 1111,
+   "bo_sot": 85,
+   "bao_dong_nham_tren_tu_dung": 25,
+   "tu_dung": 19387,
+   "so_dac_trung": 5891,
+   "hoc_tu_nguoi_dung": {
+    "so_cau": 132,
+    "trong_so": 660.0,
+    "do_chinh_xac_tren_du_lieu_nguoi_day": 0.9722,
+    "ghi_chu": "Câu học từ quyết định của giáo viên được nhân trọng số cao hơn câu dữ liệu tổng hợp."
+   },
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 967,
+    "de_xuat_dung": 840,
+    "ti_le_tren_so_loi": 0.7023,
+    "ti_le_tren_so_da_de_xuat": 0.8687,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  }
+ },
+ {
+  "luc": "2026-09-20 10:50:20",
+  "so_phan_hoi": 72,
+  "so_cau_hoc": 132,
+  "ket_qua": "khong_dat",
+  "ly_do": [
+   "F1 giảm: 0.9588 -> 0.9532",
+   "báo nhầm tăng: 17 -> 24"
+  ],
+  "chi_so_cu": {
+   "precision": 0.985,
+   "recall": 0.9339,
+   "f1": 0.9588,
+   "dung_het": 0.9953,
+   "du_doan_dung_tren_tu_sai": 1117,
+   "bo_sot": 79,
+   "bao_dong_nham_tren_tu_dung": 17,
+   "tu_dung": 19395,
+   "so_dac_trung": 5861,
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 963,
+    "de_xuat_dung": 836,
+    "ti_le_tren_so_loi": 0.699,
+    "ti_le_tren_so_da_de_xuat": 0.8681,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  },
+  "chi_so_moi": {
+   "precision": 0.9789,
+   "recall": 0.9289,
+   "f1": 0.9532,
+   "dung_het": 0.9947,
+   "du_doan_dung_tren_tu_sai": 1111,
+   "bo_sot": 85,
+   "bao_dong_nham_tren_tu_dung": 24,
+   "tu_dung": 19388,
+   "so_dac_trung": 5891,
+   "hoc_tu_nguoi_dung": {
+    "so_cau": 132,
+    "trong_so": 264.0,
+    "do_chinh_xac_tren_du_lieu_nguoi_day": 0.9722,
+    "ghi_chu": "Câu học từ quyết định của giáo viên được nhân trọng số cao hơn câu dữ liệu tổng hợp."
+   },
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 967,
+    "de_xuat_dung": 840,
+    "ti_le_tren_so_loi": 0.7023,
+    "ti_le_tren_so_da_de_xuat": 0.8687,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  }
+ },
+ {
+  "luc": "2026-09-20 10:51:10",
+  "so_phan_hoi": 72,
+  "so_cau_hoc": 132,
+  "ket_qua": "khong_dat",
+  "ly_do": [
+   "báo nhầm tăng: 17 -> 26"
+  ],
+  "chi_so_cu": {
+   "precision": 0.985,
+   "recall": 0.9339,
+   "f1": 0.9588,
+   "dung_het": 0.9953,
+   "du_doan_dung_tren_tu_sai": 1117,
+   "bo_sot": 79,
+   "bao_dong_nham_tren_tu_dung": 17,
+   "tu_dung": 19395,
+   "so_dac_trung": 5861,
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 963,
+    "de_xuat_dung": 836,
+    "ti_le_tren_so_loi": 0.699,
+    "ti_le_tren_so_da_de_xuat": 0.8681,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  },
+  "chi_so_moi": {
+   "precision": 0.9772,
+   "recall": 0.9314,
+   "f1": 0.9538,
+   "dung_het": 0.9948,
+   "du_doan_dung_tren_tu_sai": 1114,
+   "bo_sot": 82,
+   "bao_dong_nham_tren_tu_dung": 26,
+   "tu_dung": 19386,
+   "so_dac_trung": 5891,
+   "hoc_tu_nguoi_dung": {
+    "so_cau": 132,
+    "trong_so": 264.0,
+    "do_chinh_xac_tren_du_lieu_nguoi_day": 0.9722,
+    "ghi_chu": "Câu học từ quyết định của giáo viên được nhân trọng số cao hơn câu dữ liệu tổng hợp."
+   },
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 967,
+    "de_xuat_dung": 837,
+    "ti_le_tren_so_loi": 0.6998,
+    "ti_le_tren_so_da_de_xuat": 0.8656,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  }
+ },
+ {
+  "luc": "2026-09-20 10:51:57",
+  "so_phan_hoi": 72,
+  "so_cau_hoc": 132,
+  "ket_qua": "dat",
+  "canh_bao": [
+   "báo nhầm tăng nhẹ 17 -> 26 trên 19386 từ đúng"
+  ],
+  "phien_ban_cu": "1.0",
+  "phien_ban_moi": "1.1",
+  "chi_so_moi": {
+   "precision": 0.9772,
+   "recall": 0.9314,
+   "f1": 0.9538,
+   "dung_het": 0.9948,
+   "du_doan_dung_tren_tu_sai": 1114,
+   "bo_sot": 82,
+   "bao_dong_nham_tren_tu_dung": 26,
+   "tu_dung": 19386,
+   "so_dac_trung": 5891,
+   "hoc_tu_nguoi_dung": {
+    "so_cau": 132,
+    "trong_so": 264.0,
+    "do_chinh_xac_tren_du_lieu_nguoi_day": 0.9722,
+    "ghi_chu": "Câu học từ quyết định của giáo viên được nhân trọng số cao hơn câu dữ liệu tổng hợp."
+   },
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 967,
+    "de_xuat_dung": 837,
+    "ti_le_tren_so_loi": 0.6998,
+    "ti_le_tren_so_da_de_xuat": 0.8656,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  }
+ },
+ {
+  "luc": "2026-09-20 10:52:59",
+  "so_phan_hoi": 72,
+  "so_cau_hoc": 22,
+  "ket_qua": "dat",
+  "canh_bao": [],
+  "phien_ban_cu": "1.0",
+  "phien_ban_moi": "1.1",
+  "chi_so_moi": {
+   "precision": 0.9859,
+   "recall": 0.9373,
+   "f1": 0.961,
+   "dung_het": 0.9956,
+   "du_doan_dung_tren_tu_sai": 1121,
+   "bo_sot": 75,
+   "bao_dong_nham_tren_tu_dung": 16,
+   "tu_dung": 19396,
+   "so_dac_trung": 5868,
+   "hoc_tu_nguoi_dung": {
+    "so_cau": 22,
+    "trong_so": 44.0,
+    "do_chinh_xac_tren_du_lieu_nguoi_day": 1.0,
+    "ghi_chu": "Câu học từ quyết định của giáo viên được nhân trọng số cao hơn câu dữ liệu tổng hợp."
+   },
+   "de_xuat_sua": {
+    "so_loi_test": 1196,
+    "so_lan_de_xuat": 967,
+    "de_xuat_dung": 842,
+    "ti_le_tren_so_loi": 0.704,
+    "ti_le_tren_so_da_de_xuat": 0.8707,
+    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
+   }
+  }
+ }
+]

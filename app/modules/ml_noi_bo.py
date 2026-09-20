@@ -16,6 +16,7 @@ Số đo trên tập kiểm tra giữ riêng (từ sai ở tập test không có
 """
 import json
 import math
+import os
 import re
 import unicodedata
 from functools import lru_cache
@@ -49,6 +50,37 @@ def _tu_dien():
 
 
 @lru_cache(maxsize=1)
+def _duong_dan_hoc():
+    """Tệp kiến thức học từ quyết định của giáo viên (cùng thư mục CSDL)."""
+    return os.path.join(os.environ.get("DB_DIR") or "data", "hoc_tu_nguoi_dung.json")
+
+
+@lru_cache(maxsize=8)
+def _doc_hoc(noi_dung):
+    """Phân tích kiến thức học được. Khoá đệm là CHÍNH NỘI DUNG tệp.
+
+    Trước đây đệm theo thời gian sửa tệp. Cách đó sai khi hệ thống tệp có độ phân giải
+    thời gian thô (ghi hai lần trong cùng một giây -> tưởng là tệp không đổi) nên vừa
+    duyệt xong mà mô hình vẫn dùng dữ liệu cũ. So theo nội dung thì luôn đúng.
+    """
+    if not noi_dung:
+        return {"tu_dung": {}, "cap_sua": {}, "cap_nhat": ""}
+    try:
+        return json.loads(noi_dung)
+    except Exception:
+        return {"tu_dung": {}, "cap_sua": {}, "cap_nhat": ""}
+
+
+def hoc_duoc():
+    """Kiến thức học từ giáo viên: từ đã được xác nhận đúng, và cặp sửa đã được duyệt."""
+    p = _duong_dan_hoc()
+    try:
+        with open(p, encoding="utf-8") as f:
+            return _doc_hoc(f.read())
+    except Exception:
+        return _doc_hoc("")
+
+
 def trong_tu_vung(tu):
     """Từ này có nằm trong từ vựng ĐÃ KIỂM CHỨNG (đã loại mọi từ trong bảng lỗi) không?
 

@@ -90,6 +90,22 @@ CREATE TABLE IF NOT EXISTS sms_log(
 CREATE TABLE IF NOT EXISTS setting(
   k TEXT PRIMARY KEY, v TEXT
 );
+CREATE TABLE IF NOT EXISTS ml_phan_hoi(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  luc TEXT, giao_vien TEXT, lop TEXT, phien_ban TEXT,
+  tu TEXT, truoc TEXT, sau TEXT, de_xuat TEXT,
+  quyet_dinh TEXT,                 -- nhan | bo  (giáo viên nhận hay bỏ qua đề xuất)
+  nguon TEXT                       -- luat | mo_hinh | hoc_tu_nguoi_dung
+);
+CREATE INDEX IF NOT EXISTS idx_ml_phan_hoi_tu ON ml_phan_hoi(tu);
+CREATE TABLE IF NOT EXISTS ml_da_hoc(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  loai TEXT,                       -- tu_dung | cap_sua
+  khoa TEXT UNIQUE,                -- từ đúng  |  "từ sai -> từ đúng"
+  dem INTEGER DEFAULT 0,
+  du_lieu TEXT,                    -- JSON chi tiết
+  cap_nhat TEXT
+);
 """
 
 

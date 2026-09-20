@@ -46,6 +46,29 @@
  </form>
 </div>
 
+{% if hoc %}
+<div class="card">
+ <h3>Mô hình học từ chính giáo viên trong trường</h3>
+ <p>Mỗi lần thầy/cô duyệt hoặc bỏ qua một đề xuất sửa, hệ thống ghi lại quyết định đó
+ (chỉ ghi <b>từ</b> và 1 từ mỗi bên làm ngữ cảnh — <b>không ghi cả giáo án</b>, dữ liệu chỉ nằm
+ trên máy chủ này, không gửi đi đâu) rồi học dần:</p>
+ <ul>
+  <li>Từ bị bỏ qua <b>{{hoc.nguong_bo}}</b> lần → hệ thống coi là từ đúng, <b>thôi bắt oan</b>.
+      Đã học được <b>{{hoc.so_tu_dung}}</b> từ như vậy.</li>
+  <li>Cặp “từ sai → từ đúng” được duyệt <b>{{hoc.nguong_nhan}}</b> lần → thành “sửa chắc”, tích sẵn.
+      Đã học được <b>{{hoc.so_cap_sua}}</b> cặp sửa.</li>
+  <li>Dữ liệu phản hồi còn được đưa vào huấn luyện lại mô hình để mô hình chính xác hơn theo thời gian.</li>
+ </ul>
+ <p class="muted">Đã ghi <b>{{hoc.so_phan_hoi}}</b> quyết định ({{hoc.so_nhan}} nhận / {{hoc.so_bo}} bỏ qua).
+   {% if hoc.cap_nhat %}Cập nhật lần cuối: {{hoc.cap_nhat}}.{% endif %}
+   Việc học đang <b>{{'BẬT' if hoc.bat else 'TẮT'}}</b>.</p>
+ <form method="post" action="{{url_for('giao_an_nls.bat_tat_hoc')}}"
+       onsubmit="return confirm('{{"Tắt" if hoc.bat else "Bật"}} việc học từ quyết định của giáo viên?')">
+   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+   <button class="btn" type="submit">{{'Tắt việc học' if hoc.bat else 'Bật việc học'}}</button>
+ </form>
+</div>
+{% endif %}
 {% if mo_hinh and mo_hinh.co_mo_hinh %}
 <div class="card">
  <h3>Mô hình chính tả đã huấn luyện</h3>

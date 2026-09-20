@@ -22,6 +22,7 @@ from ..modules import nld_tich_hop as TH
 from ..modules import chinh_ta_gd as CTG
 from ..modules import ai_provider as AI
 from ..modules import ml_noi_bo as ML
+from ..modules import hoc_tu_nguoi_dung as HOC
 from .digital import folder, load, save  # dùng lại nơi lưu tạm, có kiểm tra chủ sở hữu
 
 MENU = {'label': 'Giáo án & năng lực số', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
@@ -30,6 +31,15 @@ NHAN_NOI_BO = ("Hệ thống chạy hoàn toàn trên máy chủ của trường
                "bộ luật chính tả và MỘT MÔ HÌNH NHỎ DO EDUASSIST TỰ HUẤN LUYỆN (dò lỗi chính tả). "
                "KHÔNG gửi nội dung giáo án ra Google/Gemini hay dịch vụ AI nào. "
                "Mô hình này KHÔNG phải mô hình ngôn ngữ lớn: không sinh nội dung, không hiểu nội dung.")
+
+
+@bp.route('/hoc-tu-nguoi-dung/bat-tat', methods=['POST'])
+@login_required
+def bat_tat_hoc():
+    """Bật/tắt việc ghi phản hồi để học. Mặc định bật; dữ liệu chỉ nằm trên máy chủ này."""
+    HOC.dat_bat(not HOC.bat())
+    flash('Đã %s việc học từ quyết định của giáo viên.' % ('BẬT' if HOC.bat() else 'TẮT'), 'ok')
+    return redirect(url_for('giao_an_nls.index'))
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -87,7 +97,7 @@ def index():
 
     return render_template('giao_an_upload.html', nhan=NHAN_NOI_BO,
                            luat=NLD.thong_ke(), tu_dien=CTG.thong_ke_tu_dien(),
-                           mo_hinh=ML.thong_tin())
+                           mo_hinh=ML.thong_tin(), hoc=HOC.thong_ke())
 
 
 @bp.route('/<token>/duyet', methods=['GET'])
@@ -100,7 +110,7 @@ def duyet(token):
     return render_template('giao_an_duyet.html', ctx=ctx['ctx'], token=token,
                            ten_file=ctx['name'], nhan=NHAN_NOI_BO,
                            nhan_ct=CTG.nhan_ket_qua(), loi_cu=session.pop('loi_cu', None),
-                           nhan_mh=ML.nhan())
+                           nhan_mh=ML.nhan(), hoc_nguong_nhan=HOC.NGUONG_NHAN)
 
 
 @bp.route('/<token>/xuat', methods=['POST'])
@@ -111,6 +121,26 @@ def xuat(token):
         flash('Phiên xử lý đã hết hạn. Vui lòng tải lại file.', 'err')
         return redirect(url_for('giao_an_nls.index'))
     c = ctx['ctx']
+
+    # Nút "Từ này đúng, đừng bắt nữa": ghi tín hiệu RÕ RÀNG rồi quay lại trang duyệt
+    dung_tu = []
+    for k in request.form:
+        if k.startswith('dung_tu_'):
+            try:
+                dung_tu.append(int(k[len('dung_tu_'):]))
+            except ValueError:
+                pass
+    if dung_tu:
+        try:
+            canh_bao = [d for d in c['de_xuat'] if d['id'] in dung_tu]
+            HOC.ghi(canh_bao, [], giao_vien=HOC.ten_giao_vien(session.get('uid')),
+                    lop=c.get('lop') or '', phien_ban=ML.thong_tin().get('phien_ban', ''),
+                    ep_quyet_dinh='dung')
+            flash('Đã ghi nhận: %s là từ đúng — lần sau hệ thống sẽ không bắt nữa.' %
+                  ', '.join('“%s”' % d['goc'] for d in canh_bao), 'ok')
+        except Exception:
+            flash('Chưa ghi nhận được, thầy/cô thử lại giúp em.', 'err')
+        return redirect(url_for('giao_an_nls.duyet', token=token))
 
     chon_ma = [code for code in request.form.getlist('ma')]
     chon_ct = []
@@ -128,6 +158,15 @@ def xuat(token):
     except Exception:
         flash('Không tạo được bản Word. File gốc có thể đã hỏng — hãy lưu lại bằng Word rồi thử lại.', 'err')
         return redirect(url_for('giao_an_nls.duyet', token=token))
+
+    # GHI PHẢN HỒI: giáo viên nhận hay bỏ qua từng đề xuất — đây là dữ liệu để
+    # hệ thống học (xem app/modules/hoc_tu_nguoi_dung.py). Lỗi ghi không được làm
+    # hỏng việc xuất tệp của giáo viên.
+    try:
+        HOC.ghi(c['de_xuat'], chon_ct, giao_vien=HOC.ten_giao_vien(session.get('uid')),
+                lop=c.get('lop') or '', phien_ban=ML.thong_tin().get('phien_ban', ''))
+    except Exception:
+        pass
 
     kt = bao_cao.get('kiem_tra') or {}
     if not kt.get('xuat_duoc', True):

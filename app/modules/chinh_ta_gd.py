@@ -126,6 +126,95 @@ def _tu_dung_da_biet(tu):
         return False
 
 
+def _hoc_duoc():
+    """Kiến thức học từ quyết định của giáo viên trong trường (nạp muộn, lỗi thì bỏ qua)."""
+    try:
+        from . import ml_noi_bo as ML
+        return ML.hoc_duoc()
+    except Exception:
+        return {"tu_dung": {}, "cap_sua": {}}
+
+
+NGUONG_HOC_NHAN = 2   # giáo viên nhận đủ 2 lần -> đề xuất đó thành "sửa chắc", tích sẵn
+
+
+def giu_nguyen_hoa(mau, tu):
+    """Giữ kiểu viết hoa của từ gốc khi thay bằng bản sửa đã học."""
+    if (tu or "")[:1].isupper():
+        return (mau or "")[:1].upper() + (mau or "")[1:]
+    return mau
+
+
+def ap_dung_da_hoc(ra):
+    """Áp kiến thức học được vào danh sách đề xuất.
+
+      · Từ giáo viên đã bỏ qua nhiều lần -> bỏ khỏi danh sách (thôi bắt oan).
+      · Cặp sửa đã được giáo viên duyệt -> dùng đúng bản sửa đó, ghi rõ nguồn gốc.
+    """
+    hoc = _hoc_duoc()
+    tu_dung = hoc.get("tu_dung") or {}
+    cap_sua = hoc.get("cap_sua") or {}
+    if tu_dung:
+        ra = [d for d in ra if (d.get("goc") or "").strip().lower() not in tu_dung]
+    for d in ra:
+        cap = cap_sua.get((d.get("goc") or "").strip().lower())
+        if not cap:
+            continue
+        d["de_xuat"] = giu_nguyen_hoa(cap["sua"], d.get("goc"))
+        d["nguon"] = "hoc_tu_nguoi_dung"
+        dem = int(cap.get("dem") or 1)
+        d["che_do"] = "sua_chac" if dem >= NGUONG_HOC_NHAN else "chi_goi_y"
+        d["do_tin_cay"] = "cao" if dem >= NGUONG_HOC_NHAN else "thap"
+        d["ly_do"] = (f"Chính tả: giáo viên trong trường đã duyệt sửa “{d['goc']}” "
+                      f"thành “{d['de_xuat']}” {dem} lần")
+        d["nhan"] = ("Sửa chắc — do giáo viên trong trường đã duyệt nhiều lần" if dem >= NGUONG_HOC_NHAN
+                     else "Chỉ gợi ý — do giáo viên trong trường đã duyệt 1 lần")
+    return ra
+
+
+def _quet_da_hoc(paragraphs, da_co):
+    """Tìm những từ mà chính trường đã biết là sai (nhờ giáo viên duyệt trước đây).
+
+    Nhờ phần này mà hệ thống học được cả những lỗi mô hình bỏ sót: giáo viên sửa một
+    lần, lần sau máy tự nhắc lại đúng bản sửa đó.
+    """
+    cap_sua = (_hoc_duoc().get("cap_sua") or {})
+    if not cap_sua:
+        return []
+    ra, dem = [], 0
+    for pi, p in enumerate(paragraphs or []):
+        if not (p or "").strip():
+            continue
+        vung = _vung_cam(p)
+        for goc, cap in cap_sua.items():
+            for m in re.finditer(re.escape(goc), p, flags=re.IGNORECASE):
+                if not _ranh_gioi_tu(p, m.start(), m.end()):
+                    continue
+                if _trong_vung(m.start(), m.end(), vung):
+                    continue
+                # KHÔNG bỏ qua chỉ vì máy cũng đã bắt chỗ này: cặp sửa do giáo viên
+                # duyệt có thể dài hơn (cả cụm) và phải thắng khi loại chồng lấn.
+                if any(x["para"] == pi and x["start"] == m.start() and x["end"] == m.end()
+                       for x in ra):
+                    continue
+                dem += 1
+                ban_sua = giu_nguyen_hoa(cap["sua"], m.group(0))
+                ra.append({
+                    "id": 300000 + dem, "para": pi, "start": m.start(), "end": m.end(),
+                    "doan_goc": p, "goc": m.group(0), "de_xuat": ban_sua,
+                    "ly_do": (f"Chính tả: giáo viên trong trường đã duyệt sửa “{m.group(0)}” "
+                              f"thành “{ban_sua}” {cap.get('dem', 1)} lần"),
+                    "loai_loi": "hoc_tu_nguoi_dung",
+                    "do_tin_cay": "cao" if int(cap.get("dem") or 1) >= NGUONG_HOC_NHAN else "thap",
+                    "che_do": "sua_chac" if int(cap.get("dem") or 1) >= NGUONG_HOC_NHAN else "chi_goi_y",
+                    "nguon": "hoc_tu_nguoi_dung",
+                    "nhan": ("Sửa chắc — do giáo viên trong trường đã duyệt nhiều lần"
+                             if int(cap.get("dem") or 1) >= NGUONG_HOC_NHAN
+                             else "Chỉ gợi ý — do giáo viên trong trường đã duyệt 1 lần"),
+                })
+    return ra
+
+
 def soan_bao_cao(paragraphs, opts=None):
     """Chạy kiểm tra và trả về danh sách đề xuất có trước/sau/lý do/độ tin cậy.
 
@@ -175,7 +264,10 @@ def soan_bao_cao(paragraphs, opts=None):
         })
     # tầng 3: MÔ HÌNH NHỎ ĐÃ HUẤN LUYỆN (chỉ gợi ý, không bao giờ "sửa chắc")
     ra += _quet_mo_hinh(paragraphs, ra)
+    # tầng 4: KIẾN THỨC HỌC TỪ CHÍNH GIÁO VIÊN TRONG TRƯỜNG (duyệt trước đây)
+    ra += _quet_da_hoc(paragraphs, ra)
 
+    ra = ap_dung_da_hoc(ra)
     ra = _loai_chong_lan(ra)
     return ra, bo_qua
 
@@ -354,24 +446,24 @@ def _quet_mo_hinh(paragraphs, da_co):
     return ra
 
 
-def _loai_chong_lan(ds):
-    """Bỏ đề xuất chồng lấn nhau trong cùng đoạn (giữ cái dài hơn).
+UU_TIEN_NGUON = {"hoc_tu_nguoi_dung": 0, "mo_hinh": 1}   # nhỏ hơn = ưu tiên hơn
 
-    Không có bước này, "hoc sinh" và "hoc" cùng khớp một vùng và khi áp dụng
-    sẽ nhân đôi chữ ("học sinhhọc sinh").
+
+def _loai_chong_lan(ds):
+    """Bỏ đề xuất chồng lấn nhau (giữ cái dài hơn), nhưng ƯU TIÊN nguồn đáng tin hơn.
+
+    Không có bước này, "hoc sinh" và "hoc" cùng khớp một vùng và khi áp dụng sẽ nhân
+    đôi chữ ("học sinhhọc sinh"). Thứ tự ưu tiên: kiến thức do giáo viên trong trường
+    đã duyệt > mô hình > bộ luật, để bản sửa người dạy đã xác nhận không bị máy ghi đè.
     """
-    theo_doan = {}
-    for d in ds:
-        theo_doan.setdefault(d["para"], []).append(d)
     ra = []
-    for _pi, ds_doan in theo_doan.items():
-        ds_doan.sort(key=lambda x: (x["start"], -(x["end"] - x["start"])))
-        cuoi = -1
-        for d in ds_doan:
-            if d["start"] < cuoi:
-                continue
-            ra.append(d)
-            cuoi = d["end"]
+    ds_sx = sorted(ds, key=lambda x: (UU_TIEN_NGUON.get(x.get("nguon"), 2),
+                                      x["para"], x["start"], -(x["end"] - x["start"])))
+    for d in ds_sx:
+        if any(k["para"] == d["para"] and d["start"] < k["end"] and k["start"] < d["end"]
+               for k in ra):
+            continue
+        ra.append(d)
     ra.sort(key=lambda x: (x["para"], x["start"]))
     for i2, d in enumerate(ra):
         d["id"] = i2

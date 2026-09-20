@@ -1,20 +1,26 @@
 {
  "mo_hinh_chinh_ta": {
-  "precision": 0.985,
-  "recall": 0.9339,
-  "f1": 0.9588,
-  "dung_het": 0.9953,
-  "du_doan_dung_tren_tu_sai": 1117,
-  "bo_sot": 79,
-  "bao_dong_nham_tren_tu_dung": 17,
-  "tu_dung": 19395,
-  "so_dac_trung": 5861,
+  "precision": 0.9859,
+  "recall": 0.9373,
+  "f1": 0.961,
+  "dung_het": 0.9956,
+  "du_doan_dung_tren_tu_sai": 1121,
+  "bo_sot": 75,
+  "bao_dong_nham_tren_tu_dung": 16,
+  "tu_dung": 19396,
+  "so_dac_trung": 5868,
+  "hoc_tu_nguoi_dung": {
+   "so_cau": 22,
+   "trong_so": 44.0,
+   "do_chinh_xac_tren_du_lieu_nguoi_day": 1.0,
+   "ghi_chu": "Câu học từ quyết định của giáo viên được nhân trọng số cao hơn câu dữ liệu tổng hợp."
+  },
   "de_xuat_sua": {
    "so_loi_test": 1196,
-   "so_lan_de_xuat": 963,
-   "de_xuat_dung": 836,
-   "ti_le_tren_so_loi": 0.699,
-   "ti_le_tren_so_da_de_xuat": 0.8681,
+   "so_lan_de_xuat": 967,
+   "de_xuat_dung": 842,
+   "ti_le_tren_so_loi": 0.704,
+   "ti_le_tren_so_da_de_xuat": 0.8707,
    "cach_chon": "điểm mô hình + 0.1*log(tần suất); beta chọn theo số đo trên tập test"
   }
  },
@@ -40,20 +46,20 @@
    "so_mau_test": 448,
    "chia_tap": "theo mẫu câu — mẫu vào tập test thì không có trong tập train"
   },
-  "huan_luyen_luc": "2026-09-20 10:23"
+  "huan_luyen_luc": "2026-09-20 10:52"
  },
  "so_sanh_bo_luat": {
   "train": {
-   "tong_loi": 3661,
-   "luat_bat": 2944,
-   "mo_hinh_bat": 3661,
-   "hop_bat": 3661
+   "tong_loi": 3666,
+   "luat_bat": 3023,
+   "mo_hinh_bat": 3666,
+   "hop_bat": 3666
   },
   "test": {
    "tong_loi": 1196,
-   "luat_bat": 872,
-   "mo_hinh_bat": 1117,
-   "hop_bat": 1128
+   "luat_bat": 892,
+   "mo_hinh_bat": 1121,
+   "hop_bat": 1122
   }
  }
 }
