@@ -100,15 +100,16 @@
       <b style="font-size:15.5px;flex:1">Kiểm tra chính tả có duyệt</b>
       <span class="chip" style="background:#cffafe;color:#0e7490">NÂNG CẤP</span>
     </div>
-    <p class="sub" style="margin:0 0 10px">Mỗi đề xuất đều nêu <b>lý do</b> và <b>nguồn</b> (bộ luật, mô hình, hay
-    đã được giáo viên duyệt trước đây). Nay hệ thống dò cả <b>chữ trong bảng biểu</b> của giáo án, và
+    <p class="sub" style="margin:0 0 10px">Đã tách thành <b>công cụ riêng</b>: chỉ chạy khi thầy/cô mở và bấm kiểm tra —
+    <b>không</b> tự chạy kèm khi soạn giáo án hay làm việc khác. Mỗi đề xuất đều nêu <b>lý do</b> và <b>nguồn</b>
+    (bộ luật, mô hình, hay đã được giáo viên duyệt trước đây); dò cả <b>chữ trong bảng biểu</b> và
     <b>không đụng</b> tới câu đúng, thuật ngữ, tên riêng, công thức, mã chỉ báo.</p>
     <div class="row" style="gap:6px;margin-bottom:11px">
       {% if ai.mo_hinh.chi_so %}<span class="chip">Bắt được {{ '%.0f'|format(ai.mo_hinh.chi_so.recall*100) }}% lỗi</span>
       <span class="chip">Báo nhầm {{ ai.mo_hinh.chi_so.bao_dong_nham_tren_tu_dung }}/{{ ai.mo_hinh.chi_so.tu_dung }} từ đúng</span>{% endif %}
       <span class="chip">Có duyệt trước khi sửa</span>
     </div>
-    <a class="btn sec sm" href="{{url_for('core.chinh_ta')}}">Kiểm tra chính tả →</a>
+    <a class="btn sec sm" href="{{url_for('chinh_ta.index') if 'chinh_ta.index' in cong_cu|map(attribute='endpoint')|list else url_for('core.dashboard')}}">Kiểm tra chính tả →</a>
   </div>
 </div>
 
@@ -188,7 +189,7 @@
           để gợi ý chỗ sai. Mọi đề xuất đều ở mức <b>gợi ý</b> — giáo viên duyệt trước khi sửa.</p>
       </div>
       {% if ai.co_toggle %}
-      <form method="post" action="{{url_for('giao_an_nls.bat_tat_hoc')}}"
+      <form method="post" action="{{url_for('chinh_ta.bat_tat_hoc')}}"
             onsubmit="return confirm('{{'Tắt' if ai.hoc.bat else 'Bật'}} việc học từ quyết định của giáo viên?')">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
         <input type="hidden" name="next" value="/">
@@ -196,7 +197,7 @@
           {{ 'Tắt việc học' if ai.hoc.bat else 'Bật việc học' }}</button>
       </form>
       {% endif %}
-      <a class="btn sec sm" href="{{url_for('giao_an_nls.index') if 'giao_an_nls.index' in cong_cu|map(attribute='endpoint')|list else url_for('core.chinh_ta')}}"
+      <a class="btn sec sm" href="{{url_for('chinh_ta.index') if 'chinh_ta.index' in cong_cu|map(attribute='endpoint')|list else url_for('core.dashboard')}}"
          style="justify-content:center">Xem chi tiết việc học →</a>
     </div>
   </div>

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block head %}Kiểm tra chính tả{% endblock %}
+{% block crumb %}Công cụ riêng — chỉ chạy khi thầy/cô cần kiểm tra chính tả{% endblock %}
+{% block body %}
+<div class="card">
+ <h3>Kiểm tra chính tả có duyệt</h3>
+ <p class="sub">Đây là <b>công cụ riêng</b>: chỉ chạy khi thầy/cô mở trang này và yêu cầu kiểm tra.
+ Nó <b>không</b> tự chạy kèm khi soạn giáo án hay khi làm việc khác.</p>
+ <p class="sub">Cách dùng: đưa vào một văn bản (giáo án, đề kiểm tra, nhận xét, bài viết…) — hệ thống dò lỗi,
+ nêu <b>lý do</b> và <b>bản sửa</b>, thầy/cô <b>duyệt từng chỗ</b> rồi tải bản .docx đã sửa.
+ Bản gốc luôn được giữ nguyên; chữ đã sửa được <b style="color:#ff0000">tô đỏ</b> để thầy/cô thấy ngay.</p>
+ <form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  <label class="f" style="margin-bottom:14px">File Word (.docx, tối đa 8 MB)
+   <input type="file" name="file" accept=".docx"></label>
+  <label class="f" style="margin-bottom:14px">Hoặc dán nội dung cần kiểm tra
+   <textarea name="noi_dung" rows="8" maxlength="200000"
+             placeholder="Dán văn bản vào đây…"></textarea></label>
+  <div class="row">
+   <label class="f" style="flex:1;min-width:160px">Lớp (không bắt buộc)
+    <select name="grade">
+     <option value="">— Không chọn —</option>
+     {% for i in range(1,13) %}<option value="{{i}}">Lớp {{i}}</option>{% endfor %}
+    </select></label>
+   <label class="f" style="flex:2;min-width:180px">Môn (không bắt buộc)
+    <input name="subject" maxlength="100" value="{{user['subject'] or ''}}" placeholder="Ví dụ: Ngữ văn"></label>
+  </div>
+  <button class="ok" style="margin-top:16px">Kiểm tra chính tả</button>
+  <p class="muted" style="margin-top:8px">Điền lớp/môn để chỗ sửa được ghi lại kèm ngữ cảnh giúp hệ thống học chính xác hơn —
+  không bắt buộc.</p>
+ </form>
+</div>
+
+{% if hoc %}
+<div class="card">
+ <h3>Mô hình học từ chính giáo viên trong trường</h3>
+ <p>Mỗi lần thầy/cô duyệt hoặc bỏ qua một đề xuất sửa, hệ thống ghi lại quyết định đó
+ (chỉ ghi <b>từ</b> và 1 từ mỗi bên làm ngữ cảnh — <b>không ghi cả văn bản</b>, dữ liệu chỉ nằm
+ trên máy chủ này, không gửi đi đâu) rồi học dần:</p>
+ <ul>
+  <li>Từ bị bỏ qua <b>{{hoc.nguong_bo}}</b> lần → hệ thống coi là từ đúng, <b>thôi bắt oan</b>.
+      Đã học được <b>{{hoc.so_tu_dung}}</b> từ như vậy.</li>
+  <li>Cặp “từ sai → từ đúng” được duyệt <b>{{hoc.nguong_nhan}}</b> lần → thành “sửa chắc”, tích sẵn.
+      Đã học được <b>{{hoc.so_cap_sua}}</b> cặp sửa.</li>
+  <li>Dữ liệu phản hồi còn được đưa vào huấn luyện lại mô hình để mô hình chính xác hơn theo thời gian.</li>
+ </ul>
+ <p class="muted">Đã ghi <b>{{hoc.so_phan_hoi}}</b> quyết định ({{hoc.so_nhan}} nhận / {{hoc.so_bo}} bỏ qua).
+   {% if hoc.cap_nhat %}Cập nhật lần cuối: {{hoc.cap_nhat}}.{% endif %}
+   Việc học đang <b>{{'BẬT' if hoc.bat else 'TẮT'}}</b>.</p>
+ <form method="post" action="{{url_for('chinh_ta.bat_tat_hoc')}}"
+       onsubmit="return confirm('{{'Tắt' if hoc.bat else 'Bật'}} việc học từ quyết định của giáo viên?')">
+   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+   <button class="btn" type="submit">{{'Tắt việc học' if hoc.bat else 'Bật việc học'}}</button>
+ </form>
+</div>
+{% endif %}
+
+{% if mo_hinh and mo_hinh.co_mo_hinh %}
+<div class="card">
+ <h3>Mô hình chính tả đã huấn luyện</h3>
+ <p>Bên cạnh bộ luật, hệ thống dùng thêm một <b>mô hình nhỏ do chính EduAssist huấn luyện</b> để dò lỗi chính tả
+ (hồi quy logistic trên n-gram ký tự, {{mo_hinh.so_trong_so}} trọng số). Đây <b>không phải mô hình ngôn ngữ lớn</b>:
+ mô hình không sinh nội dung, không hiểu nội dung, chỉ chấm điểm từng từ.</p>
+ <ul>
+  <li>Huấn luyện lúc {{mo_hinh.huan_luyen_luc}} trên dữ liệu tổng hợp (cụm từ ngành + câu nguyên văn văn bản Bộ),
+      từ vựng {{mo_hinh.so_tu_vung}} từ.</li>
+  <li>Tập kiểm tra giữ riêng (từ sai ở tập test không có trong tập train):
+      chính xác <b>{{'%.2f'|format(mo_hinh.chi_so.precision)}}</b>,
+      bắt được <b>{{'%.0f'|format(mo_hinh.chi_so.recall*100)}}%</b> số lỗi,
+      báo nhầm {{mo_hinh.chi_so.bao_dong_nham_tren_tu_dung}}/{{mo_hinh.chi_so.tu_dung}} từ đúng.</li>
+  <li>Mọi đề xuất từ mô hình đều ở mức <b>chỉ gợi ý</b> — hệ thống không tự sửa.</li>
+ </ul>
+</div>
+{% endif %}
+
+<div class="card">
+ <h3>Hệ thống làm gì — và không làm gì</h3>
+ <p><b>Có làm:</b> dò lỗi theo bộ luật nội bộ, từ điển thuật ngữ giáo dục ({{luat.so_thuat_ngu}} thuật ngữ được bảo vệ)
+ và mô hình nhỏ đã huấn luyện; dò cả <b>chữ trong bảng biểu</b>; loại trừ tên riêng, công thức, mã chỉ báo,
+ viết tắt (GV, HS, SGK…) và thuật ngữ; nêu trước/sau/lý do/nguồn cho từng chỗ; tô đỏ chữ đã sửa.</p>
+ <p><b>Không làm:</b> không gửi văn bản của thầy/cô ra Google/Gemini hay bất kỳ dịch vụ AI bên ngoài;
+ không chạy macro trong file Word; không tự sửa khi thầy/cô chưa tích; không tự tạo mã chỉ báo;
+ không lưu file lên máy chủ lâu dài (phiên xử lý tự hết hạn).</p>
+ <p class="muted">{{nhan}}</p>
+ <p class="muted">{{nhan_ct}}</p>
+</div>
+{% endblock %}

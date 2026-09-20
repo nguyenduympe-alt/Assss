@@ -11,8 +11,6 @@ from .modules.word_bao_giang import build_docx
 from .modules import billing as BL
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
-from .modules import chinhta as CT
-from .modules import docx_text as DT
 from .modules import sms as SMS
 from .modules import bank_webhook as BW
 from .modules import config as CFG
@@ -33,9 +31,10 @@ def _cong_cu():
         {"icon": "🤖", "ten": "Nhận xét AI", "endpoint": "core.nhan_xet", "mau": "#059669",
          "mo_ta": "Sinh nhận xét học sinh theo mẫu của Bộ, xuất file Excel cho cả lớp",
          "the": ["Thông tư 27/2020"], "moi": False},
-        {"icon": "🔤", "ten": "Kiểm tra chính tả có duyệt", "endpoint": "core.chinh_ta", "mau": "#06b6d4",
-         "mo_ta": "Dò lỗi bằng mô hình nhỏ + bộ luật, nêu lý do và bản sửa để thầy/cô duyệt từng chỗ",
-         "the": ["Dò cả trong bảng biểu"], "moi": True},
+        {"icon": "🔤", "ten": "Kiểm tra chính tả", "endpoint": "chinh_ta.index", "mau": "#06b6d4",
+         "mo_ta": "Công cụ riêng, chỉ chạy khi thầy/cô cần: dò lỗi bằng mô hình nhỏ + bộ luật, "
+                  "nêu lý do và bản sửa để thầy/cô duyệt từng chỗ",
+         "the": ["Tách riêng khỏi năng lực số", "Dò cả trong bảng biểu"], "moi": True},
         {"icon": "🧩", "ten": "Năng lực số & STEM", "endpoint": "digital.index", "mau": "#8b5cf6",
          "mo_ta": "Kho chỉ báo năng lực số đã kiểm chứng theo văn bản Bộ; gợi ý bài học STEM",
          "the": ["137 chỉ báo"], "moi": False},
@@ -80,7 +79,10 @@ def _trang_thai_ai():
     except Exception:
         out["hoc"] = None
     from flask import current_app
-    out["co_toggle"] = "giao_an_nls.bat_tat_hoc" in current_app.view_functions
+    # Nút bật/tắt việc học: nay nằm ở công cụ CHÍNH TẢ (đã tách riêng khỏi giáo án).
+    # Vẫn nhận tên cũ để không vỡ nếu bản triển khai nào chưa cập nhật.
+    out["co_toggle"] = any(ep in current_app.view_functions
+                           for ep in ("chinh_ta.bat_tat_hoc", "giao_an_nls.bat_tat_hoc"))
     return out if (out["mo_hinh"] or out["hoc"]) else None
 
 
@@ -734,126 +736,6 @@ def lich_nghi():
     return render_template("lichnghi.html", breaks=breaks, cal=cal, tuan1=tuan1,
                            max_tuan=max_tuan, n_tuan_nghi=n_tuan_nghi, ket_thuc=ket_thuc,
                            nam_nay=datetime.date.today().year)
-
-
-# ---------------- Kiểm tra lỗi chính tả ----------------
-_CT_DIR = os.path.join(os.environ.get("DB_DIR", "data"), "tmp")
-
-
-def _ct_save(payload, data):
-    """Lưu ngữ cảnh phiên chính tả ra đĩa (cookie chỉ giữ 1 token ngắn)."""
-    os.makedirs(_CT_DIR, exist_ok=True)
-    now = time.time()
-    for fn in os.listdir(_CT_DIR):          # dọn file cũ > 2 giờ
-        fp = os.path.join(_CT_DIR, fn)
-        try:
-            if now - os.path.getmtime(fp) > 7200:
-                os.remove(fp)
-        except OSError:
-            pass
-    tok = uuid.uuid4().hex
-    with open(os.path.join(_CT_DIR, tok + ".json"), "w", encoding="utf-8") as fh:
-        json.dump(payload, fh, ensure_ascii=False)
-    if data:
-        with open(os.path.join(_CT_DIR, tok + ".docx"), "wb") as fh:
-            fh.write(data)
-    session["ct"] = tok
-    return tok
-
-
-def _ct_load():
-    tok = session.get("ct")
-    if not tok or not re.fullmatch(r"[0-9a-f]{32}", tok or ""):
-        return None, None
-    fj = os.path.join(_CT_DIR, tok + ".json")
-    if not os.path.exists(fj):
-        return None, None
-    with open(fj, encoding="utf-8") as fh:
-        ctx = json.load(fh)
-    fd = os.path.join(_CT_DIR, tok + ".docx")
-    return ctx, (fd if os.path.exists(fd) else None)
-
-@bp.route("/chinh-ta", methods=["GET", "POST"])
-@login_required
-def chinh_ta():
-    db, u = get_db(), current_user()
-    if request.method == "POST":
-        f = request.files.get("file")
-        raw = request.form.get("noi_dung", "")
-        opts = {"mat_dau": bool(request.form.get("mat_dau")),
-                "lap_tu": bool(request.form.get("lap_tu"))}
-        data, paras, name, src = None, [], "", "text"
-        if f and f.filename:
-            name = f.filename
-            data = f.read()
-            if name.lower().endswith(".docx"):
-                try:
-                    _, _, paras = DT.read_docx(data)
-                    src = "docx"
-                except Exception as e:
-                    flash(f"Không đọc được file Word: {e}", "err")
-                    return redirect(url_for("core.chinh_ta"))
-            elif name.lower().endswith(".txt"):
-                paras = data.decode("utf-8", "ignore").splitlines()
-            else:
-                flash("Chỉ hỗ trợ file .docx hoặc .txt", "err")
-                return redirect(url_for("core.chinh_ta"))
-        elif raw.strip():
-            paras = raw.splitlines()
-            name = "Văn bản nhập tay"
-        else:
-            flash("Vui lòng chọn file hoặc dán nội dung cần kiểm tra.", "err")
-            return redirect(url_for("core.chinh_ta"))
-
-        issues, stats = CT.check_text(paras, opts)
-        _ct_save({"paras": paras, "issues": issues, "name": name, "src": src},
-                 data if src == "docx" else None)
-        return render_template("chinhta.html", issues=issues, stats=stats, paras=paras,
-                               name=name, KIND=CT.KIND_LABEL, done=False)
-
-    return render_template("chinhta.html", issues=None, KIND=CT.KIND_LABEL)
-
-
-@bp.route("/chinh-ta/sua", methods=["POST"])
-@login_required
-def chinh_ta_sua():
-    db, u = get_db(), current_user()
-    ctx, fdocx = _ct_load()
-    if not ctx:
-        flash("Phiên làm việc đã hết hạn, vui lòng tải file lại.", "err")
-        return redirect(url_for("core.chinh_ta"))
-    chosen = request.form.getlist("fix")
-    if not chosen:
-        flash("Bạn chưa chọn lỗi nào để sửa.", "err")
-        return redirect(url_for("core.chinh_ta"))
-    if not BL.can_use(u):
-        return redirect(url_for("core.nang_cap", need="chinhta"))
-
-    BL.consume(db, u, "chinhta", f"Sửa {len(chosen)} lỗi — {ctx['name']}")
-    issues = ctx["issues"]
-    if ctx["src"] == "docx" and fdocx:
-        with open(fdocx, "rb") as fh:
-            bio, n = DT.apply_to_docx(fh.read(), issues, chosen)
-        fname = (ctx["name"].rsplit(".", 1)[0] + "-da-sua.docx")
-    else:
-        newp = CT.apply_fixes(ctx["paras"], issues, chosen)
-        bio = DT.make_docx_from_text(newp)
-        fname = "van-ban-da-sua.docx"
-    return send_file(bio, as_attachment=True, download_name=fname,
-                     mimetype="application/vnd.openxmlformats-officedocument."
-                              "wordprocessingml.document")
-
-
-@bp.route("/chinh-ta/xem-truoc", methods=["POST"])
-@login_required
-def chinh_ta_xem():
-    """Xem trước kết quả sau khi sửa (không tốn lượt)."""
-    ctx, _ = _ct_load()
-    if not ctx:
-        return jsonify(ok=False, msg="Phiên đã hết hạn")
-    chosen = request.get_json(force=True).get("ids", [])
-    newp = CT.apply_fixes(ctx["paras"], ctx["issues"], chosen)
-    return jsonify(ok=True, paras=newp)
 
 
 # ---------------- Bảng điều khiển quản trị ----------------

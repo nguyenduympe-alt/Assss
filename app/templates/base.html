@@ -162,7 +162,6 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
   <nav>
     <a href="{{url_for('core.nhan_xet')}}" class="{{'on' if ep=='core.nhan_xet'}}"><i>🤖</i>Nhận xét AI</a>
     <a href="{{url_for('core.lich_su')}}" class="{{'on' if ep=='core.lich_su'}}"><i>🕘</i>Lịch sử nhận xét</a>
-    <a href="{{url_for('core.chinh_ta')}}" class="{{'on' if ep=='core.chinh_ta'}}"><i>🔤</i>Kiểm tra chính tả</a>
     {% for m in (PLUGIN_MENUS or []) %}<a href="{{url_for(m.endpoint)}}" class="{{'on' if ep==m.endpoint}}"><i>{{m.icon}}</i>{{m.label}}</a>{% endfor %}
   </nav>
   <div class="navgrp">Hệ thống</div>

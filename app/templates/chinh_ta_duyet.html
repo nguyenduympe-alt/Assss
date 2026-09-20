@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block head %}Duyệt sửa chính tả{% endblock %}
+{% block crumb %}{{ten_file}} · {{c.mon or 'chưa rõ môn'}} · {{('lớp ' + c.lop) if c.lop else 'chưa rõ lớp'}}{% endblock %}
+{% block body %}
+
+<div class="card">
+ <h3>Đã kiểm tra xong</h3>
+ <p>Nguồn đưa vào: <b>{{c.nguon_vao}}</b> · đã đọc <b>{{c.so_doan}}</b> đoạn (kể cả chữ trong bảng biểu).</p>
+ {% set so_loi = c.de_xuat | selectattr('de_xuat') | list | length %}
+ <p>Phát hiện <b>{{c.de_xuat|length}}</b> chỗ cần xem, trong đó <b>{{so_loi}}</b> chỗ có sẵn bản sửa để thầy/cô duyệt.</p>
+ {% if c.bo_qua %}
+ <p class="muted">Đã chủ động <b>bỏ qua</b> {{c.bo_qua.vung_cam}} chỗ trong vùng cấm (mã chỉ báo, công thức),
+  {{c.bo_qua.ten_rieng}} tên riêng, {{c.bo_qua.thuat_ngu}} thuật ngữ, {{c.bo_qua.tu_dung}} từ đúng đã kiểm chứng.</p>
+ {% endif %}
+ <p class="muted">Bản gốc được giữ nguyên; kết quả tải về là một BẢN SAO .docx, chữ đã sửa tô đỏ.</p>
+</div>
+
+{% set so_hoc = c.de_xuat | selectattr('nguon', 'equalto', 'hoc_tu_nguoi_dung') | list | length %}
+{% set so_mh = c.de_xuat | selectattr('nguon', 'equalto', 'mo_hinh') | list | length %}
+<div class="card">
+ <h3>Chính tả cần sửa ({{c.de_xuat|length}} chỗ)</h3>
+ <p class="sub">“Sửa chắc” là lỗi rõ ràng, đã tích sẵn. “Chỉ gợi ý” cần thầy/cô xem ngữ cảnh — hệ thống
+ không tự sửa. Tên riêng, công thức, mã chỉ báo, thuật ngữ và viết tắt (GV, HS, SGK…) đã được loại khỏi danh sách.</p>
+ {% if so_hoc %}
+ <p class="sub">Có <b>{{so_hoc}}</b> chỗ dựa trên <b>bản sửa mà giáo viên trong trường đã duyệt trước đây</b>
+  — những chỗ này đáng tin hơn gợi ý của máy; chỗ đã được duyệt từ {{hoc_nguong_nhan}} lần trở lên thì đã tích sẵn.</p>
+ {% endif %}
+ {% if so_mh %}
+ <p class="sub">Trong đó <b>{{so_mh}}</b> chỗ do <b>mô hình nhỏ đã huấn luyện</b> đề xuất —
+  mô hình được huấn luyện trên dữ liệu tổng hợp, không phải mô hình ngôn ngữ lớn; mọi chỗ đều chỉ ở mức
+  gợi ý và không tự sửa.</p>
+ {% endif %}
+ {% if not c.de_xuat %}
+  <p>Không phát hiện chỗ nào cần sửa theo bộ kiểm tra nội bộ. Thầy/cô vẫn nên đọc lại giúp em —
+  không có bộ kiểm tra nào bắt hết mọi lỗi.</p>
+ {% endif %}
+
+ <form method="post" action="{{url_for('chinh_ta.xuat', token=token)}}">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  {% if c.de_xuat %}
+  <table style="width:100%;border-collapse:collapse">
+   <tr style="text-align:left">
+    <th style="padding:6px">Chọn</th><th style="padding:6px">Hiện tại</th>
+    <th style="padding:6px">Đề xuất</th><th style="padding:6px">Lý do</th><th style="padding:6px">Nguồn</th></tr>
+   {% for d in c.de_xuat %}
+   <tr style="border-top:1px solid #eef2f1">
+    <td style="padding:6px">
+     {% if d.de_xuat %}<input type="checkbox" name="ct_{{d.id}}" value="1" {% if d.che_do=='sua_chac' %}checked{% endif %} style="width:17px">
+     {% else %}<span class="muted">—</span>{% endif %}
+     <button type="submit" name="dung_tu_{{d.id}}" value="1" class="muted"
+             style="font-size:11px;padding:1px 5px;margin-top:3px"
+             title="Nếu từ này đúng, bấm để hệ thống thôi bắt oan về sau">từ này đúng</button></td>
+    <td style="padding:6px">{{d.goc}}</td>
+    <td style="padding:6px">{% if d.de_xuat %}<b>{{d.de_xuat}}</b>{% else %}<span class="muted">chưa tìm được bản sửa</span>{% endif %}</td>
+    <td style="padding:6px" class="muted">{{d.ly_do}}</td>
+    <td style="padding:6px" class="muted">{{nguon.get(d.nguon or 'luat', 'bộ luật nội bộ')}}</td>
+   </tr>
+   {% endfor %}
+  </table>
+  {% endif %}
+
+  <div class="card" style="margin-top:16px;background:#f8fbfa">
+   <label style="display:flex;gap:10px;margin-bottom:12px">
+    <input type="checkbox" name="reviewed" value="1" style="width:18px">
+    Tôi đã rà soát danh sách trên và đồng ý tải bản Word đã sửa.</label>
+   <button class="ok">Tải bản .docx đã sửa</button>
+   <a class="btn sec" href="{{url_for('chinh_ta.index')}}">Kiểm tra văn bản khác</a>
+  </div>
+ </form>
+ <p class="muted">{{nhan_ct}}</p>
+ <p class="muted">{{nhan_mh}}</p>
+ <p class="muted">{{nhan}}</p>
+</div>
+{% endblock %}

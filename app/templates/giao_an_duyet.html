@@ -18,13 +18,15 @@
  <p>Tên bài: <b>{{ctx.ten_bai or 'chưa nhận diện được'}}</b></p>
  {% if ctx.pt_canh_bao %}<ul style="color:#a16207">{% for c in ctx.pt_canh_bao %}<li>{{c}}</li>{% endfor %}</ul>{% endif %}
  <p class="muted">Bản gốc được giữ nguyên; kết quả tải về là một BẢN SAO .docx.</p>
+ <p class="muted">Công cụ này chỉ làm phần <b>tích hợp năng lực số</b>. Nếu thầy/cô cũng muốn dò chính tả,
+  hãy dùng công cụ riêng <a href="{{url_for('chinh_ta.index')}}">Kiểm tra chính tả</a> — chỉ chạy khi thầy/cô cần.</p>
 </div>
 
 <form method="post" action="{{url_for('giao_an_nls.xuat', token=token)}}">
  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
 
  <div class="card">
-  <h3>1. Tiêu chí năng lực số đưa vào bài</h3>
+  <h3>Tiêu chí năng lực số đưa vào bài</h3>
   <p class="sub">Bỏ tích nếu thầy/cô thấy tiêu chí chưa phù hợp. Chỉ những tiêu chí được tích mới vào file.
    Tiêu chí ghi <b>CẦN GIÁO VIÊN DUYỆT</b> mặc định không tích, vì hệ thống chưa có căn cứ trong bài.</p>
   {% if not ctx.chon %}
@@ -54,44 +56,6 @@
   </div>
   {% endfor %}
   {% for c in ctx.canh_bao %}<p style="color:#a16207">{{c}}</p>{% endfor %}
- </div>
-
- <div class="card">
-  <h3>2. Chính tả cần sửa ({{ctx.de_xuat|length}} chỗ)</h3>
-  <p class="sub">“Sửa chắc” là lỗi rõ ràng, đã tích sẵn. “Chỉ gợi ý” cần thầy/cô xem ngữ cảnh — hệ thống
-  không tự sửa. Tên riêng, công thức, mã chỉ báo, thuật ngữ và viết tắt (GV, HS, SGK…) đã được loại khỏi danh sách.</p>
-  {% set so_hoc = ctx.de_xuat | selectattr('nguon', 'equalto', 'hoc_tu_nguoi_dung') | list | length %}
-  {% if so_hoc %}
-  <p class="sub">Có <b>{{so_hoc}}</b> chỗ dựa trên <b>bản sửa mà giáo viên trong trường đã duyệt trước đây</b>
-   — những chỗ này đáng tin hơn gợi ý của máy; chỗ đã được duyệt từ {{hoc_nguong_nhan}} lần trở lên thì đã tích sẵn.</p>
-  {% endif %}
-  {% set so_mh = ctx.de_xuat | selectattr('nguon', 'equalto', 'mo_hinh') | list | length %}
-  {% if so_mh %}
-  <p class="sub">Trong đó <b>{{so_mh}}</b> chỗ do <b>mô hình nhỏ đã huấn luyện</b> đề xuất —
-   mô hình được huấn luyện trên dữ liệu tổng hợp, không phải mô hình ngôn ngữ lớn; mọi chỗ đều chỉ ở mức
-   gợi ý và không tự sửa. Số đo trên tập kiểm tra giữ riêng: xem bảng bên dưới.</p>
-  {% endif %}
-  {% if not ctx.de_xuat %}<p>Không phát hiện lỗi chính tả nào theo bộ kiểm tra nội bộ.</p>{% endif %}
-  {% if ctx.de_xuat %}
-  <table style="width:100%;border-collapse:collapse">
-   <tr style="text-align:left"><th style="padding:6px">Chọn</th><th style="padding:6px">Hiện tại</th><th style="padding:6px">Đề xuất</th><th style="padding:6px">Lý do</th></tr>
-   {% for d in ctx.de_xuat %}
-   <tr style="border-top:1px solid #eef2f1">
-    <td style="padding:6px">{% if d.de_xuat %}<input type="checkbox" name="ct_{{d.id}}" value="1" {% if d.che_do=='sua_chac' %}checked{% endif %} style="width:17px">{% else %}<span class="muted">—</span>{% endif %}
-      <button type="submit" name="dung_tu_{{d.id}}" value="1" class="muted"
-              style="font-size:11px;padding:1px 5px;margin-top:3px"
-              title="Nếu từ này đúng, bấm để hệ thống thôi bắt oan về sau">từ này đúng</button></td>
-    <td style="padding:6px">{{d.goc}}
-     {% if d.nguon == 'mo_hinh' %}<br><span class="muted" style="font-size:11px">mô hình</span>{% endif %}
-     {% if d.nguon == 'hoc_tu_nguoi_dung' %}<br><span class="muted" style="font-size:11px">đã được giáo viên duyệt trước đây</span>{% endif %}</td>
-    <td style="padding:6px">{% if d.de_xuat %}<b>{{d.de_xuat}}</b>{% else %}<span class="muted">chưa tìm được bản sửa</span>{% endif %}</td>
-    <td style="padding:6px" class="muted">{{d.ly_do}} — {{d.nhan}}</td>
-   </tr>
-   {% endfor %}
-  </table>
-  {% endif %}
-  <p class="muted">{{nhan_ct}}</p>
-  <p class="muted">{{nhan_mh}}</p>
  </div>
 
  <div class="card">
