@@ -123,9 +123,24 @@ def xuat(token):
         return redirect(url_for('giao_an_nls.index'))
     c = ctx['ctx']
     chon_ma = [code for code in request.form.getlist('ma')]
+    # Giáo viên có thể chọn CHỈ chèn phần giáo dục AI (không chèn mục năng lực số)
+    chi_ai = request.form.get('chi_ai') == '1'
     # Nội dung giáo dục AI: CHỈ chèn những mạch giáo viên tích ở trang duyệt
     ma_ai = [x for x in request.form.getlist('ma_ai')]
     chon_ai = [x for x in (c.get('chon_ai') or []) if x.get('id') in ma_ai]
+    if not chon_ma and not chi_ai:
+        flash('Thầy/cô chưa tích tiêu chí năng lực số nào. Nếu bài này chỉ cần phần giáo dục AI, '
+              'hãy tích ô “Chỉ chèn phần giáo dục AI cho bài này”; nếu vẫn cần phần năng lực số, '
+              'hãy tích ít nhất một tiêu chí rồi tải lại file.', 'err')
+        return redirect(url_for('giao_an_nls.duyet', token=token))
+    if chi_ai:
+        chon_ma = []
+        if not chon_ai:
+            flash('Thầy/cô đã chọn “chỉ chèn phần giáo dục AI” nhưng chưa tích mạch nội dung AI nào.', 'err')
+            return redirect(url_for('giao_an_nls.duyet', token=token))
+        if not (c.get('chon_ai') or []):
+            flash('Bài này chưa đề xuất được mạch nội dung giáo dục AI nào.', 'err')
+            return redirect(url_for('giao_an_nls.duyet', token=token))
 
     try:
         doc = GA.doc_word(open(folder() / (token + '.docx'), 'rb').read())
@@ -133,7 +148,8 @@ def xuat(token):
             doc, thiet_bi=c['thiet_bi'], toi_da=c['toi_da'], thoi_luong=c['thoi_luong'],
             lop_ghi_de=c['lop'] or '', mon_ghi_de=c['mon'] or '',
             goc_doan=c['doan_goc'], chon_ma=chon_ma,
-            chon_ai=chon_ai, ai_thoi_luong=c.get('ai_thoi_luong') or AI_THOI_LUONG)
+            chon_ai=chon_ai, ai_thoi_luong=c.get('ai_thoi_luong') or AI_THOI_LUONG,
+            chi_ai=chi_ai)
     except Exception:
         flash('Không tạo được bản Word. File gốc có thể đã hỏng — hãy lưu lại bằng Word rồi thử lại.', 'err')
         return redirect(url_for('giao_an_nls.duyet', token=token))
@@ -148,7 +164,7 @@ def xuat(token):
     out = io.BytesIO()
     doc_out.save(out)
     out.seek(0)
-    ten = 'Giao-an-tich-hop-%s-%s.docx' % ('NLS-va-AI' if chon_ai else 'NLS',
-                                           c['lop'] or 'khong-ro-lop')
+    ten = 'Giao-an-tich-hop-%s-%s.docx' % (
+        'AI' if chi_ai else ('NLS-va-AI' if chon_ai else 'NLS'), c['lop'] or 'khong-ro-lop')
     return send_file(out, as_attachment=True, download_name=ten,
                      mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
