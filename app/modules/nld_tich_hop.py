@@ -17,6 +17,7 @@ from .giao_an import (DO, NHAN_AI, doan_mau, gon, khong_dau,
                        phan_tich, _xoa_muc_nld_cu)
 
 NHAN_QD = "[QUY ĐỊNH]"
+RE_HOAT_DONG_BANG = re.compile(r"^\s*Hoạt động tích hợp năng lực số\s*\(", re.I)
 NHAN_DX = "[ĐỀ XUẤT]"
 
 # ---------------------------------------------------------------- ánh xạ nội dung
@@ -502,27 +503,58 @@ def _cac_buoc(chon, thiet_bi, lop=""):
 
 
 # ------------------------------------------------------------------ chèn vào Word
+def _nhan_muc_tich_hop(mt, nl, doc):
+    """Nhãn tiêu đề mục mới, hợp với cách đánh số mà giáo án đang dùng."""
+    con = [str(x).lower() for x in (nl.get("cac_muc_con") or [])]
+    chu = [x for x in con if len(x) == 1 and x.isalpha() and x not in ("i", "v")]
+    if chu:                                   # đang dùng a, b, … -> tiếp là c
+        cuoi = max(chu)
+        if cuoi < "z":
+            return f"{chr(ord(cuoi) + 1)}. Tích hợp năng lực số"
+    if nl.get("cach_chen") == "cuoi_muc_tieu":   # không có mục Năng lực/Phẩm chất -> đánh số tiếp
+        return f"{_so_tiep_theo(mt, doc)}. Tích hợp năng lực số"
+    return "Tích hợp năng lực số"                 # nằm trong mục Năng lực, không thêm số
+
+
 def chen_muc_tieu(doc, pt, chon, ten_bai="", mon=""):
-    """Chèn mục 'Tích hợp năng lực số' cuối phần MỤC TIÊU, tô đỏ toàn bộ nội dung mới."""
+    """Chèn mục 'Tích hợp năng lực số' vào CUỐI PHẦN NĂNG LỰC (trong MỤC TIÊU).
+
+    Thứ tự ưu tiên vị trí:
+      1. Ngay cuối mục con “Năng lực” — tức trước mục “Phẩm chất” (Công văn 5512 hay dùng).
+      2. Nếu bài không có mục “Năng lực” nhưng có “Phẩm chất” → chèn ngay trước “Phẩm chất”.
+      3. Không có cả hai → chèn cuối phần MỤC TIÊU như trước.
+    Toàn bộ nội dung mới tô đỏ để giáo viên thấy ngay.
+    """
     mt = pt["muc_tieu"]
     if not mt.get("co") or not chon:
         return {"da_chen": False, "ly_do": "Không có phần MỤC TIÊU hoặc không có tiêu chí nào."}
 
-    so = _so_tiep_theo(mt, doc)
-    mau = doc.paragraphs[max(mt["vi_tri"], mt["ket_thuc"] - 1)]
-    neo = doc.paragraphs[min(mt["ket_thuc"] - 1, len(doc.paragraphs) - 1)]
+    nl = mt.get("nang_luc") or {}
+    cach = nl.get("cach_chen") or "cuoi_muc_tieu"
+    vi_tri_chen = int(nl.get("ket_thuc", mt["ket_thuc"]))
+    vi_tri_chen = max(mt["vi_tri"] + 1, min(vi_tri_chen, len(doc.paragraphs)))
+
+    so = _nhan_muc_tich_hop(mt, nl, doc)
+    mau = doc.paragraphs[vi_tri_chen - 1] if vi_tri_chen > 0 else None
+    neo = doc.paragraphs[vi_tri_chen - 1] if vi_tri_chen > 0 else None
 
     # chèn ngược từ dưới lên để giữ đúng thứ tự
     dong = soan_muc_tieu(ten_bai, pt.get("lop"), mon, chon)
-    ds = [(f"{so}. Tích hợp năng lực số", "tieude")] + dong
+    ds = [(f"{so}", "tieude")] + dong
     ds.append((f"({NHAN_AI} Phần mã, nguyên văn tiêu chí và nguồn là nội dung quy định nguyên văn; "
                f"phần ghi rõ {NHAN_DX} do hệ thống soạn cho bài học này.)", "ghichu"))
 
     for text, loai in reversed(ds):
         p = doan_mau(doc, mau, text, do=True, in_dam=(loai == "tieude"))
-        # đưa đoạn mới ra sau neo, giữ thứ tự
-        neo._p.addnext(p._p)
-    return {"da_chen": True, "so_muc": so, "so_tieu_chi": len(chon)}
+        if neo is not None:
+            neo._p.addnext(p._p)     # đưa đoạn mới ra sau neo, giữ thứ tự
+
+    diem = {"trong_muc_nang_luc": "cuối phần Năng lực (ngay trước mục Phẩm chất)",
+            "truoc_pham_chat": "ngay trước mục Phẩm chất (bài không có mục Năng lực riêng)",
+            "cuoi_muc_tieu": "cuối phần MỤC TIÊU"}[cach]
+    return {"da_chen": True, "so_muc": so, "so_tieu_chi": len(chon),
+            "cach_chen": cach, "diem_chèn": diem,
+            "trong_muc_nang_luc": cach == "trong_muc_nang_luc"}
 
 
 def _so_tiep_theo(mt, doc):
@@ -555,9 +587,19 @@ def chen_hoat_dong(doc, pt, hd):
 
 
 def _chen_vao_bang(doc, tt, hd):
-    """Chèn một dòng hoạt động vào bảng tiến trình, sau hoạt động phù hợp nhất."""
+    """Chèn một dòng hoạt động vào bảng tiến trình, sau hoạt động phù hợp nhất.
+
+    Nếu lần chạy trước đã chèn dòng hoạt động tích hợp thì XOÁ dòng cũ trước khi chèn
+    dòng mới — chạy lại nhiều lần không được làm bảng dài thêm.
+    """
     table = doc.tables[tt["vi_tri"]]
     cot = tt["cot"]
+    da_xoa = 0
+    for row in list(table.rows):
+        dau = next((gon(c.text) for c in row.cells if gon(c.text)), "")
+        if RE_HOAT_DONG_BANG.match(dau or ""):
+            row._tr.getparent().remove(row._tr)
+            da_xoa += 1
     hang = table.rows
     if len(hang) < 2:
         return {"da_chen": False, "ly_do": "Bảng tiến trình chưa có dòng dữ liệu nào."}
@@ -583,7 +625,7 @@ def _chen_vao_bang(doc, tt, hd):
 
     for ci, cell in enumerate(row.cells):
         _dat_o(cell, _noi_dung_o(ci, cot, hd))
-    return {"da_chen": True, "kieu": "bang", "vi_tri_dong": vitri,
+    return {"da_chen": True, "kieu": "bang", "vi_tri_dong": vitri, "da_thay_dong_cu": da_xoa,
             "so_dong": len(table.rows), "diem_chèn": f"sau dòng {vitri} của bảng tiến trình"}
 
 
@@ -652,7 +694,12 @@ def _chen_sau_doan(doc, tt, hd):
 
 
 def _chen_duoi_muc_tieu(doc, pt, hd, them_dong=None):
-    """Không có tiến trình nhận diện được: đặt hoạt động ngay sau phần MỤC TIÊU và báo rõ."""
+    """Không có tiến trình nhận diện được: đặt hoạt động ngay sau phần MỤC TIÊU và báo rõ.
+
+    Phân tích lại tài liệu tại đây vì mục “Tích hợp năng lực số” vừa được chèn vào
+    GIỮA phần MỤC TIÊU, làm chỉ số đoạn phía sau dịch đi — dùng chỉ số cũ sẽ chèn sai.
+    """
+    pt = phan_tich(doc)
     neo = doc.paragraphs[min(pt["muc_tieu"].get("ket_thuc", len(doc.paragraphs)) - 1,
                              len(doc.paragraphs) - 1)]
     dong = [
@@ -706,9 +753,10 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
 
     # 2. đã chèn vào đúng chỗ chưa
     if ket_qua.get("muc_tieu", {}).get("da_chen"):
-        dat.append("Đã chèn mục “Tích hợp năng lực số” trong phần MỤC TIÊU.")
+        dat.append("Đã chèn mục “Tích hợp năng lực số” ở %s."
+                   % ket_qua["muc_tieu"].get("diem_chèn", "trong phần MỤC TIÊU"))
     else:
-        loi.append("Chưa chèn được mục năng lực số vào MỤC TIÊU."); cung.append(loi[-1])
+        loi.append("Chưa chèn được mục năng lực số vào phần MỤC TIÊU."); cung.append(loi[-1])
     if ket_qua.get("hoat_dong", {}).get("da_chen"):
         dat.append(f"Đã chèn hoạt động: {ket_qua['hoat_dong'].get('diem_chèn', '')}")
         if ket_qua["hoat_dong"].get("kieu") == "du_phong":

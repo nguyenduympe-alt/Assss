@@ -80,6 +80,92 @@ def _la_tieu_de_muc_tieu(t):
     return None
 
 
+# ------------------------------------------------- mục con trong MỤC TIÊU
+# Giáo án theo Công văn 5512 thường có: 1. Kiến thức · 2. Năng lực · 3. Phẩm chất
+# (trong "2. Năng lực" lại có a. Năng lực chung · b. Năng lực đặc thù).
+# Mục "Tích hợp năng lực số" phải nằm ở CUỐI PHẦN NĂNG LỰC, tức ngay trước "Phẩm chất"
+# — chứ không phải nhảy xuống cuối cả mục MỤC TIÊU.
+_ROMAN = ("i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii")
+
+
+def kieu_so_muc(text):
+    """(kiểu đánh số, số/ chữ) của một dòng tiêu đề mục con. ('', '') nếu không phải."""
+    t = gon(text)
+    m = re.match(r"^\s*(\d+|[A-Za-z]{1,6})\s*[.)]\s+(.*)$", t)
+    if not m:
+        return "", "", ""
+    so, con = m.group(1), m.group(2)
+    if so.isdigit():
+        kieu = "1"
+    elif so.lower() in _ROMAN:
+        kieu = "I"
+    elif len(so) == 1:
+        kieu = "a"
+    else:
+        return "", "", ""
+    return kieu, so.lower(), khong_dau(con)
+
+
+def _do_sau(kieu):
+    """Mức lồng nhau: La Mã (ngoài cùng) < số < chữ cái (trong cùng)."""
+    return {"I": 0, "1": 1, "a": 2}.get(kieu, 3)
+
+
+def _muc_con_trong(paras, tu, den):
+    """Các tiêu đề mục con trong khoảng đoạn [tu, den): [{vi_tri, kieu, so, ten}]."""
+    ra = []
+    for i in range(max(0, tu), min(den, len(paras))):
+        kieu, so, ten = kieu_so_muc(paras[i].text)
+        if kieu and ten:
+            ra.append({"vi_tri": i, "kieu": kieu, "so": so, "ten": ten})
+    return ra
+
+
+def _dau_bang(ten, *cums):
+    t = " ".join(ten.split())
+    return any(t == c or t.startswith(c + ":") or t.startswith(c + " ") for c in cums)
+
+
+def tim_muc_nang_luc(paras, tu, den):
+    """Tìm mục "Năng lực" trong MỤC TIÊU và vị trí kết thúc của nó.
+
+    Trả về:
+      {'co': bool, 'vi_tri': int, 'ket_thuc': int, 'cach_chen': 'trong_muc_nang_luc'
+       | 'truoc_pham_chat' | 'cuoi_muc_tieu'}
+    'ket_thuc' = đoạn mà mục mới phải được chèn NGAY TRƯỚC nó.
+    """
+    muc = _muc_con_trong(paras, tu, den)
+    # bỏ qua chính mục do hệ thống chèn lần trước
+    muc = [m for m in muc if not RE_NLD.search(m["ten"])]
+
+    nl = [m for m in muc if _dau_bang(m["ten"], "nang luc", "ve nang luc")]
+    if nl:
+        # mục NĂNG LỰC ngoài cùng (nếu có "2. Năng lực" thì lấy nó, không lấy "a. Năng lực chung")
+        cap = min(_do_sau(m["kieu"]) for m in nl)
+        goc = [m for m in nl if _do_sau(m["kieu"]) == cap][-1]
+        # kết thúc = mục kế tiếp cùng cấp hoặc cao hơn (ví dụ "3. Phẩm chất")
+        ket_thuc = den
+        for m in muc:
+            if m["vi_tri"] > goc["vi_tri"] and _do_sau(m["kieu"]) <= cap:
+                ket_thuc = m["vi_tri"]
+                break
+        return {"co": True, "vi_tri": goc["vi_tri"], "ket_thuc": ket_thuc,
+                "cach_chen": "trong_muc_nang_luc", "kieu_so": goc["kieu"],
+                "cac_muc_con": [m["so"] for m in muc
+                                if goc["vi_tri"] < m["vi_tri"] < ket_thuc]}
+
+    pc = [m for m in muc if _dau_bang(m["ten"], "pham chat", "ve pham chat")]
+    if pc:
+        cap = min(_do_sau(m["kieu"]) for m in pc)
+        goc = [m for m in pc if _do_sau(m["kieu"]) == cap][0]
+        return {"co": False, "vi_tri": -1, "ket_thuc": goc["vi_tri"],
+                "cach_chen": "truoc_pham_chat", "kieu_so": "",
+                "cac_muc_con": [m["so"] for m in muc
+                                if _do_sau(m["kieu"]) == cap and m["vi_tri"] < goc["vi_tri"]]}
+    return {"co": False, "vi_tri": -1, "ket_thuc": den, "cach_chen": "cuoi_muc_tieu",
+            "kieu_so": "", "cac_muc_con": [m["so"] for m in muc]}
+
+
 def _la_tieu_de_khac(t):
     """Tiêu đề mục lớn tiếp theo (để biết MỤC TIÊU kết thúc ở đâu)."""
     n = khong_dau(gon(t))
@@ -165,6 +251,7 @@ def phan_tich(doc):
             ra["muc_tieu"] = {"co": True, "vi_tri": i, "kieu_so": tt["kieu_so"],
                               "tieu_de": tt["tieu_de"], "ket_thuc": cuoi,
                               "cac_muc_con": _danh_so_muc_con(doc, i, cuoi),
+                              "nang_luc": tim_muc_nang_luc(paras, i + 1, cuoi),
                               "da_co_nld": any(RE_NLD.search(khong_dau(gon(paras[j].text)))
                                                for j in range(i + 1, cuoi))}
             break
@@ -274,12 +361,26 @@ def _xoa_doan(p):
     p._p.getparent().remove(p._p)
 
 
-RE_TIEU_DE_NLD = re.compile(r"^\s*(?:\d+|[ivx]+|[a-z])\s*[.)]\s*tich hop nang luc so", re.I)
+# Tiêu đề mục do hệ thống chèn: có thể đánh số ("2. Tích hợp năng lực số", "c. …")
+# hoặc không đánh số (khi nằm trong mục Năng lực vốn không dùng chữ cái).
+RE_TIEU_DE_NLD = re.compile(
+    r"^(?:\s*(?:\d+|[ivx]+|[a-z])\s*[.)]\s*)?tich hop nang luc so\s*:?\s*$", re.I)
 
 
 def la_tieu_de_nld(text):
     """Đúng là TIÊU ĐỀ mục 'Tích hợp năng lực số' (không phải câu nhắc tới nó)."""
     return bool(RE_TIEU_DE_NLD.match(khong_dau(gon(text))))
+
+
+# Các dòng con hệ thống sinh ra trong mục "Tích hợp năng lực số"
+# và trong khối hoạt động dự phòng — dùng để dọn khi chạy lại.
+RE_HOAT_DONG_HE_THONG = re.compile(r"^\s*Hoạt động tích hợp năng lực số\s*\(", re.I)
+
+RE_DONG_DO_HE_THONG = re.compile(
+    r"^\s*(?:\d+\s*\.\s*Tiêu chí|·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
+    r"Hoạt động tích hợp năng lực số|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
+    r"Nhiệm vụ của giáo viên:|Nhiệm vụ của học sinh:|Sản phẩm học tập:|"
+    r"Tiêu chí đánh giá:|\()")
 
 
 def _xoa_muc_nld_cu(doc, mt):
@@ -289,6 +390,22 @@ def _xoa_muc_nld_cu(doc, mt):
     đã chèn trước đó — bảo đảm xử lý lại không bị trùng nội dung.
     """
     xoa = 0
+    # Lượt 1: dọn khối HOẠT ĐỘNG do hệ thống chèn (dạng đoạn văn) ở bất kỳ đâu trong tài
+    # liệu — chạy lại phải CẬP NHẬT, không được nhân thêm khối.
+    for i in range(len(doc.paragraphs) - 1, -1, -1):
+        t = gon(doc.paragraphs[i].text)
+        if not RE_HOAT_DONG_HE_THONG.match(t or ""):
+            continue
+        _xoa_doan(doc.paragraphs[i]); xoa += 1
+        j = i
+        while j < len(doc.paragraphs):
+            t2 = gon(doc.paragraphs[j].text)
+            if not t2:
+                _xoa_doan(doc.paragraphs[j]); xoa += 1; continue
+            if not RE_DONG_DO_HE_THONG.match(t2):
+                break
+            _xoa_doan(doc.paragraphs[j]); xoa += 1
+    # Lượt 2: dọn mục "Tích hợp năng lực số" trong MỤC TIÊU
     for i in range(len(doc.paragraphs) - 1, -1, -1):
         p = doc.paragraphs[i]
         if not la_tieu_de_nld(p.text):
@@ -302,8 +419,12 @@ def _xoa_muc_nld_cu(doc, mt):
             if not t:
                 _xoa_doan(doc.paragraphs[j]); xoa += 1; continue
             kd = khong_dau(t)
-            if la_tieu_de_nld(t) or _la_tieu_de_khac(t) or re.match(
-                    r"^\s*\d+\s*[.)]\s", t) or re.match(r"^\s*hoat\s*dong\s*\d", kd):
+            if la_tieu_de_nld(t) or _la_tieu_de_khac(t) or re.match(r"^\s*hoat\s*dong\s*\d", kd):
+                break
+            # Chỉ xoá dòng ĐÚNG do hệ thống sinh ra (tiêu chí, [QUY ĐỊNH]/[ĐỀ XUẤT], các dòng
+            # của khối hoạt động, ghi chú). Dòng nào không khớp thì coi là nội dung của giáo
+            # viên -> dừng ngay, tuyệt đối không xoá.
+            if not RE_DONG_DO_HE_THONG.match(t):
                 break
             _xoa_doan(doc.paragraphs[j]); xoa += 1
     return xoa
