@@ -76,6 +76,24 @@
     <a class="btn sec sm" href="#tro-ly-ai">Xem trợ lý học được gì →</a>
   </div>
 
+  {% if 'check_ai.index' in cong_cu|map(attribute='endpoint')|list %}
+  <div class="card" style="margin:0;border-left:4px solid #e11d48">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:26px">🕵️</span>
+      <b style="font-size:15.5px;flex:1">Kiểm tra tài liệu do AI viết</b>
+      <span class="chip" style="background:#ffe4e6;color:#be123c">MỚI</span>
+    </div>
+    <p class="sub" style="margin:0 0 10px">Tải bài làm (.docx, .pdf) hoặc dán văn bản để xem <b>dấu hiệu văn phong
+    do máy viết</b>: nhịp câu quá đều, nhiều từ nối kiểu văn mẫu, thiếu chi tiết cụ thể… Hệ thống chỉ ra
+    <b>lý do</b> và <b>từng đoạn</b> đáng xem lại, kèm cả <b>dấu hiệu nghiêng về người viết</b>.</p>
+    <div class="row" style="gap:6px;margin-bottom:11px">
+      <span class="chip">Chỉ mang tính tham khảo</span>
+      <span class="chip">Không lưu tệp</span>
+    </div>
+    <a class="btn sec sm" href="{{url_for('check_ai.index')}}">Kiểm tra thử →</a>
+  </div>
+  {% endif %}
+
   <div class="card" style="margin:0;border-left:4px solid #06b6d4">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <span style="font-size:26px">🔤</span>
