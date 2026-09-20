@@ -255,3 +255,166 @@ def _cac_buoc(chon, lop):
     return (f"1) Nêu vấn đề/tiêu chí đánh giá. 2) Học sinh thử nghiệm với công cụ AI, thu thập kết quả "
             f"({ten_mach}). 3) Phản biện, so sánh, đánh giá độ tin cậy. 4) Đề xuất cải tiến và trình bày "
             "cách kiểm chứng; ghi rõ mức độ sử dụng AI.")
+
+
+# ============================================================ KHO MÃ GIÁO DỤC AI
+# Mã yêu cầu cần đạt do chính Quyết định 2422/QĐ-BGDĐT quy định:
+# [Lớp].[Mã chủ đề].[Số thứ tự] — nội dung mở rộng thêm tiền tố “MR”.
+ASSET_MA = ASSET.parent / "khung-nang-luc-ai.json"
+_KHO_MA = None
+
+
+def kho_ma():
+    """Đọc kho mã giáo dục AI (sinh từ tài liệu gốc của Bộ, xem tao_khung_ai.py)."""
+    global _KHO_MA
+    if _KHO_MA is None:
+        _KHO_MA = json.loads(ASSET_MA.read_text(encoding="utf-8"))
+    return _KHO_MA
+
+
+def quy_uoc_ma():
+    return kho_ma()["quy_uoc_ma"]
+
+
+def tra_ma(ma):
+    """Tra một mã yêu cầu cần đạt: {ma, yccd, nội dung, chủ đề, mạch, nguồn} hoặc None."""
+    lop = str(ma or "").split(".")[0]
+    for x in kho_ma()["theo_lop"].get(lop, []):
+        if x["ma"] == ma:
+            return dict(x, nguon=NGUON_MA)
+    return None
+
+
+def ma_theo_lop(lop, gom_mo_rong=True):
+    return [dict(x, nguon=NGUON_MA) for x in kho_ma()["theo_lop"].get(str(lop or ""), [])
+            if gom_mo_rong or not x["mo_rong"]]
+
+
+TU_DUNG = {"duoc", "cua", "cho", "voi", "trong", "khi", "nhung", "hoac", "cac", "mot",
+           "nhieu", "nay", "va", "la", "co", "khong", "nhu", "tren", "den", "tu", "cung",
+           "phai", "bang", "cach", "gi", "sao", "nhat", "trinh", "nhan", "biet", "hieu",
+           "thuc", "hien", "neu", "giai", "thich", "trinh bay", "the nao", "hay", "minh",
+           "hoa", "duoc"}
+
+
+def _tu_khoa_ma(x):
+    """Từ khoá và cụm 2 từ của một yêu cầu cần đạt (bỏ dấu).
+
+    Cụm 2 từ ghép từ danh sách từ GỐC (chưa lọc từ chung) để không làm mất các cụm
+    có nghĩa như “dữ liệu”, “học máy”, “kiểm tra”; chỉ bỏ cụm gồm toàn từ chung.
+    """
+    tho = khong_dau((x.get("noi_dung") or "") + ". " + (x.get("yccd") or ""))
+    tat_ca = re.findall(r"[a-z][a-z0-9]{2,}", tho)
+    tu = [t for t in tat_ca if t not in TU_DUNG]
+    cum = [a + " " + b for a, b in zip(tat_ca, tat_ca[1:])
+           if a not in TU_DUNG or b not in TU_DUNG]
+    for nguon in (x.get("mach_ten"), x.get("chu_de_ten"), x.get("noi_dung")):
+        c = gon_kd(nguon or "")
+        if len(c) >= 8:
+            cum.append(c)
+    return tu, cum
+
+
+def gon_kd(s):
+    return re.sub(r"\s+", " ", khong_dau(s)).strip()
+
+
+def _thong_ke(ds_ma):
+    """Tần suất từ và cụm 2 từ trong kho mã của một lớp."""
+    dem_tu, dem_cum = {}, {}
+    for x in ds_ma:
+        tu, cum = _tu_khoa_ma(x)
+        for t in set(tu):
+            dem_tu[t] = dem_tu.get(t, 0) + 1
+        for c in set(cum):
+            dem_cum[c] = dem_cum.get(c, 0) + 1
+    n = max(1, len(ds_ma))
+    return ({t: n / k for t, k in dem_tu.items()}, {c: n / k for c, k in dem_cum.items()})
+
+
+_DF_TOAN_KHO = None
+
+
+def _thong_ke_toan_kho():
+    """Tần suất từ/cụm trong TOÀN BỘ kho mã 12 lớp — chuẩn chung để biết từ nào là phổ biến."""
+    global _DF_TOAN_KHO
+    if _DF_TOAN_KHO is None:
+        tat_ca = [x for v in kho_ma()["theo_lop"].values() for x in v]
+        dem_tu, dem_cum = {}, {}
+        for x in tat_ca:
+            tu, cum = _tu_khoa_ma(x)
+            for t in set(tu):
+                dem_tu[t] = dem_tu.get(t, 0) + 1
+            for c in set(cum):
+                dem_cum[c] = dem_cum.get(c, 0) + 1
+        n = max(1, len(tat_ca))
+        _DF_TOAN_KHO = ({t: k / n for t, k in dem_tu.items()},
+                        {c: k / n for c, k in dem_cum.items()})
+    return _DF_TOAN_KHO
+
+
+def _diem_ma(x, tu_bai, tho_bai, df_tu, df_cum):
+    """Chấm điểm theo cụm từ và từ đặc thù trùng với bài học (bỏ dấu).
+
+    Trọng số = độ hiếm của từ/cụm trong toàn kho: từ càng ít xuất hiện càng đáng tin.
+    """
+    tu, cum = _tu_khoa_ma(x)
+    w_tu = lambda t: 1.0 / max(df_tu.get(t, 1.0), 1.0)
+    w_cum = lambda c: 1.0 / max(df_cum.get(c, 1.0), 1.0)
+    cum_khop = [c for c in dict.fromkeys(cum) if c in tho_bai]
+    tu_khop = [t for t in dict.fromkeys(tu) if t in tu_bai and len(t) >= 5]
+    diem = sum(0.5 + 3.0 * w_cum(c) for c in cum_khop)
+    diem += sum(0.3 + 2.0 * w_tu(t) for t in tu_khop)
+    # cần ít nhất một cụm khớp, hoặc 2 từ cùng xuất hiện, hoặc 1 từ hiếm & rõ nghĩa (vd “prompt”)
+    hiem = any(df_tu.get(t, 1.0) < 0.05 and len(t) >= 6 for t in tu_khop)
+    if not cum_khop and len(tu_khop) < 2 and not hiem:
+        return 0.0, []
+    return round(diem, 2), (cum_khop[:3] or tu_khop[:3])
+
+
+def goi_y_ma(lop, van_ban="", ten_bai="", mon="", toi_da=2, chi_cot_loi=True):
+    """Gợi ý mã yêu cầu cần đạt giáo dục AI cho một bài/dòng KHGD.
+
+    Xếp hạng theo cụm từ/từ đặc thù trùng giữa bài học với yêu cầu cần đạt của đúng lớp đó;
+    bài không có căn cứ thì trả về danh sách rỗng (giáo viên tự chọn trong kho mã của lớp).
+    Mã thuộc phần MỞ RỘNG chỉ được dùng khi không có mã cốt lõi nào sát bài (theo CV 5588).
+    """
+    ds = ma_theo_lop(lop, gom_mo_rong=not chi_cot_loi)
+    if not ds:
+        return [], ["Chưa xác định được lớp nên chưa gợi ý được mã giáo dục AI."]
+    df_tu, df_cum = _thong_ke_toan_kho()
+    tho_bai = gon_kd(" ".join([ten_bai or "", van_ban or "", mon or ""]))
+    tu_bai = set(re.findall(r"[a-z][a-z0-9]{2,}", tho_bai))
+    ket_qua = []
+    for x in ds:
+        diem, khop = _diem_ma(x, tu_bai, tho_bai, df_tu, df_cum)
+        if diem:
+            ket_qua.append(dict(x, diem=diem, khop=khop))
+    if ket_qua:
+        ket_qua.sort(key=lambda z: (-z["diem"], z["ma"]))
+        nguong = max(1.0, 0.55 * ket_qua[0]["diem"])
+        ra = [x for x in ket_qua if x["diem"] >= nguong][:max(1, toi_da)]
+        if ra:
+            return ra, [f"Đối chiếu kho mã giáo dục AI lớp {lop} ({len(ds)} yêu cầu cần đạt cốt lõi — "
+                        f"{len(ket_qua)} mã có từ khoá liên quan): giữ {len(ra)} mã sát bài học nhất, "
+                        f"kèm cụm từ khớp để giáo viên kiểm tra."]
+    if chi_cot_loi:
+        # không có mã cốt lõi nào sát bài: mới xét tới phần mở rộng (tự nguyện theo CV 5588)
+        mr, _ = goi_y_ma(lop, van_ban, ten_bai, mon, toi_da, chi_cot_loi=False)
+        mr = [x for x in mr if x.get("mo_rong")]
+        if mr:
+            return mr, [f"Bài học không khớp mã cốt lõi của lớp {lop}; dưới đây là mã thuộc PHẦN MỞ RỘNG "
+                        f"(tự nguyện, hiệu trưởng quyết định theo Công văn 5588/BGDĐT-GDPT) — chỉ dùng nếu "
+                        f"giáo viên thấy phù hợp."]
+    return [], [f"Bài học không có cụm từ nào trùng với yêu cầu cần đạt giáo dục AI của lớp {lop} — "
+                f"để trống ô AI, giáo viên tự chọn mã phù hợp nếu vẫn muốn lồng ghép."]
+
+
+def dong_ma(ds_ma):
+    """Chuỗi mã để ghi vào một ô bảng KHGD (giống cách ghi mã năng lực số)."""
+    return "; ".join(x["ma"] for x in ds_ma)
+
+
+NGUON_MA = ("Quyết định 2422/QĐ-BGDĐT (18/8/2026) — Khung nội dung giáo dục AI cho học sinh "
+            "phổ thông, kèm bảng “Nội dung giáo dục AI cho học sinh lớp 1-12”; "
+            "Công văn 5588/BGDĐT-GDPT (19/8/2026) hướng dẫn triển khai")

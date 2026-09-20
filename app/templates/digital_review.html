@@ -2,13 +2,18 @@
 {% block head %}Rà soát nội dung tích hợp{% endblock %}
 {% block crumb %}{{ctx.name}} · {{ctx.subject}} · Lớp {{ctx.grade}}{% endblock %}
 {% block body %}
-<div class="card"><h3>{{ctx.rows|length}} dòng cần rà soát</h3><p>Hệ thống đối chiếu cục bộ với bảng chỉ báo theo khối lớp, không gửi tài liệu ra bên ngoài. Đây là đề xuất tự động theo quy tắc, chưa phải kết quả AI sinh nội dung. Chỉnh sửa các ô trước khi tải Word; ô trống nghĩa là chưa đủ căn cứ.</p></div>
+<div class="card"><h3>{{ctx.rows|length}} dòng cần rà soát</h3>
+ <p>Hệ thống đối chiếu cục bộ ngay trên máy chủ: <b>năng lực số</b> theo Thông tư 02/2025/TT-BGDĐT,
+ <b>giáo dục AI</b> theo Quyết định 2422/QĐ-BGDĐT — không gửi tài liệu ra bên ngoài. Đây là đề xuất tự động
+ theo quy tắc + kho mã, chưa phải kết quả AI sinh nội dung. Chỉnh sửa các ô trước khi tải Word; ô trống
+ nghĩa là chưa đủ căn cứ.
+ <b>Ô tích “giữ” ở mỗi cột:</b> bỏ tích để cột đó trống ở riêng dòng này (giữ nguyên file gốc).</p></div>
 <form method="post">
  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
  {% for row in ctx.rows %}{% set i=loop.index0 %}
  <div class="card">
   <h3>{{loop.index}}. {{row.title}}</h3>
-  {% if row.references %}<details style="margin:10px 0"><summary>Căn cứ đề xuất mã năng lực số</summary>
+  {% if row.references and 'digital' in ctx.chon %}<details style="margin:10px 0"><summary>Căn cứ đề xuất mã năng lực số</summary>
   {% for ref in row.references %}<p><b>{{ref.code}} — {{ref.name}}</b><br>{{ref.description}}<br><small>Ngữ cảnh nhận diện: “{{ref.evidence}}”. <a href="{{ref.source}}" target="_blank" rel="noopener">Bảng chỉ báo tham khảo</a></small></p>{% endfor %}
   </details>{% endif %}
   <div class="row">
@@ -16,15 +21,27 @@
    <label class="f" style="flex:1;min-width:130px">{{label}}<input name="{{i}}_{{key}}" value="{{row[key]}}" maxlength="5000"></label>
    {% endfor %}
   </div>
+  {% if row.ma_ai %}
+  <details style="margin:10px 0"><summary>Căn cứ mã giáo dục AI đã chọn (Quyết định 2422/QĐ-BGDĐT)</summary>
+   {% for x in row.ma_ai %}<p><b>{{x.ma}}</b> — mạch {{x.mach_ten}}, chủ đề {{x.chu_de_ten}}{% if x.mo_rong %} <i>(nội dung mở rộng)</i>{% endif %}<br>
+    “{{x.yccd}}”<br><small>Khớp với bài qua: {{x.khop|join(', ')}}. Nguồn: {{x.nguon}}</small></p>{% endfor %}
+   {% if row.canh_bao_ai %}<p class="muted">{{row.canh_bao_ai|join(' ')}}</p>{% endif %}
+  </details>
+  {% elif row.canh_bao_ai %}<p class="muted">{{row.canh_bao_ai|join(' ')}}</p>{% endif %}
   <div class="g2" style="margin-top:16px">
    {% for key,label in [('digital','Năng lực số'),('ai','Trí tuệ nhân tạo (AI)'),('stem','STEM / STEAM'),('notes','Ghi chú / Cách tổ chức và đánh giá')] %}
-   <label class="f">{{label}}{% if row.original[key] %}<span class="muted">Nội dung đã có trong file gốc</span>{% endif %}<textarea rows="4" name="{{i}}_{{key}}" maxlength="5000">{{row[key]}}</textarea></label>
+   <label class="f">
+    {% if key in ('digital','ai','stem') %}
+    <span style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="{{i}}_giu_{{key}}" value="1"{% if row[key] %} checked{% endif %} style="width:16px">Giữ cột {{label}}</span>
+    {% else %}{{label}}{% endif %}
+    {% if row.original[key] %}<span class="muted">Nội dung đã có trong file gốc</span>{% endif %}
+    <textarea rows="4" name="{{i}}_{{key}}" maxlength="5000">{{row[key]}}</textarea></label>
    {% endfor %}
   </div>
  </div>
  {% endfor %}
  <div class="card">
-  <label style="display:flex;gap:10px;margin-bottom:15px"><input type="checkbox" name="reviewed" value="1" required style="width:18px">Tôi đã rà soát nội dung, mã chỉ báo, tuần và thời lượng phù hợp với lớp học.</label>
+  <label style="display:flex;gap:10px;margin-bottom:15px"><input type="checkbox" name="reviewed" value="1" required style="width:18px">Tôi đã rà soát nội dung, mã (năng lực số và giáo dục AI), tuần và thời lượng phù hợp với lớp học.</label>
   <button class="ok">Tải Word đã tích hợp</button> <a class="btn sec" href="{{url_for('digital.index')}}">Tải file khác</a>
   <p class="muted">File tạm được lưu tối đa 2 giờ; chỉ tài khoản tải lên được truy cập bản xem trước.</p>
  </div>

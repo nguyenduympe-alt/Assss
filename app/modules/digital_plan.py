@@ -8,6 +8,8 @@ from pathlib import Path
 from docx import Document
 from docx.shared import Pt
 
+from . import ai_giao_duc as AIGD
+
 SOURCE = 'https://congbao.chinhphu.vn/van-ban/thong-tu-so-02-2025-tt-bgddt-44148.htm'
 DOMAINS = ['Khai thác dữ liệu và thông tin', 'Giao tiếp và hợp tác trong môi trường số',
            'Sáng tạo nội dung số', 'An toàn', 'Giải quyết vấn đề', 'Ứng dụng trí tuệ nhân tạo']
@@ -111,7 +113,9 @@ def extract_rows(doc):
     return result
 
 
-def preview(data, mode, grade, subject):
+def preview(data, mode, grade, subject, chon=None):
+    """chon: tập nội dung cần đề xuất — 'digital' (năng lực số), 'ai' (giáo dục AI), 'stem'."""
+    chon = set(chon or ('digital', 'ai', 'stem'))
     doc = read_word(data)
     if mode == 'ppct':
         rows = extract_rows(doc)
@@ -125,17 +129,46 @@ def preview(data, mode, grade, subject):
         title = title or next((p.text.strip() for p in doc.paragraphs if p.text.strip()), 'Giáo án')
         rows = [dict(week='', topic='', title=title[:500], periods='', digital='', ai='', stem='', notes='')]
     from .framework_match import match
+    if 'digital' not in chon:
+        text = ''                      # không đề xuất năng lực số: bỏ luôn phần đối chiếu chỉ báo
     for row in rows:
         row['original'] = {k: row[k] for k in ('digital','ai','stem','notes')}
         proposal = suggestions(row['title'], grade, subject)
         for key, value in proposal.items():
-            if not row[key]:
+            if key == 'notes':
+                if 'digital' in chon and not row[key]:
+                    row[key] = value
+            elif key in chon and not row[key]:
                 row[key] = value
+        if 'digital' not in chon:
+            row['digital'] = row['original']['digital']
+        if 'stem' not in chon:
+            row['stem'] = row['original']['stem']
+        # ---- mã giáo dục AI theo Quyết định 2422/QĐ-BGDĐT (không tự đặt mã) ----
+        row['ma_ai'] = []
+        row['canh_bao_ai'] = []
+        if 'ai' in chon and not row['original']['ai']:
+            ds_ma, canh_bao_ai = AIGD.goi_y_ma(grade, ten_bai=row['title'],
+                                               van_ban=row.get('topic', ''), mon=subject)
+            row['ai'] = AIGD.dong_ma(ds_ma)
+            row['ma_ai'] = [{'ma': x['ma'], 'yccd': x['yccd'], 'noi_dung': x.get('noi_dung', ''),
+                             'chu_de_ten': x['chu_de_ten'], 'mach_ten': x['mach_ten'],
+                             'mo_rong': x['mo_rong'], 'khop': x.get('khop', []),
+                             'nguon': AIGD.NGUON_MA} for x in ds_ma]
+            row['canh_bao_ai'] = canh_bao_ai
+            if ds_ma:
+                row['notes'] = ((row['notes'] + '\n') if row['notes'] else '') + \
+                    'Giáo dục AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT): ' + \
+                    '; '.join(x['yccd'][:110] for x in ds_ma) + \
+                    '\nGiáo viên rà soát mã và nội dung AI trước khi dùng.'
+        elif 'ai' not in chon:
+            row['ai'] = row['original']['ai']
         references = match(text if mode == 'lesson' else row['title'], grade)
         row['references'] = references
-        if references and not row['original']['digital']:
+        if 'digital' in chon and references and not row['original']['digital']:
             row['digital'] = '\n'.join(x['code'] + ': ' + x['description'] for x in references)
             row['notes'] = '\n'.join(dict.fromkeys(x['activity'] for x in references)) + '\nĐề xuất tự động theo khung; giáo viên rà soát trước khi sử dụng.'
+        row['chon'] = sorted(chon)
     return rows
 
 
@@ -178,7 +211,7 @@ def export(data, mode, rows, grade, subject):
                 if item.get(key):
                     doc.add_heading(label, level=2)
                     doc.add_paragraph(item[key])
-    doc.add_paragraph('Tham chiếu Thông tư 02/2025/TT-BGDĐT và hướng dẫn theo khối lớp tại Công văn 3456/BGDĐT-GDPT. Bảng chỉ báo tham khảo do THCS Mỹ Đức công bố. Các mã và hoạt động tích hợp cần được giáo viên rà soát theo thực tế lớp học.')
+    doc.add_paragraph('Tham chiếu Thông tư 02/2025/TT-BGDĐT và hướng dẫn theo khối lớp tại Công văn 3456/BGDĐT-GDPT (mã năng lực số). Mã giáo dục AI lấy theo Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026 (Khung nội dung giáo dục AI cho học sinh phổ thông; quy ước mã [Lớp].[Mã chủ đề].[Số thứ tự], nội dung mở rộng thêm tiền tố “MR”) và hướng dẫn triển khai tại Công văn 5588/BGDĐT-GDPT ngày 19/8/2026. Các mã và hoạt động tích hợp cần được giáo viên rà soát theo thực tế lớp học.')
     output = io.BytesIO()
     doc.save(output)
     output.seek(0)

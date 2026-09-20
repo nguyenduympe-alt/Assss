@@ -55,18 +55,24 @@ def index():
     if request.method == 'POST':
         file = request.files.get('file')
         mode, grade, subject = (request.form.get(k, '').strip() for k in ('mode','grade','subject'))
+        # Giáo viên chọn nội dung cần tích hợp: năng lực số / giáo dục AI / STEM — có thể chọn riêng hoặc cả hai
+        chon = tuple('digital' if k == 'nls' else k
+                     for k in ('nls', 'ai', 'stem') if request.form.get('chon_' + k))
         if not file or not file.filename.lower().endswith('.docx'):
             flash('Vui lòng chọn file Word .docx (không hỗ trợ .doc hoặc file ảnh).', 'err')
         elif mode not in ('ppct','lesson') or grade not in [str(i) for i in range(1,13)] or not 1 <= len(subject) <= 100:
             flash('Vui lòng chọn loại tài liệu, lớp 1–12 và nhập môn học.', 'err')
+        elif not chon:
+            flash('Hãy chọn ít nhất một nội dung cần tích hợp: năng lực số, giáo dục AI hoặc STEM.', 'err')
         else:
             try:
                 data = file.read(8 * 1024 * 1024 + 1)
-                rows = DP.preview(data, mode, grade, subject)
+                rows = DP.preview(data, mode, grade, subject, chon=chon)
                 token = uuid.uuid4().hex
                 root = folder()
                 (root / (token + '.docx')).write_bytes(data)
-                ctx = dict(uid=current_user()['id'], rows=rows, mode=mode, grade=grade, subject=subject, name=file.filename[:200])
+                ctx = dict(uid=current_user()['id'], rows=rows, mode=mode, grade=grade, subject=subject,
+                           name=file.filename[:200], chon=list(chon))
                 (root / (token + '.json')).write_text(json.dumps(ctx, ensure_ascii=False), encoding='utf-8')
                 return redirect(url_for('digital.review', token=token))
             except ValueError as exc:
@@ -90,6 +96,10 @@ def review(token):
             rows = []
             for index, original in enumerate(ctx['rows']):
                 row = {key: request.form.get(f'{index}_{key}', original.get(key, '')).strip() for key in FIELDS}
+                # ô tích “giữ” từng cột: bỏ tích nghĩa là để trống cột đó ở dòng này
+                for key in ('digital', 'ai', 'stem'):
+                    if not request.form.get(f'{index}_giu_{key}'):
+                        row[key] = ''
                 if any(len(value) > 5000 for value in row.values()):
                     flash('Một ô nội dung vượt quá 5.000 ký tự.', 'err')
                     return render_template('digital_review.html', ctx=ctx, token=token)
@@ -97,7 +107,15 @@ def review(token):
                 rows.append(row)
             data = (folder() / (token + '.docx')).read_bytes()
             output = DP.export(data, ctx['mode'], rows, ctx['grade'], ctx['subject'])
-            return send_file(output, as_attachment=True,
-                             download_name=('KHGD' if ctx['mode']=='ppct' else 'Giao-an')+'-tich-hop-NLS-STEM.docx',
+            _phan = []
+            if any(r.get('digital') for r in rows):
+                _phan.append('NLS')
+            if any(r.get('ai') for r in rows):
+                _phan.append('AI')
+            if any(r.get('stem') for r in rows):
+                _phan.append('STEM')
+            _ten = ('KHGD' if ctx['mode'] == 'ppct' else 'Giao-an') + '-tich-hop-' + \
+                   ('-'.join(_phan) if _phan else 'trong') + '.docx'
+            return send_file(output, as_attachment=True, download_name=_ten,
                              mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     return render_template('digital_review.html', ctx=ctx, token=token)
