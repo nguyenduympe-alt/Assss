@@ -12,6 +12,12 @@ def create_app():
     if os.environ.get("HTTPS_ONLY", "").lower() in ("1", "true", "yes"):
         app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True,
                           SESSION_COOKIE_SAMESITE="Lax")
+    app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    # Gunicorn listens on loopback; Nginx overwrites forwarded headers.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+    from .security import install
+    install(app)
     app.teardown_appcontext(close_db)
     init_db()
     # nạp cấu hình admin đã lưu trong CSDL (ưu tiên hơn biến môi trường)

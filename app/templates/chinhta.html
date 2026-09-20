@@ -7,7 +7,9 @@
 <div class="card">
  <h3>📄 Chọn văn bản cần kiểm tra</h3>
  <p class="sub">Hỗ trợ file Word (.docx) và văn bản thuần (.txt) — hoặc dán trực tiếp nội dung</p>
+ <p class="muted">Hiện kiểm tra bằng quy tắc trên VPS. Chế độ AI chưa kích hoạt; kết quả có thể bỏ sót hoặc nhầm từ tùy ngữ cảnh.</p>
  <form method="post" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
   <div class="tabs">
    <button type="button" class="on" onclick="tab(0,this)">📎 Tải file lên</button>
    <button type="button" onclick="tab(1,this)">✍️ Dán nội dung</button>
@@ -62,19 +64,20 @@
  <div class="kpi" style="--c:#0d9488"><div class="ic">📝</div><b>{{stats.so_tu}}</b><span>Tổng số từ</span></div>
  <div class="kpi" style="--c:#06b6d4"><div class="ic">📄</div><b>{{stats.so_doan}}</b><span>Đoạn văn bản</span></div>
  <div class="kpi" style="--c:#059669"><div class="ic">🎯</div>
-  <b>{{ ((1 - stats.tong / stats.so_tu) * 100)|round(1) if stats.so_tu else 100 }}%</b><span>Độ chính xác</span></div>
+  <b>Quy tắc</b><span>Phương pháp kiểm tra</span></div>
 </div>
 
 {% if not stats.tong %}
 <div class="card" style="text-align:center;padding:40px">
  <div style="font-size:52px">🎉</div>
  <h3 style="font-size:19px;margin:10px 0 5px">Tuyệt vời! Không phát hiện lỗi chính tả</h3>
- <p class="muted">Văn bản “{{name}}” đã đúng chính tả tiếng Việt.</p>
+ <p class="muted">Bộ kiểm tra chưa tìm thấy lỗi trong “{{name}}”. Bạn nên đọc lại tên riêng và các từ phụ thuộc ngữ cảnh.</p>
  <a class="btn" style="margin-top:14px" href="{{url_for('core.chinh_ta')}}">Kiểm tra văn bản khác</a>
 </div>
 {% else %}
 
 <form method="post" action="{{url_for('core.chinh_ta_sua')}}" id="frm">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
 <div class="card">
  <div class="chead">
   <div><h3>Danh sách lỗi — {{name}}</h3>
@@ -150,7 +153,7 @@ function cnt(){const n=document.querySelectorAll('.cb:checked').length;const e=d
 document.addEventListener('change',e=>{if(e.target.classList.contains('cb'))cnt();});
 function xem(){
  const ids=[...document.querySelectorAll('.cb:checked')].map(c=>+c.value);
- fetch('{{url_for("core.chinh_ta_xem")}}',{method:'POST',headers:{'Content-Type':'application/json'},
+ fetch('{{url_for("core.chinh_ta_xem")}}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':{{csrf_token()|tojson}}},
   body:JSON.stringify({ids})}).then(r=>r.json()).then(d=>{
    if(!d.ok){alert(d.msg);return;}
    document.getElementById('pv').innerHTML=d.paras.filter(p=>p.trim()).map(p=>

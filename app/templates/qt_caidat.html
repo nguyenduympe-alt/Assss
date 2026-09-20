@@ -68,6 +68,7 @@
  {% endif %}
 
  <form method="post">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
   <input type="hidden" name="nhom" value="{{ma}}">
   <div class="cfg">
    {% for x in muc.get(ma, []) %}
@@ -136,10 +137,55 @@
  {% endif %}
  {% if ma == 'dang_nhap' %}
  <hr class="s">
- <p class="muted" style="font-size:12.5px">Lấy khoá tại
-  <b>console.cloud.google.com → APIs &amp; Services → Credentials</b>.
-  Địa chỉ chuyển hướng cần khai báo:
-  <code style="background:#f1f5f9;padding:2px 7px;border-radius:6px">{{ request.url_root }}login/google/callback</code></p>
+
+ {# ---------- Bảng chẩn đoán: đủ điều kiện chạy chưa ---------- #}
+ <div style="border:1px solid {{ '#a7f3d0' if google_tt.bat else '#fed7aa' }};border-radius:13px;
+   padding:14px 16px;background:{{ '#f0fdf9' if google_tt.bat else '#fffbf5' }}">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+   <span style="font-size:20px">{{ '✅' if google_tt.bat else '⚠️' }}</span>
+   <b style="font-size:14.5px;color:{{ '#065f46' if google_tt.bat else '#b45309' }}">
+    {{ 'Đăng nhập Google đang BẬT' if google_tt.bat else 'Đăng nhập Google đang TẮT' }}</b>
+   <form method="post" style="margin-left:auto">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <button class="sec sm" name="act" value="thu_google">🔌 Kiểm tra kết nối Google</button>
+   </form>
+  </div>
+
+  <div style="display:grid;gap:7px;font-size:13px">
+   <div>{{ '✅' if google_tt.co_client_id else '❌' }} Google Client ID
+    {% if google_tt.co_client_id %}<code style="color:#64748b">{{ google_tt.client_id_rut_gon }}</code>{% endif %}</div>
+   <div>{{ '✅' if google_tt.co_client_secret else '❌' }} Google Client Secret</div>
+   <div>{{ '✅' if google_tt.co_dia_chi else '❌' }} Địa chỉ HTTPS
+    {% if google_tt.dia_chi_dang_dung %}<code style="color:#64748b">{{ google_tt.dia_chi_dang_dung }}</code>
+      {%- if google_tt.tu_dong_nhan_dien %} <span class="src csdl">tự nhận diện</span>{% endif %}
+    {% else %}<span class="muted">— chưa có tên miền HTTPS, Google không cho phép dùng địa chỉ IP</span>{% endif %}</div>
+  </div>
+
+  {% if google_tt.callback %}
+  <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #cbd5e1">
+   <div style="font-size:12.5px;font-weight:650;color:#334155;margin-bottom:5px">
+    ① Dán đúng dòng này vào <b>Authorized redirect URIs</b> trên Google Cloud Console:</div>
+   <code style="background:#fff;border:1px solid #e2e8f0;padding:7px 10px;border-radius:8px;
+     display:inline-block;font-size:12.5px;word-break:break-all">{{ google_tt.callback }}</code>
+   <button type="button" class="sec sm" onclick="cpx(this,'{{ google_tt.callback }}')">Sao chép</button>
+  </div>
+  {% endif %}
+
+  <div style="margin-top:12px;font-size:12.5px;color:#475569;line-height:1.7">
+   <b>② Các bước còn lại</b> (nếu chưa làm):
+   <div>1. Vào <b>console.cloud.google.com</b> → tạo dự án → <b>APIs &amp; Services</b> → <b>OAuth consent screen</b>, chọn <i>External</i>, điền tên ứng dụng + email hỗ trợ.</div>
+   <div>2. <b>Credentials</b> → <i>Create credentials</i> → <i>OAuth client ID</i> → loại <b>Web application</b>.</div>
+   <div>3. Mục <b>Authorized JavaScript origins</b> dán: <code>{{ google_tt.dia_chi_dang_dung or 'https://ten-mien-cua-ban' }}</code></div>
+   <div>4. Mục <b>Authorized redirect URIs</b> dán dòng ở mục ① phía trên → <b>Create</b> → copy Client ID &amp; Client Secret dán vào 2 ô bên trên → <b>Lưu mục này</b>.</div>
+   <div>5. Nếu ứng dụng còn ở trạng thái <i>Testing</i>, thêm email của thầy/cô vào danh sách <b>Test users</b>, nếu không Google sẽ chặn.</div>
+  </div>
+
+  <div class="ht" style="margin-top:10px">
+   ⓘ Google <b>bắt buộc</b> dùng <b>https://</b> và <b>tên miền thật</b> — không dùng được
+   <code>http://</code> hay địa chỉ IP như <code>180.93.0.187</code>.
+   Địa chỉ đang dùng để tạo redirect URI: <b>{{ google_tt.dia_chi_dang_dung or 'chưa có' }}</b>.
+  </div>
+ </div>
  {% endif %}
 </div>
 {% endfor %}

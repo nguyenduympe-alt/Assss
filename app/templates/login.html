@@ -57,18 +57,22 @@ button:hover{filter:brightness(1.07);transform:translateY(-1px)}
  <div class="fe"><i>📊</i><div><b>Dashboard thống kê</b><span>Phổ điểm, tỉ lệ hoàn thành, chất lượng theo từng lớp</span></div></div>
 </div>
 <div class="right"><form class="box" method="post">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
  <h1>Đăng nhập</h1><p class="s">Chào mừng trở lại! Vui lòng nhập thông tin tài khoản.</p>
  {% with ms=get_flashed_messages(with_categories=true) %}{% for c,m in ms %}<div class="{{'ok' if c=='ok' else 'err'}}">{{m}}</div>{% endfor %}{% endwith %}
- <label>Tài khoản</label><input name="username" placeholder="Nhập tên đăng nhập" required autofocus>
- <label>Mật khẩu</label><input name="password" type="password" placeholder="••••••••" required>
+ <label for="username">Tài khoản hoặc email</label><input id="username" name="username" placeholder="Tên đăng nhập hoặc email" value="{{request.form.get('username', '')}}" maxlength="254" autocomplete="username" required autofocus>
+ <label for="password">Mật khẩu</label><input id="password" name="password" type="password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
  <button>Đăng nhập →</button>
  {% if google_enabled %}
  <div class="or"><span>hoặc</span></div>
  <a class="gbtn" href="{{url_for('auth.google_login')}}">
   <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.4z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.1 2 20.4 2 24s.8 6.9 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C35 4.3 30 2 24 2 15.4 2 7.9 7 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>
   Đăng nhập bằng Google</a>
+ {% else %}
+ <div class="or"><span>hoặc</span></div>
+ <button type="button" class="gbtn" disabled aria-disabled="true">Đăng nhập bằng Google</button>
+ <p style="font-size:12px;color:#64748b;text-align:center">Google chưa được quản trị viên kích hoạt. Bạn vẫn có thể đăng ký và đăng nhập bằng mật khẩu.</p>
  {% endif %}
  <div class="hint">Chưa có tài khoản? <a href="{{url_for('auth.register')}}">Đăng ký ngay</a></div>
- <div class="demo">Tài khoản dùng thử: <b>gv</b> / <b>123456</b></div>
 </form></div>
 </body></html>

@@ -101,13 +101,13 @@ COMMON_ERRORS = OrderedDict([
     ("xử lý xố", "xử lý số"), ("sử lý", "xử lý"), ("sử dụng sai", "sử dụng sai"),
     ("dành được", "giành được"), ("giành thời gian", "dành thời gian"),
     ("sáng lạn", "xán lạn"), ("cọ sát", "cọ xát"), ("chín mùi", "chín muồi"),
-    ("xúc tích", "súc tích"), ("bàng quang", "bàng quan"), ("chuẩn đoán", "chẩn đoán"),
-    ("tựu chung", "tựu trung"), ("nhậm chức", "nhận chức"), ("vô hình chung", "vô hình trung"),
+    ("xúc tích", "súc tích"),  ("chuẩn đoán", "chẩn đoán"),
+    ("tựu chung", "tựu trung"),  ("vô hình chung", "vô hình trung"),
     ("đường xá", "đường sá"), ("xán lạng", "xán lạn"), ("sơ xuất", "sơ suất"),
-    ("trau chuốt", "trau chuốt"), ("chỉnh chu", "chu đáo"), ("suôn xẻ", "suôn sẻ"),
+    ("trau chuốt", "trau chuốt"), ("chỉnh chu", "chỉn chu"), ("suôn xẻ", "suôn sẻ"),
     ("thăm quan", "tham quan"), ("tham gia ý kiến", "tham gia ý kiến"),
     ("phong phanh", "phong thanh"), ("che dấu", "che giấu"), ("dấu diếm", "giấu giếm"),
-    ("gian dối", "gian dối"), ("rốt ráo", "ráo riết"),
+    ("gian dối", "gian dối"), 
     # sai hỏi / ngã hay gặp
     ("sữa chữa", "sửa chữa"), ("sữa lỗi", "sửa lỗi"), ("cũng cố", "củng cố"),
     ("bổ xung", "bổ sung"), ("kiễm tra", "kiểm tra"), ("tỷ mỷ", "tỉ mỉ"),
@@ -120,7 +120,7 @@ COMMON_ERRORS = OrderedDict([
     ("lảng phí", "lãng phí"), ("mỉm cười", "mỉm cười"), ("nghiêm khắt", "nghiêm khắc"),
     ("hoàn thành tôt", "hoàn thành tốt"),
     # lỗi gõ lặp / thiếu
-    ("nhưng mà là", "nhưng"), ("thì là", "thì"),
+    
 ])
 
 # Cặp hỏi/ngã dễ nhầm: dạng SAI -> dạng ĐÚNG (chỉ 1 âm tiết, xét theo ngữ cảnh từ ghép)

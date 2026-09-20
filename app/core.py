@@ -2,7 +2,8 @@ import io, json, datetime, csv, re, os, time, uuid
 from flask import (Blueprint, render_template, request, redirect, url_for, session,
                    send_file, jsonify, flash, Response)
 from .db import get_db, setting, set_setting
-from .auth import login_required, current_user, admin_required
+from .auth import (login_required, current_user, admin_required, google_bat,
+                    google_callback_url, google_tinh_trang, kiem_tra_google)
 from .modules import ai_nhanxet as AI
 from .modules import excel_io as XL
 from .modules.pdf_bao_giang import build_pdf, THU_NAME
@@ -27,7 +28,7 @@ def inject():
             "now": datetime.date.today(), "BL": BL,
             "is_pro": BL.is_pro(u), "remaining": BL.remaining(u),
             "days_left": BL.days_left(u), "FREE_QUOTA": BL.FREE_QUOTA,
-            "CFG": CFG,
+            "CFG": CFG, "google_enabled": google_bat(), "google_callback_url": google_callback_url(),
             "SITE_NAME": CFG.get("SITE_NAME", "EduAssist"),
             "SITE_TAGLINE": CFG.get("SITE_TAGLINE", "Trợ lý giáo viên"),
             "SITE_LOGO": CFG.get("SITE_LOGO", "🎓"),
@@ -894,6 +895,9 @@ def qt_caidat():
         elif act == "mac_dinh":
             CFG.xoa(db, request.form.get("key", ""))
             flash("Đã trả tham số về giá trị mặc định.", "ok")
+        elif act == "thu_google":
+            ok, msg = kiem_tra_google()
+            flash(msg, "ok" if ok else "err")
         elif act == "thu_sms":
             u = current_user()
             phone = SMS.normalize(request.form.get("phone")) or (u["phone"] if u else None)
@@ -924,6 +928,7 @@ def qt_caidat():
             {"m": m, "gia_tri": CFG.get(m.key), "nguon": CFG.nguon(m.key)})
     return render_template("qt_caidat.html", NHOM=CFG.NHOM, muc=muc_theo_nhom,
                            CFG=CFG, suc_khoe=CFG.suc_khoe(),
+                           google_tt=google_tinh_trang(),
                            webhook_url=request.url_root.rstrip("/") + "/webhook/bank")
 
 

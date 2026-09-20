@@ -21,6 +21,7 @@
  <div class="card">
   <h3>👤 Hồ sơ giáo viên</h3><p class="sub">Thông tin này sẽ tự điền vào lịch báo giảng PDF</p>
   <form method="post">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
    <div class="row">
     <label class="f" style="flex:1;min-width:180px">Họ và tên<input name="fullname" value="{{user['fullname'] or ''}}"></label>
     <label class="f">Môn dạy<input name="subject" value="{{user['subject'] or ''}}" style="width:150px"></label>
@@ -41,14 +42,17 @@
    {% else %}<div class="av" style="width:46px;height:46px;flex:0 0 46px;font-size:18px">{{(user['fullname'] or user['username'])[0]|upper}}</div>{% endif %}
    <div style="flex:1"><b>{{user['fullname'] or user['username']}}</b>
     <div class="muted">@{{user['username']}}{% if user['email'] %} · {{user['email']}}{% endif %} · {{user['role']}}</div></div>
-   {% if user['google_sub'] %}<span class="chip">🔗 Liên kết Google</span>{% endif %}
+   {% if user['google_sub'] %}<span class="chip">🔗 Đã liên kết Google</span>
+   {% elif google_enabled %}<a class="btn sec" href="{{url_for('auth.google_login')}}">Liên kết Google</a>{% endif %}
   </div>
   <hr class="s">
   <h3 style="font-size:14px" id="doimk">🔑 Đổi mật khẩu</h3>
   <p class="sub">{% if not user['password'] %}Tài khoản Google — đặt mật khẩu để đăng nhập được cả hai cách.{% else %}Nên đổi mật khẩu mặc định ngay.{% endif %}</p>
   <form method="post" action="{{url_for('auth.doi_mk')}}" class="row">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
    {% if user['password'] %}<label class="f">Mật khẩu hiện tại<input type="password" name="old" required></label>{% endif %}
-   <label class="f">Mật khẩu mới<input type="password" name="new" minlength="6" required></label>
+   <label class="f">Mật khẩu mới<input type="password" name="new" minlength="8" maxlength="128" autocomplete="new-password" required></label>
+   <label class="f">Nhập lại mật khẩu mới<input type="password" name="confirm" minlength="8" maxlength="128" autocomplete="new-password" required></label>
    <button class="sec">Đổi mật khẩu</button>
   </form>
  </div>
