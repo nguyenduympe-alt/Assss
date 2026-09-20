@@ -3,11 +3,8 @@
 {% block crumb %}{{ctx.name}} · {{ctx.subject}} · Lớp {{ctx.grade}}{% endblock %}
 {% block body %}
 <div class="card"><h3>{{ctx.rows|length}} dòng cần rà soát</h3>
- <p>Hệ thống đối chiếu cục bộ ngay trên máy chủ: <b>năng lực số</b> theo Thông tư 02/2025/TT-BGDĐT,
- <b>giáo dục AI</b> theo Quyết định 2422/QĐ-BGDĐT — không gửi tài liệu ra bên ngoài. Đây là đề xuất tự động
- theo quy tắc + kho mã, chưa phải kết quả AI sinh nội dung. Chỉnh sửa các ô trước khi tải Word; ô trống
- nghĩa là chưa đủ căn cứ.
- <b>Ô tích “giữ” ở mỗi cột:</b> bỏ tích để cột đó trống ở riêng dòng này (giữ nguyên file gốc).</p>
+ <p>Sửa trực tiếp các ô nếu cần, rồi tích “Tôi đã rà soát” ở cuối trang để tải Word. Ô trống nghĩa là
+ <b>chưa đủ căn cứ</b>. <b>Ô tích “giữ cột”</b> ở mỗi dòng: bỏ tích để cột đó trống ở riêng dòng ấy.</p>
  <p class="muted">Trong file Word tải về: ô <b style="color:#c00">Năng lực số tô ĐỎ</b>, ô
  <b style="color:#00f">Trí tuệ nhân tạo (AI) tô XANH DƯƠNG</b> (chỉ tô phần hệ thống đề xuất, nội dung thầy/cô
  tự nhập giữ nguyên màu đen).</p></div>
@@ -25,9 +22,9 @@
    {% endfor %}
   </div>
   {% if row.ma_ai %}
-  <details style="margin:10px 0"><summary>Căn cứ mã giáo dục AI đã chọn (Quyết định 2422/QĐ-BGDĐT)</summary>
+  <details style="margin:10px 0"><summary>Căn cứ mã AI đã chọn để thầy/cô đối chiếu (Quyết định 2422/QĐ-BGDĐT)</summary>
    {% for x in row.ma_ai %}<p><b>{{x.ma}}</b> — mạch {{x.mach_ten}}, chủ đề {{x.chu_de_ten}}{% if x.mo_rong %} <i>(nội dung mở rộng)</i>{% endif %}<br>
-    “{{x.yccd}}”<br><small>Khớp với bài qua: {{x.khop|join(', ')}}. Nguồn: {{x.nguon}}</small></p>{% endfor %}
+    “{{x.yccd}}”<br><small>Khớp với bài qua: {{x.khop|join(', ')}}</small></p>{% endfor %}
    {% if row.canh_bao_ai %}<p class="muted">{{row.canh_bao_ai|join(' ')}}</p>{% endif %}
   </details>
   {% elif row.canh_bao_ai %}<p class="muted">{{row.canh_bao_ai|join(' ')}}</p>{% endif %}

@@ -7,22 +7,21 @@
   <div style="display:flex;gap:12px;align-items:flex-start">
     <span style="font-size:24px">⚠️</span>
     <div>
-      <b style="font-size:15px">Đọc trước khi dùng: kết quả chỉ là GỢI Ý, không phải bằng chứng.</b>
+      <b style="font-size:15px">Kết quả chỉ là GỢI Ý, không phải bằng chứng.</b>
       <p class="sub" style="margin:6px 0 0">
-      Chưa có công cụ nào trên thế giới — kể cả của các công ty lớn — xác định chắc chắn một văn bản do AI viết.
-      Công cụ này <b>đo văn phong</b> (nhịp câu, từ nối, độ đều…), nên:
-      <b>văn bản người viết theo văn phong hành chính, báo cáo, sách giáo khoa rất dễ bị chấm nhầm là AI</b>;
-      còn bài <b>do AI viết rồi học sinh tự sửa lại thì rất khó phát hiện</b>.
-      Vì vậy <b>không dùng kết quả này để buộc tội, trừ điểm hay kết luận về một học sinh</b>.
-      Nếu cần kết luận, thầy/cô hãy đối chiếu với quá trình học, hỏi lại học sinh, xem bản nháp.</p>
+      Công cụ <b>đo văn phong</b> (nhịp câu, từ nối, độ đều…), nên văn bản người viết theo văn phong hành chính,
+      báo cáo, sách giáo khoa rất dễ bị <b>chấm nhầm là AI</b>; còn bài AI viết rồi học sinh <b>tự sửa lại</b>
+      thì rất khó phát hiện. <b>Không dùng để buộc tội, trừ điểm hay kết luận về một học sinh</b> — hãy
+      <b>hỏi lại học sinh</b>, xem bản nháp và quá trình học.</p>
     </div>
   </div>
 </div>
 
 <div class="card">
   <h3>Kiểm tra tài liệu</h3>
-  <p class="sub">Nhận tệp Word (.docx), PDF, hoặc văn bản dán trực tiếp. Dùng được cho cả bài của học sinh
-  và tài liệu của thầy/cô. Nội dung <b>chỉ xử lý trên máy chủ này</b>, <b>không lưu tệp</b>, <b>không gửi đi đâu</b>.</p>
+  <p class="sub">Tải tệp Word (.docx) hoặc PDF (tối đa 8 MB), hay dán văn bản trực tiếp rồi bấm
+  “Phân tích văn phong”. Nội dung <b>chỉ xử lý trên máy chủ này</b>, <b>không lưu tệp</b>,
+  <b>không gửi đi đâu</b>. Điểm dưới 35 coi như không có gì đáng lo, trên 65 mới nên xem lại.</p>
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
     <div class="row" style="align-items:flex-start">
@@ -107,45 +106,20 @@
 </div>
 {% endif %}
 
-<div class="g2">
-  <div class="card">
-    <h3>Máy chấm dựa trên gì</h3>
-    <ul style="margin:8px 0 0;padding-left:18px;line-height:1.75">
-      <li><b>Nhịp câu:</b> độ dài các câu có thay đổi hay đều tăm tắp.</li>
-      <li><b>Từ nối kiểu văn mẫu:</b> “do đó, hơn nữa, nhìn chung, có thể thấy rằng…” dày hay thưa.</li>
-      <li><b>Lặp cụm từ, mở đầu câu giống nhau, đoạn dài bằng nhau.</b></li>
-      <li><b>Chi tiết cụ thể:</b> số liệu, tên riêng, từ khẩu ngữ (“em”, “hôm nay”, “lớp em có 34 bạn”) —
-      người viết thường có, văn máy thường thiếu.</li>
-      <li><b>Độ “mượt”:</b> so với thống kê ký tự học từ văn bản người viết (tài liệu tập huấn của Bộ).</li>
-      <li><b>Dấu vết công cụ:</b> ký hiệu <code>**</code>, <code>##</code>, gạch đầu dòng, biểu tượng cảm xúc.</li>
-    </ul>
-  </div>
-  <div class="card" style="border:1px solid #e2e8f0;background:#fbfdfe">
-    <h3>Nói thẳng về độ tin cậy</h3>
-    {% set cte = thong_tin.chi_so_thuc_te or {} %}
-    {% set cga = thong_tin.chi_so_giao_an or {} %}
-    {% if thong_tin.co_mo_hinh %}
-    <p class="sub" style="margin:0 0 8px">Mô hình nhỏ do EduAssist tự huấn luyện ({{thong_tin.so_dac_trung}} đặc trưng
-    văn phong), huấn luyện lúc {{thong_tin.huan_luyen_luc}}. <b>Không phải mô hình ngôn ngữ lớn</b>:
-    máy không hiểu nội dung, chỉ đo hình thức diễn đạt.</p>
-    <table style="margin:6px 0 10px">
-      <tbody>
-        <tr><td style="padding:6px 0;border:0">Văn bản <b>vẫn giữ nguyên văn phong AI</b></td>
-          <td style="padding:6px 0;border:0"><b style="color:#059669">bắt được ~97%</b></td></tr>
-        <tr><td style="padding:6px 0;border:0">Văn bản <b>AI viết rồi người tự sửa lại</b></td>
-          <td style="padding:6px 0;border:0"><b style="color:#e11d48">chỉ bắt được ~{{ ((cte.bat_duoc or 0.24) * 100)|round|int }}%</b></td></tr>
-        <tr><td style="padding:6px 0;border:0">Chấm nhầm trên văn bản người viết (tập kiểm tra)</td>
-          <td style="padding:6px 0;border:0"><b>{{ cga.so_bao_nham if cga else 0 }}/{{ (cga.so_mau or 0) }}</b>
-            <span class="muted">— thực tế sẽ cao hơn</span></td></tr>
-      </tbody>
-    </table>
-    <p class="muted" style="font-size:12.3px;margin:0">Dữ liệu “máy viết” dùng để huấn luyện là do chính AI sinh ra
-    mô phỏng, <b>không phải bài thật của học sinh</b>, nên các con số trên lạc quan hơn thực tế.
-    Khi dùng thật, thầy/cô hãy coi điểm dưới 35 là “không có gì đáng lo”, trên 65 mới đáng xem lại —
-    và <b>đừng bao giờ kết luận chỉ dựa vào con số</b>.</p>
-    {% else %}
-    <p class="sub">Chưa có mô hình trên máy chủ này.</p>
-    {% endif %}
-  </div>
+<div class="card">
+  <h3>Máy chấm dựa trên gì</h3>
+  {% if thong_tin.co_mo_hinh %}
+  <p class="sub">Mô hình nhỏ do EduAssist tự huấn luyện ({{thong_tin.so_dac_trung}} đặc trưng văn phong) —
+  <b>Không phải mô hình ngôn ngữ lớn</b>: máy chỉ đo hình thức diễn đạt, không hiểu nội dung. Dấu hiệu được
+  đo gồm: nhịp câu đều hay không, mật độ <b>từ nối kiểu văn mẫu</b> (“do đó, hơn nữa, nhìn chung…”), lặp cụm
+  từ, độ dài đoạn, mức độ có chi tiết cụ thể (số liệu, tên riêng, khẩu ngữ) và dấu vết công cụ
+  (<code>**</code>, <code>##</code>, gạch đầu dòng, biểu tượng cảm xúc).</p>
+  <p class="sub">Văn bản giữ nguyên văn phong AI: bắt được khoảng 97%. Văn bản AI viết rồi người tự sửa lại:
+  <b>chỉ bắt được khoảng {{ ((thong_tin.chi_so_thuc_te or {}).bat_duoc or 0.24)|round(2) * 100 | round | int }}%</b>
+  — vì vậy kết quả chỉ để tham khảo, không kết luận. Dữ liệu huấn luyện là văn bản do AI sinh mô phỏng,
+  không phải bài thật của học sinh.</p>
+  {% else %}
+  <p class="sub">Chưa có mô hình trên máy chủ này.</p>
+  {% endif %}
 </div>
 {% endblock %}

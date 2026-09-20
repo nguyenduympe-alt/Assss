@@ -25,22 +25,20 @@ def _cong_cu():
     """
     ds = [
         {"icon": "📝", "ten": "Giáo án & năng lực số", "endpoint": "giao_an_nls.index", "mau": "#0d9488",
-         "mo_ta": "Tải giáo án Word → chèn mục “Tích hợp năng lực số” vào đúng vị trí, "
-                  "giữ nguyên định dạng gốc, duyệt rồi tải bản .docx",
-         "the": ["Lớp 1–12", "Phần máy tạo tô đỏ"], "moi": True},
+         "mo_ta": "Tải giáo án Word → tích chọn nội dung cần chèn → duyệt → tải bản .docx",
+         "the": [], "moi": False},
         {"icon": "🤖", "ten": "Nhận xét AI", "endpoint": "core.nhan_xet", "mau": "#059669",
-         "mo_ta": "Sinh nhận xét học sinh theo mẫu của Bộ, xuất file Excel cho cả lớp",
-         "the": ["Thông tư 27/2020"], "moi": False},
+         "mo_ta": "Nhập điểm cho lớp → tạo nhận xét → xuất file Excel",
+         "the": [], "moi": False},
         {"icon": "🔤", "ten": "Kiểm tra chính tả", "endpoint": "chinh_ta.index", "mau": "#06b6d4",
-         "mo_ta": "Công cụ riêng, chỉ chạy khi thầy/cô cần: dò lỗi bằng mô hình nhỏ + bộ luật, "
-                  "nêu lý do và bản sửa để thầy/cô duyệt từng chỗ",
-         "the": ["Tách riêng khỏi năng lực số", "Dò cả trong bảng biểu"], "moi": True},
+         "mo_ta": "Tải .docx hoặc dán văn bản → duyệt từng chỗ sửa → tải bản .docx",
+         "the": [], "moi": False},
         {"icon": "🧩", "ten": "Năng lực số & STEM", "endpoint": "digital.index", "mau": "#8b5cf6",
-         "mo_ta": "Kho chỉ báo năng lực số đã kiểm chứng theo văn bản Bộ; gợi ý bài học STEM",
-         "the": ["137 chỉ báo"], "moi": False},
+         "mo_ta": "Tải KHGD/PPCT Word → chọn cột cần tích hợp → tải bản .docx",
+         "the": [], "moi": False},
         {"icon": "🖨️", "ten": "Lịch báo giảng", "endpoint": "core.bao_giang", "mau": "#f59e0b",
-         "mo_ta": "Xuất lịch báo giảng cả năm ra PDF hoặc Word chỉ trong vài giây",
-         "the": ["35 tuần"], "moi": False},
+         "mo_ta": "Xuất lịch báo giảng ra PDF hoặc Word",
+         "the": [], "moi": False},
         {"icon": "📘", "ten": "Phân phối chương trình", "endpoint": "core.ppct", "mau": "#0ea5e9",
          "mo_ta": "Nhập và quản lý phân phối chương trình theo tuần, theo bài",
          "the": [], "moi": False},
@@ -48,16 +46,19 @@ def _cong_cu():
          "mo_ta": "Xếp thời khoá biểu theo buổi, tiết, phòng học",
          "the": [], "moi": False},
         {"icon": "🎋", "ten": "Lịch nghỉ", "endpoint": "core.lich_nghi", "mau": "#ec4899",
-         "mo_ta": "Ngày nghỉ, ngày lễ để tính đúng số tuần thực dạy",
+         "mo_ta": "Nhập ngày nghỉ để tính đúng số tuần thực dạy",
          "the": [], "moi": False},
     ]
+    # Công cụ do plugin đăng ký: chỉ kèm đúng một câu hướng dẫn dùng.
+    HUONG_DAN = {"check_ai.index": "Tải .docx/.pdf hoặc dán văn bản → xem điểm dấu hiệu và lý do"}
     from flask import current_app
     co = set(current_app.view_functions)
     for m in (current_app.jinja_env.globals.get("PLUGIN_MENUS") or []):
         ep = m.get("endpoint")
         if ep and ep not in {x["endpoint"] for x in ds}:
             ds.append({"icon": m.get("icon") or "🧩", "ten": m.get("label") or "Tính năng",
-                       "endpoint": ep, "mau": "#64748b", "mo_ta": "", "the": [], "moi": False})
+                       "endpoint": ep, "mau": "#64748b", "mo_ta": HUONG_DAN.get(ep, ""),
+                       "the": [], "moi": False})
     return [x for x in ds if x["endpoint"] in co]
 
 

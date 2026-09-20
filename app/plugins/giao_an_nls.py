@@ -34,11 +34,8 @@ from .digital import folder, load, save  # dùng lại nơi lưu tạm, có ki�
 MENU = {'label': 'Giáo án, năng lực số & AI', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
 MAX_BYTES = 8 * 1024 * 1024
 AI_THOI_LUONG = 5          # phút lồng ghép giáo dục AI đề xuất mỗi tiết
-NHAN_NOI_BO = ("Hệ thống chạy hoàn toàn trên máy chủ của trường: kho chỉ báo năng lực số đã kiểm chứng "
-               "theo Thông tư 02/2025/TT-BGDĐT; nội dung giáo dục AI theo Khung ban hành kèm "
-               "Quyết định 2422/QĐ-BGDĐT và Công văn 5588/BGDĐT-GDPT. KHÔNG gửi nội dung giáo án ra "
-               "Google/Gemini hay dịch vụ AI nào. Công cụ này không dò chính tả — việc đó nằm ở "
-               "công cụ riêng “Kiểm tra chính tả”.")
+NHAN_NOI_BO = ("Xử lý ngay trên máy chủ của trường, KHÔNG gửi nội dung giáo án ra ngoài; "
+               "file Word không chạy macro.")
 
 
 @bp.route('/', methods=['GET', 'POST'])

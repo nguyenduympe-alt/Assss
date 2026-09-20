@@ -34,10 +34,7 @@ from .digital import folder, load, save
 MAX_BYTES = 8 * 1024 * 1024
 MAX_TEXT = 200_000
 
-NHAN = ("Công cụ chạy hoàn toàn trên máy chủ của trường: bộ luật chính tả, từ điển thuật ngữ "
-        "giáo dục và MỘT MÔ HÌNH NHỎ DO EDUASSIST TỰ HUẤN LUYỆN (chấm điểm từng từ). "
-        "KHÔNG gửi nội dung ra Google/Gemini hay dịch vụ AI nào. "
-        "Mô hình này KHÔNG phải mô hình ngôn ngữ lớn: không sinh nội dung, không hiểu nội dung.")
+NHAN = ("Xử lý ngay trên máy chủ của trường, KHÔNG gửi văn bản ra ngoài; bản gốc luôn được giữ nguyên.")
 
 NGUON = {
     'mo_hinh': 'mô hình nhỏ đã huấn luyện',
