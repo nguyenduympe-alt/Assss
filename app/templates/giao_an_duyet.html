@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block head %}Duyệt nội dung tích hợp{% endblock %}
+{% block crumb %}{{ten_file}} · {{ctx.mon or 'chưa rõ môn'}} · lớp {{ctx.lop or 'chưa rõ'}}{% endblock %}
+{% block body %}
+
+{% if loi_cu %}
+<div class="card" style="border-left:4px solid #e11d48">
+ <h3>Bộ kiểm tra chặn xuất file</h3>
+ <p>Phải xử lý các lỗi sau rồi mới xuất được — hệ thống không xuất file sai:</p>
+ <ul>{% for l in loi_cu.loi_cung %}<li>{{l}}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<div class="card">
+ <h3>Đã đọc được cấu trúc giáo án</h3>
+ <p>{{ctx.so_doan}} đoạn · {{ctx.so_bang}} bảng · tiến trình dạng <b>{{ctx.tien_trinh}}</b> ·
+  tổng thời lượng đọc được <b>{{ctx.tong_phut or '?'}} phút</b></p>
+ <p>Tên bài: <b>{{ctx.ten_bai or 'chưa nhận diện được'}}</b></p>
+ {% if ctx.pt_canh_bao %}<ul style="color:#a16207">{% for c in ctx.pt_canh_bao %}<li>{{c}}</li>{% endfor %}</ul>{% endif %}
+ <p class="muted">Bản gốc được giữ nguyên; kết quả tải về là một BẢN SAO .docx.</p>
+</div>
+
+<form method="post" action="{{url_for('giao_an_nls.xuat', token=token)}}">
+ <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+
+ <div class="card">
+  <h3>1. Tiêu chí năng lực số đưa vào bài</h3>
+  <p class="sub">Bỏ tích nếu thầy/cô thấy tiêu chí chưa phù hợp. Chỉ những tiêu chí được tích mới vào file.
+   Tiêu chí ghi <b>CẦN GIÁO VIÊN DUYỆT</b> mặc định không tích, vì hệ thống chưa có căn cứ trong bài.</p>
+  {% if not ctx.chon %}
+   <p style="color:#a16207">Chưa chọn được tiêu chí nào. {% for c in ctx.canh_bao %}{{c}} {% endfor %}</p>
+  {% endif %}
+  {% for x in ctx.chon %}
+  <div style="border:1px solid #e2e8e6;border-radius:12px;padding:14px;margin:12px 0">
+   <label style="display:flex;gap:10px;align-items:flex-start">
+    <input type="checkbox" name="ma" value="{{x.chi_bao.code}}" {% if not x.can_duyet %}checked{% endif %} style="width:18px;margin-top:3px">
+    <span><b>{{x.chi_bao.code}}</b> — {{x.chi_bao.name}}
+     {% if x.can_duyet %}<b style="color:#b45309">· CẦN GIÁO VIÊN DUYỆT</b>{% endif %}<br>
+     <span class="muted">Mức {{x.chi_bao.level}} ({{x.chi_bao.level_name}}) ·
+      {% if x.can_duyet %}bài học chưa nêu hoạt động số nào, hệ thống KHÔNG tự gán — chỉ tích nếu thầy/cô thật sự tổ chức hoạt động này{% else %}khớp với từ khoá “{{x.tu_khoa_khop}}”{% endif %}</span></span>
+   </label>
+   <div style="margin:10px 0 6px;padding:10px 12px;background:#f6f9f8;border-radius:10px">
+    <b>[QUY ĐỊNH]</b> Nguyên văn văn bản của Bộ — hệ thống không sửa phần này:<br>
+    {{x.chi_bao.verbatim_full_muc or x.chi_bao.verbatim}}
+    <div class="muted" style="margin-top:6px">Nguồn: {{x.chi_bao.source}} — {{x.chi_bao.source_location}}</div>
+   </div>
+   <div style="padding:0 12px">
+    <b>[ĐỀ XUẤT]</b> Nội dung cho bài này — thầy/cô sửa lại nếu cần:<br>
+    <span class="muted">Mục tiêu:</span> {{x.chi_bao.code}} — {{x.ten_hoat_dong}}<br>
+    <span class="muted">Hoạt động:</span> {{x.ten_hoat_dong}}<br>
+    <span class="muted">Sản phẩm học tập:</span> {{x.san_pham}}<br>
+    <span class="muted">Minh chứng đánh giá:</span> {{x.minh_chung}}
+   </div>
+  </div>
+  {% endfor %}
+  {% for c in ctx.canh_bao %}<p style="color:#a16207">{{c}}</p>{% endfor %}
+ </div>
+
+ <div class="card">
+  <h3>2. Chính tả cần sửa ({{ctx.de_xuat|length}} chỗ)</h3>
+  <p class="sub">“Sửa chắc” là lỗi rõ ràng, đã tích sẵn. “Chỉ gợi ý” cần thầy/cô xem ngữ cảnh — hệ thống
+  không tự sửa. Tên riêng, công thức, mã chỉ báo, thuật ngữ và viết tắt (GV, HS, SGK…) đã được loại khỏi danh sách.</p>
+  {% if not ctx.de_xuat %}<p>Không phát hiện lỗi chính tả nào theo bộ kiểm tra nội bộ.</p>{% endif %}
+  {% if ctx.de_xuat %}
+  <table style="width:100%;border-collapse:collapse">
+   <tr style="text-align:left"><th style="padding:6px">Chọn</th><th style="padding:6px">Hiện tại</th><th style="padding:6px">Đề xuất</th><th style="padding:6px">Lý do</th></tr>
+   {% for d in ctx.de_xuat %}
+   <tr style="border-top:1px solid #eef2f1">
+    <td style="padding:6px"><input type="checkbox" name="ct_{{d.id}}" value="1" {% if d.che_do=='sua_chac' %}checked{% endif %} style="width:17px"></td>
+    <td style="padding:6px">{{d.goc}}</td>
+    <td style="padding:6px"><b>{{d.de_xuat}}</b></td>
+    <td style="padding:6px" class="muted">{{d.ly_do}} — {{d.nhan}}</td>
+   </tr>
+   {% endfor %}
+  </table>
+  {% endif %}
+  <p class="muted">{{nhan_ct}}</p>
+ </div>
+
+ <div class="card">
+  <label style="display:flex;gap:10px;margin-bottom:14px">
+   <input type="checkbox" name="reviewed" value="1" required style="width:18px">
+   Tôi đã rà soát các tiêu chí và nội dung đề xuất ở trên, và đồng ý tải bản Word đã tích hợp.</label>
+  <button class="ok">Tải bản Word (.docx)</button>
+  <a class="btn sec" href="{{url_for('giao_an_nls.index')}}">Tải file khác</a>
+  <p class="muted">{{nhan}}</p>
+ </div>
+</form>
+{% endblock %}

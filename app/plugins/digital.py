@@ -26,6 +26,16 @@ def folder():
     return root
 
 
+def save(name, blob, ctx):
+    """Lưu file tải lên + ngữ cảnh xử lý, trả về token dùng ở bước xem trước."""
+    token = uuid.uuid4().hex
+    root = folder()
+    (root / (token + '.docx')).write_bytes(blob)
+    ctx = {"uid": current_user()['id'], "name": name, "ctx": ctx}
+    (root / (token + '.json')).write_text(json.dumps(ctx, ensure_ascii=False), encoding='utf-8')
+    return token
+
+
 def load(token):
     if not re.fullmatch(r'[0-9a-f]{32}', token or ''):
         return None

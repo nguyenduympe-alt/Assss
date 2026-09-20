@@ -1,0 +1,2949 @@
+{
+ "version": "2026-09-20",
+ "ten": "Khung năng lực số cho người học",
+ "can_cu": "Thông tư 02/2025/TT-BGDĐT ngày 24/01/2025 quy định Khung năng lực số cho người học",
+ "cong_van_huong_dan": "Công văn 3456/BGDĐT-GDPT",
+ "nguon": {
+  "van_ban": "Công văn 3456/BGDĐT-GDPT",
+  "can_cu_goc": "Thông tư 02/2025/TT-BGDĐT ngày 24/01/2025 quy định Khung năng lực số cho người học",
+  "tai_lieu": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)",
+  "phan": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT)",
+  "vi_tri": "trang 61–78",
+  "phien_ban": "2026-09-20",
+  "ghi_chu_nguon": "Thông tư 02/2025/TT-BGDĐT quy định cấu trúc khung: 6 miền năng lực, 24 năng lực thành phần, 4 trình độ theo 8 bậc. Bảng mã chỉ báo chi tiết theo từng mức nằm ở PHỤ LỤC 1 dẫn theo Công văn 3456/BGDĐT-GDPT."
+ },
+ "grade_levels": {
+  "1": "CB1",
+  "2": "CB1",
+  "3": "CB1",
+  "4": "CB2",
+  "5": "CB2",
+  "6": "TC1",
+  "7": "TC1",
+  "8": "TC2",
+  "9": "TC2",
+  "10": "NC1",
+  "11": "NC1",
+  "12": "NC1"
+ },
+ "level_info": {
+  "CB1": {
+   "grades": "L1-L2-L3",
+   "ten": "Cơ bản 1",
+   "bac": "Bậc 1"
+  },
+  "CB2": {
+   "grades": "L4-L5",
+   "ten": "Cơ bản 2",
+   "bac": "Bậc 2"
+  },
+  "TC1": {
+   "grades": "L6-L7",
+   "ten": "Trung cấp 1",
+   "bac": "Bậc 3"
+  },
+  "TC2": {
+   "grades": "L8-L9",
+   "ten": "Trung cấp 2",
+   "bac": "Bậc 4"
+  },
+  "NC1": {
+   "grades": "L10-L11-L12",
+   "ten": "Nâng cao 1",
+   "bac": "Bậc 5"
+  }
+ },
+ "domains": [
+  "1. Khai thác dữ liệu và thông tin",
+  "2. Giao tiếp và Hợp tác",
+  "3. Sáng tạo nội dung số",
+  "4. An toàn",
+  "5. Giải quyết vấn đề",
+  "6. Ứng dụng trí tuệ nhân tạo"
+ ],
+ "components": {
+  "1.1": {
+   "component": "1.1",
+   "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin"
+  },
+  "1.2": {
+   "component": "1.2",
+   "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin"
+  },
+  "1.3": {
+   "component": "1.3",
+   "name": "Quản lý dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin"
+  },
+  "2.1": {
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác"
+  },
+  "2.2": {
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác"
+  },
+  "2.3": {
+   "component": "2.3",
+   "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+   "domain": "2. Giao tiếp và Hợp tác"
+  },
+  "2.4": {
+   "component": "2.4",
+   "name": "Hợp tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác"
+  },
+  "2.5": {
+   "component": "2.5",
+   "name": "Quy tắc ứng xử trên mạng",
+   "domain": "2. Giao tiếp và Hợp tác"
+  },
+  "2.6": {
+   "component": "2.6",
+   "name": "Quản lý danh tính số",
+   "domain": "2. Giao tiếp và Hợp tác"
+  },
+  "3.1": {
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số"
+  },
+  "3.2": {
+   "component": "3.2",
+   "name": "Tích hợp và tạo lập lại nội dung số",
+   "domain": "3. Sáng tạo nội dung số"
+  },
+  "3.3": {
+   "component": "3.3",
+   "name": "Thực thi bản quyền và giấy phép",
+   "domain": "3. Sáng tạo nội dung số"
+  },
+  "3.4": {
+   "component": "3.4",
+   "name": "Lập trình",
+   "domain": "3. Sáng tạo nội dung số"
+  },
+  "4.1": {
+   "component": "4.1",
+   "name": "Bảo vệ thiết bị",
+   "domain": "4. An toàn"
+  },
+  "4.2": {
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn"
+  },
+  "4.3": {
+   "component": "4.3",
+   "name": "Bảo vệ sức khỏe và an sinh số",
+   "domain": "4. An toàn"
+  },
+  "4.4": {
+   "component": "4.4",
+   "name": "Bảo vệ môi trường",
+   "domain": "4. An toàn"
+  },
+  "5.1": {
+   "component": "5.1",
+   "name": "Giải quyết các vấn đề kỹ thuật",
+   "domain": "5. Giải quyết vấn đề"
+  },
+  "5.2": {
+   "component": "5.2",
+   "name": "Xác định nhu cầu và giải pháp công nghệ",
+   "domain": "5. Giải quyết vấn đề"
+  },
+  "5.3": {
+   "component": "5.3",
+   "name": "Sử dụng sáng tạo công nghệ số",
+   "domain": "5. Giải quyết vấn đề"
+  },
+  "5.4": {
+   "component": "5.4",
+   "name": "Xác định các vấn đề cần cải thiện về NLS",
+   "domain": "5. Giải quyết vấn đề"
+  },
+  "6.1": {
+   "component": "6.1",
+   "name": "Hiểu biết về trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo"
+  },
+  "6.2": {
+   "component": "6.2",
+   "name": "Sử dụng trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo"
+  },
+  "6.3": {
+   "component": "6.3",
+   "name": "Đánh giá trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo"
+  }
+ },
+ "indicators": [
+  {
+   "code": "1.1.CB1a",
+   "component": "1.1",
+   "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được nhu cầu thông tin, tìm kiếm dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, b- Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, c- Xác định được các chiến lược tìm kiếm đơn giản."
+   ],
+   "verbatim": "Xác định được nhu cầu thông tin, tìm kiếm dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, b- Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, c- Xác định được các chiến lược tìm kiếm đơn giản.",
+   "verbatim_full_muc": "a- Xác định được nhu cầu thông tin, tìm kiếm dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, b- Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, c- Xác định được các chiến lược tìm kiếm đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.1.CB2",
+   "component": "1.1",
+   "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được nhu cầu thông tin. Tìm được dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, Xác định được các chiến lược tìm kiếm đơn giản.",
+   "verbatim_full_muc": "Xác định được nhu cầu thông tin. Tìm được dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, Xác định được các chiến lược tìm kiếm đơn giản.",
+   "items": [
+    "Xác định được nhu cầu thông tin. Tìm được dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, Xác định được các chiến lược tìm kiếm đơn giản."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.1.TC1",
+   "component": "1.1",
+   "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Giải thích được nhu cầu thông tin, Thực hiện được rõ ràng và theo quy trình các tìm kiếm để tìm dữ liệu, thông tin và nội dung trong môi trường số, Giải thích được cách truy cập và điều hướng các kết quả tìm kiếm, Giải thích được rõ ràng và theo quy trình chiến lược tìm kiếm.",
+   "verbatim_full_muc": "Giải thích được nhu cầu thông tin, Thực hiện được rõ ràng và theo quy trình các tìm kiếm để tìm dữ liệu, thông tin và nội dung trong môi trường số, Giải thích được cách truy cập và điều hướng các kết quả tìm kiếm, Giải thích được rõ ràng và theo quy trình chiến lược tìm kiếm.",
+   "items": [
+    "Giải thích được nhu cầu thông tin, Thực hiện được rõ ràng và theo quy trình các tìm kiếm để tìm dữ liệu, thông tin và nội dung trong môi trường số, Giải thích được cách truy cập và điều hướng các kết quả tìm kiếm, Giải thích được rõ ràng và theo quy trình chiến lược tìm kiếm."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.1.TC2",
+   "component": "1.1",
+   "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Minh họa được nhu cầu thông tin, Tổ chức được tìm kiếm dữ liệu, thông tin và nội dung trong môi trường số, c-Mô tả được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, d-Tổ chức được các chiến lược tìm kiếm.",
+   "verbatim_full_muc": "Minh họa được nhu cầu thông tin, Tổ chức được tìm kiếm dữ liệu, thông tin và nội dung trong môi trường số, c-Mô tả được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, d-Tổ chức được các chiến lược tìm kiếm.",
+   "items": [
+    "Minh họa được nhu cầu thông tin, Tổ chức được tìm kiếm dữ liệu, thông tin và nội dung trong môi trường số, c-Mô tả được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng, d-Tổ chức được các chiến lược tìm kiếm."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.1.NC1",
+   "component": "1.1",
+   "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Đáp ứng được nhu cầu thông tin, Áp dụng được kỹ thuật tìm kiếm để lấy được dữ liệu, thông tin và nội dung trong môi trường số, Chỉ cho người khác cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng. Tự đề xuất được chiến lược tìm kiếm.",
+   "verbatim_full_muc": "Đáp ứng được nhu cầu thông tin, Áp dụng được kỹ thuật tìm kiếm để lấy được dữ liệu, thông tin và nội dung trong môi trường số, Chỉ cho người khác cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng. Tự đề xuất được chiến lược tìm kiếm.",
+   "items": [
+    "Đáp ứng được nhu cầu thông tin, Áp dụng được kỹ thuật tìm kiếm để lấy được dữ liệu, thông tin và nội dung trong môi trường số, Chỉ cho người khác cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng. Tự đề xuất được chiến lược tìm kiếm."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.2.CB1a",
+   "component": "1.2",
+   "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a-Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.2.CB2",
+   "component": "1.2",
+   "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số.",
+   "items": [
+    "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.2.TC1",
+   "component": "1.2",
+   "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thực hiện phân tích, so sánh, đánh giá được độ tin cậy và độ chính xác của các nguồn dữ liệu, thông tin và nội dung số đã được tổ chức rõ ràng. Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số được xác định rõ ràng.",
+   "verbatim_full_muc": "Thực hiện phân tích, so sánh, đánh giá được độ tin cậy và độ chính xác của các nguồn dữ liệu, thông tin và nội dung số đã được tổ chức rõ ràng. Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số được xác định rõ ràng.",
+   "items": [
+    "Thực hiện phân tích, so sánh, đánh giá được độ tin cậy và độ chính xác của các nguồn dữ liệu, thông tin và nội dung số đã được tổ chức rõ ràng. Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số được xác định rõ ràng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.2.TC2",
+   "component": "1.2",
+   "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thực hiện phân tích, so sánh và đánh giá được các nguồn dữ liệu, thông tin và nội dung số. Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "Thực hiện phân tích, so sánh và đánh giá được các nguồn dữ liệu, thông tin và nội dung số. Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số.",
+   "items": [
+    "Thực hiện phân tích, so sánh và đánh giá được các nguồn dữ liệu, thông tin và nội dung số. Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.2.NC1",
+   "component": "1.2",
+   "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thực hiện đánh giá được độ tin cậy và độ tin cậy của các nguồn dữ liệu, thông tin và nội dung số. b-Tiến hành đánh giá được các dữ liệu, thông tin và nội dung số khác nhau.",
+   "verbatim_full_muc": "Thực hiện đánh giá được độ tin cậy và độ tin cậy của các nguồn dữ liệu, thông tin và nội dung số. b-Tiến hành đánh giá được các dữ liệu, thông tin và nội dung số khác nhau.",
+   "items": [
+    "Thực hiện đánh giá được độ tin cậy và độ tin cậy của các nguồn dữ liệu, thông tin và nội dung số. b-Tiến hành đánh giá được các dữ liệu, thông tin và nội dung số khác nhau."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.3.CB1",
+   "component": "1.3",
+   "name": "Quản lý dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số. Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc.",
+   "verbatim_full_muc": "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số. Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc.",
+   "items": [
+    "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số. Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.3.CB2",
+   "component": "1.3",
+   "name": "Quản lý dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số. Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc.",
+   "verbatim_full_muc": "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số. Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc.",
+   "items": [
+    "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số. Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.3.TC1",
+   "component": "1.3",
+   "name": "Quản lý dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Lựa chọn được dữ liệu, thông tin và nội dung để tổ chức, lưu trữ và truy xuất chúng một cách thường xuyên trong môi trường số. Sắp xếp chúng một cách trật tự trong một môi trường có cấu trúc.",
+   "verbatim_full_muc": "Lựa chọn được dữ liệu, thông tin và nội dung để tổ chức, lưu trữ và truy xuất chúng một cách thường xuyên trong môi trường số. Sắp xếp chúng một cách trật tự trong một môi trường có cấu trúc.",
+   "items": [
+    "Lựa chọn được dữ liệu, thông tin và nội dung để tổ chức, lưu trữ và truy xuất chúng một cách thường xuyên trong môi trường số. Sắp xếp chúng một cách trật tự trong một môi trường có cấu trúc."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.3.TC2",
+   "component": "1.3",
+   "name": "Quản lý dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Sắp xếp được thông tin, dữ liệu, nội dung để dễ dàng lưu trữ và truy xuất. Tổ chức được thông tin, dữ liệu và nội dung trong một môi trường có cấu trúc.",
+   "verbatim_full_muc": "Sắp xếp được thông tin, dữ liệu, nội dung để dễ dàng lưu trữ và truy xuất. Tổ chức được thông tin, dữ liệu và nội dung trong một môi trường có cấu trúc.",
+   "items": [
+    "Sắp xếp được thông tin, dữ liệu, nội dung để dễ dàng lưu trữ và truy xuất. Tổ chức được thông tin, dữ liệu và nội dung trong một môi trường có cấu trúc."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "1.3.NC1",
+   "component": "1.3",
+   "name": "Quản lý dữ liệu, thông tin và nội dung số",
+   "domain": "1. Khai thác dữ liệu và thông tin",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thao tác được thông tin, dữ liệu và nội dung để tổ chức, lưu trữ và truy xuất dễ dàng hơn. Triển khai được việc tổ chức và sắp xếp dữ liệu, thông tin và nội dung trong môi trường có cấu trúc.",
+   "verbatim_full_muc": "Thao tác được thông tin, dữ liệu và nội dung để tổ chức, lưu trữ và truy xuất dễ dàng hơn. Triển khai được việc tổ chức và sắp xếp dữ liệu, thông tin và nội dung trong môi trường có cấu trúc.",
+   "items": [
+    "Thao tác được thông tin, dữ liệu và nội dung để tổ chức, lưu trữ và truy xuất dễ dàng hơn. Triển khai được việc tổ chức và sắp xếp dữ liệu, thông tin và nội dung trong môi trường có cấu trúc."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.CB1a",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được các công nghệ số đơn giản để tương tác."
+   ],
+   "verbatim": "Lựa chọn được các công nghệ số đơn giản để tương tác.",
+   "verbatim_full_muc": "a- Lựa chọn được các công nghệ số đơn giản để tương tác. b- Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.CB1b",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể."
+   ],
+   "verbatim": "Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể.",
+   "verbatim_full_muc": "a- Lựa chọn được các công nghệ số đơn giản để tương tác. b- Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.CB2a",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được các công nghệ số đơn giản để tương tác."
+   ],
+   "verbatim": "Lựa chọn được các công nghệ số đơn giản để tương tác.",
+   "verbatim_full_muc": "a- Lựa chọn được các công nghệ số đơn giản để tương tác. b- Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.CB2b",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể."
+   ],
+   "verbatim": "Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể.",
+   "verbatim_full_muc": "a- Lựa chọn được các công nghệ số đơn giản để tương tác. b- Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.TC1a",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Thực hiện được các tương tác được xác định rõ ràng và thường xuyên với các công nghệ số."
+   ],
+   "verbatim": "Thực hiện được các tương tác được xác định rõ ràng và thường xuyên với các công nghệ số.",
+   "verbatim_full_muc": "a- Thực hiện được các tương tác được xác định rõ ràng và thường xuyên với các công nghệ số. b- Lựa chọn được các phương tiện giao tiếp số phù hợp, được xác định rõ ràng cho phù hợp với bối cảnh nhất định.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.TC1b",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được các phương tiện giao tiếp số phù hợp, được xác định rõ ràng cho phù hợp với bối cảnh nhất định."
+   ],
+   "verbatim": "Lựa chọn được các phương tiện giao tiếp số phù hợp, được xác định rõ ràng cho phù hợp với bối cảnh nhất định.",
+   "verbatim_full_muc": "a- Thực hiện được các tương tác được xác định rõ ràng và thường xuyên với các công nghệ số. b- Lựa chọn được các phương tiện giao tiếp số phù hợp, được xác định rõ ràng cho phù hợp với bối cảnh nhất định.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.TC2a",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được nhiều công nghệ số để tương tác."
+   ],
+   "verbatim": "Lựa chọn được nhiều công nghệ số để tương tác.",
+   "verbatim_full_muc": "a- Lựa chọn được nhiều công nghệ số để tương tác. b-Lựa chọn được nhiều phương tiện truyền thông số cho phù hợp với bối cảnh nhất định.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.TC2b",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được nhiều phương tiện truyền thông số cho phù hợp với bối cảnh nhất định."
+   ],
+   "verbatim": "Lựa chọn được nhiều phương tiện truyền thông số cho phù hợp với bối cảnh nhất định.",
+   "verbatim_full_muc": "a- Lựa chọn được nhiều công nghệ số để tương tác. b-Lựa chọn được nhiều phương tiện truyền thông số cho phù hợp với bối cảnh nhất định.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.NC1a",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Sử dụng được nhiều công nghệ số để tương tác."
+   ],
+   "verbatim": "Sử dụng được nhiều công nghệ số để tương tác.",
+   "verbatim_full_muc": "a- Sử dụng được nhiều công nghệ số để tương tác. b-Cho người khác thấy phương tiện giao tiếp số phù hợp nhất cho một bối cảnh cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.1.NC1b",
+   "component": "2.1",
+   "name": "Tương tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Cho người khác thấy phương tiện giao tiếp số phù hợp nhất cho một bối cảnh cụ thể."
+   ],
+   "verbatim": "Cho người khác thấy phương tiện giao tiếp số phù hợp nhất cho một bối cảnh cụ thể.",
+   "verbatim_full_muc": "a- Sử dụng được nhiều công nghệ số để tương tác. b-Cho người khác thấy phương tiện giao tiếp số phù hợp nhất cho một bối cảnh cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.CB1a",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số."
+   ],
+   "verbatim": "Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số.",
+   "verbatim_full_muc": "a-Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số. b-Nhận biết được phương pháp trích dẫn và ghi nguồn cơ bản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.CB1b",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Nhận biết được phương pháp trích dẫn và ghi nguồn cơ bản."
+   ],
+   "verbatim": "Nhận biết được phương pháp trích dẫn và ghi nguồn cơ bản.",
+   "verbatim_full_muc": "a-Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số. b-Nhận biết được phương pháp trích dẫn và ghi nguồn cơ bản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.CB2a",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số."
+   ],
+   "verbatim": "Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số.",
+   "verbatim_full_muc": "a- Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số. b- Xác định được phương pháp trích dẫn và ghi nguồn cơ bản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.CB2b",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được phương pháp trích dẫn và ghi nguồn cơ bản."
+   ],
+   "verbatim": "Xác định được phương pháp trích dẫn và ghi nguồn cơ bản.",
+   "verbatim_full_muc": "a- Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số. b- Xác định được phương pháp trích dẫn và ghi nguồn cơ bản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.TC1a",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a- Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số. b- Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên, c- Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.TC1b",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên."
+   ],
+   "verbatim": "Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên.",
+   "verbatim_full_muc": "a- Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số. b- Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên, c- Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.TC1c",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "c",
+   "has_letter_code": true,
+   "items": [
+    "Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn."
+   ],
+   "verbatim": "Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn.",
+   "verbatim_full_muc": "a- Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số. b- Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên, c- Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.TC2a",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a- Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số. b- Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c- Áp dụng được các phương pháp tham chiếu và ghi chú nguồn.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.TC2b",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số."
+   ],
+   "verbatim": "Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số.",
+   "verbatim_full_muc": "a- Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số. b- Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c- Áp dụng được các phương pháp tham chiếu và ghi chú nguồn.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.TC2c",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "c",
+   "has_letter_code": true,
+   "items": [
+    "Áp dụng được các phương pháp tham chiếu và ghi chú nguồn."
+   ],
+   "verbatim": "Áp dụng được các phương pháp tham chiếu và ghi chú nguồn.",
+   "verbatim_full_muc": "a- Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số. b- Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c- Áp dụng được các phương pháp tham chiếu và ghi chú nguồn.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.NC1a",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp."
+   ],
+   "verbatim": "Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp.",
+   "verbatim_full_muc": "a- Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp, b- Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c-Áp dụng được nhiều phương pháp tham chiếu và ghi nguồn khác nhau.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.NC1b",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số."
+   ],
+   "verbatim": "Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số.",
+   "verbatim_full_muc": "a- Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp, b- Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c-Áp dụng được nhiều phương pháp tham chiếu và ghi nguồn khác nhau.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.2.NC1c",
+   "component": "2.2",
+   "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "c",
+   "has_letter_code": true,
+   "items": [
+    "Áp dụng được nhiều phương pháp tham chiếu và ghi nguồn khác nhau."
+   ],
+   "verbatim": "Áp dụng được nhiều phương pháp tham chiếu và ghi nguồn khác nhau.",
+   "verbatim_full_muc": "a- Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp, b- Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c-Áp dụng được nhiều phương pháp tham chiếu và ghi nguồn khác nhau.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.3.CB1",
+   "component": "2.3",
+   "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội. Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân.",
+   "verbatim_full_muc": "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội. Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân.",
+   "items": [
+    "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội. Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.3.CB2",
+   "component": "2.3",
+   "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội. Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân.",
+   "verbatim_full_muc": "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội. Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân.",
+   "items": [
+    "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội. Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.3.TC1",
+   "component": "2.3",
+   "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Lựa chọn được các dịch vụ số được xác định rõ ràng và phổ biến để tham gia vào xã hội. Xác định được các công nghệ số rõ ràng và thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân.",
+   "verbatim_full_muc": "Lựa chọn được các dịch vụ số được xác định rõ ràng và phổ biến để tham gia vào xã hội. Xác định được các công nghệ số rõ ràng và thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân.",
+   "items": [
+    "Lựa chọn được các dịch vụ số được xác định rõ ràng và phổ biến để tham gia vào xã hội. Xác định được các công nghệ số rõ ràng và thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.3.TC2",
+   "component": "2.3",
+   "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Lựa chọn được các dịch vụ số để tham gia vào xã hội. Thảo luận về các công nghệ số phù hợp để nâng cao năng lực của bản thân và tham gia vào xã hội với tư cách là một công.",
+   "verbatim_full_muc": "Lựa chọn được các dịch vụ số để tham gia vào xã hội. Thảo luận về các công nghệ số phù hợp để nâng cao năng lực của bản thân và tham gia vào xã hội với tư cách là một công.",
+   "items": [
+    "Lựa chọn được các dịch vụ số để tham gia vào xã hội. Thảo luận về các công nghệ số phù hợp để nâng cao năng lực của bản thân và tham gia vào xã hội với tư cách là một công."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.3.NC1",
+   "component": "2.3",
+   "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Đề xuất được các dịch vụ số khác nhau để tham gia vào xã hội. Sử dụng được các công nghệ số thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân.",
+   "verbatim_full_muc": "Đề xuất được các dịch vụ số khác nhau để tham gia vào xã hội. Sử dụng được các công nghệ số thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân.",
+   "items": [
+    "Đề xuất được các dịch vụ số khác nhau để tham gia vào xã hội. Sử dụng được các công nghệ số thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.4.CB1a",
+   "component": "2.4",
+   "name": "Hợp tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác."
+   ],
+   "verbatim": "Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác.",
+   "verbatim_full_muc": "a-Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.4.CB2a",
+   "component": "2.4",
+   "name": "Hợp tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác."
+   ],
+   "verbatim": "Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác.",
+   "verbatim_full_muc": "a-Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.4.TC1a",
+   "component": "2.4",
+   "name": "Hợp tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được các công cụ và công nghệ số được xác định rõ ràng và thường xuyên cho các quá trình hợp tác."
+   ],
+   "verbatim": "Lựa chọn được các công cụ và công nghệ số được xác định rõ ràng và thường xuyên cho các quá trình hợp tác.",
+   "verbatim_full_muc": "a-Lựa chọn được các công cụ và công nghệ số được xác định rõ ràng và thường xuyên cho các quá trình hợp tác.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.4.TC2a",
+   "component": "2.4",
+   "name": "Hợp tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được các công cụ và công nghệ số cho các quá trình hợp tác."
+   ],
+   "verbatim": "Lựa chọn được các công cụ và công nghệ số cho các quá trình hợp tác.",
+   "verbatim_full_muc": "a-Lựa chọn được các công cụ và công nghệ số cho các quá trình hợp tác.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.4.NC1a",
+   "component": "2.4",
+   "name": "Hợp tác thông qua công nghệ số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Đề xuất được các công cụ và công nghệ số khác nhau cho các quá trình hợp tác."
+   ],
+   "verbatim": "Đề xuất được các công cụ và công nghệ số khác nhau cho các quá trình hợp tác.",
+   "verbatim_full_muc": "a-Đề xuất được các công cụ và công nghệ số khác nhau cho các quá trình hợp tác.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.5.CB1",
+   "component": "2.5",
+   "name": "Quy tắc ứng xử trên mạng",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân biệt được các chuẩn mực hành vi đơn giản và biết cách sử dụng công nghệ số và tương tác trong môi trường số. Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số. Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số.",
+   "verbatim_full_muc": "Phân biệt được các chuẩn mực hành vi đơn giản và biết cách sử dụng công nghệ số và tương tác trong môi trường số. Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số. Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số.",
+   "items": [
+    "Phân biệt được các chuẩn mực hành vi đơn giản và biết cách sử dụng công nghệ số và tương tác trong môi trường số. Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số. Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.5.CB2",
+   "component": "2.5",
+   "name": "Quy tắc ứng xử trên mạng",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân biệt được các chuẩn mực hành vi đơn giản và bí quyết sử dụng công nghệ số và tương tác trong môi trường số. Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số. Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số.",
+   "verbatim_full_muc": "Phân biệt được các chuẩn mực hành vi đơn giản và bí quyết sử dụng công nghệ số và tương tác trong môi trường số. Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số. Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số.",
+   "items": [
+    "Phân biệt được các chuẩn mực hành vi đơn giản và bí quyết sử dụng công nghệ số và tương tác trong môi trường số. Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số. Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.5.TC1",
+   "component": "2.5",
+   "name": "Quy tắc ứng xử trên mạng",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Làm rõ được các chuẩn mực hành vi thường xuyên và được xác định rõ ràng cũng như bí quyết khi sử dụng công nghệ số và tương tác trong môi trường số. Thể hiện được các chiến lược giao tiếp thường xuyên và xác định rõ ràng phương thức giao tiếp phù hợp trong môi trường số. Mô tả các khía cạnh đa dạng về văn hóa và thế hệ được xác định rõ ràng và thông thường cần xem xét trong môi trường số.",
+   "verbatim_full_muc": "Làm rõ được các chuẩn mực hành vi thường xuyên và được xác định rõ ràng cũng như bí quyết khi sử dụng công nghệ số và tương tác trong môi trường số. Thể hiện được các chiến lược giao tiếp thường xuyên và xác định rõ ràng phương thức giao tiếp phù hợp trong môi trường số. Mô tả các khía cạnh đa dạng về văn hóa và thế hệ được xác định rõ ràng và thông thường cần xem xét trong môi trường số.",
+   "items": [
+    "Làm rõ được các chuẩn mực hành vi thường xuyên và được xác định rõ ràng cũng như bí quyết khi sử dụng công nghệ số và tương tác trong môi trường số. Thể hiện được các chiến lược giao tiếp thường xuyên và xác định rõ ràng phương thức giao tiếp phù hợp trong môi trường số. Mô tả các khía cạnh đa dạng về văn hóa và thế hệ được xác định rõ ràng và thông thường cần xem xét trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.5.TC2",
+   "component": "2.5",
+   "name": "Quy tắc ứng xử trên mạng",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thảo luận về các chuẩn mực hành vi và cách sử dụng công nghệ số và tương tác trong môi trường số. Thảo luận các chiến lược giao tiếp phù hợp trong môi trường số. Thảo luận các khía cạnh đa dạng về văn hóa và thế hệ cần xem xét trong môi trường số.",
+   "verbatim_full_muc": "Thảo luận về các chuẩn mực hành vi và cách sử dụng công nghệ số và tương tác trong môi trường số. Thảo luận các chiến lược giao tiếp phù hợp trong môi trường số. Thảo luận các khía cạnh đa dạng về văn hóa và thế hệ cần xem xét trong môi trường số.",
+   "items": [
+    "Thảo luận về các chuẩn mực hành vi và cách sử dụng công nghệ số và tương tác trong môi trường số. Thảo luận các chiến lược giao tiếp phù hợp trong môi trường số. Thảo luận các khía cạnh đa dạng về văn hóa và thế hệ cần xem xét trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.5.NC1",
+   "component": "2.5",
+   "name": "Quy tắc ứng xử trên mạng",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Áp dụng được các chuẩn mực hành vi và bí quyết khác nhau khi sử dụng công nghệ số và tương tác trong môi trường số. Áp dụng được các chiến lược giao tiếp khác nhau trong môi trường số một cách phù hợp. Áp dụng được các khía cạnh đa dạng về văn hóa và thế hệ khác nhau để xem xét trong môi trường số.",
+   "verbatim_full_muc": "Áp dụng được các chuẩn mực hành vi và bí quyết khác nhau khi sử dụng công nghệ số và tương tác trong môi trường số. Áp dụng được các chiến lược giao tiếp khác nhau trong môi trường số một cách phù hợp. Áp dụng được các khía cạnh đa dạng về văn hóa và thế hệ khác nhau để xem xét trong môi trường số.",
+   "items": [
+    "Áp dụng được các chuẩn mực hành vi và bí quyết khác nhau khi sử dụng công nghệ số và tương tác trong môi trường số. Áp dụng được các chiến lược giao tiếp khác nhau trong môi trường số một cách phù hợp. Áp dụng được các khía cạnh đa dạng về văn hóa và thế hệ khác nhau để xem xét trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.6.CB1",
+   "component": "2.6",
+   "name": "Quản lý danh tính số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được danh tính số. Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân. Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "verbatim_full_muc": "Xác định được danh tính số. Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân. Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "items": [
+    "Xác định được danh tính số. Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân. Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.6.CB2",
+   "component": "2.6",
+   "name": "Quản lý danh tính số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được danh tính số. Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân. Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "verbatim_full_muc": "Xác định được danh tính số. Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân. Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "items": [
+    "Xác định được danh tính số. Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân. Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.6.TC1",
+   "component": "2.6",
+   "name": "Quản lý danh tính số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân biệt được một loạt các danh tính số thông thường và được xác định rõ ràng. Giải thích được những cách được xác định rõ ràng và thường xuyên để bảo vệ danh tiếng trực tuyến của bản thân. Mô tả dữ liệu được xác định rõ ràng mà bạn thường xuyên thu được thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "verbatim_full_muc": "Phân biệt được một loạt các danh tính số thông thường và được xác định rõ ràng. Giải thích được những cách được xác định rõ ràng và thường xuyên để bảo vệ danh tiếng trực tuyến của bản thân. Mô tả dữ liệu được xác định rõ ràng mà bạn thường xuyên thu được thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "items": [
+    "Phân biệt được một loạt các danh tính số thông thường và được xác định rõ ràng. Giải thích được những cách được xác định rõ ràng và thường xuyên để bảo vệ danh tiếng trực tuyến của bản thân. Mô tả dữ liệu được xác định rõ ràng mà bạn thường xuyên thu được thông qua các công cụ, môi trường hoặc dịch vụ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.6.TC2",
+   "component": "2.6",
+   "name": "Quản lý danh tính số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Hiển thị được nhiều danh tính số cụ thể, Thảo luận những cách cụ thể để bảo vệ danh tiếng trực tuyến của bản thân. Thao tác dữ liệu cá nhân tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "verbatim_full_muc": "Hiển thị được nhiều danh tính số cụ thể, Thảo luận những cách cụ thể để bảo vệ danh tiếng trực tuyến của bản thân. Thao tác dữ liệu cá nhân tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+   "items": [
+    "Hiển thị được nhiều danh tính số cụ thể, Thảo luận những cách cụ thể để bảo vệ danh tiếng trực tuyến của bản thân. Thao tác dữ liệu cá nhân tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "2.6.NC1",
+   "component": "2.6",
+   "name": "Quản lý danh tính số",
+   "domain": "2. Giao tiếp và Hợp tác",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Sử dụng được nhiều danh tính số khác nhau. Áp dụng được các cách khác nhau để bảo vệ danh tính trực tuyến của bản thân. Sử dụng được dữ liệu tạo ra thông qua công cụ, môi trường và một số dịch vụ số.",
+   "verbatim_full_muc": "Sử dụng được nhiều danh tính số khác nhau. Áp dụng được các cách khác nhau để bảo vệ danh tính trực tuyến của bản thân. Sử dụng được dữ liệu tạo ra thông qua công cụ, môi trường và một số dịch vụ số.",
+   "items": [
+    "Sử dụng được nhiều danh tính số khác nhau. Áp dụng được các cách khác nhau để bảo vệ danh tính trực tuyến của bản thân. Sử dụng được dữ liệu tạo ra thông qua công cụ, môi trường và một số dịch vụ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.CB1a",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản."
+   ],
+   "verbatim": "Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản.",
+   "verbatim_full_muc": "a- Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản, b- Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.CB1b",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản."
+   ],
+   "verbatim": "Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+   "verbatim_full_muc": "a- Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản, b- Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.CB2a",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản."
+   ],
+   "verbatim": "Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản.",
+   "verbatim_full_muc": "a- Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản, b- Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.CB2b",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản."
+   ],
+   "verbatim": "Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+   "verbatim_full_muc": "a- Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản, b- Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.TC1a",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chỉ ra được cách tạo và chỉnh sửa nội dung có khái niệm cụ thể và mang tính phổ thông bằng những định dạng rõ ràng, phổ biến, b-Thể hiện được bản thân thông qua việc tạo ra các nội dung số thông thường và được xác định rõ ràng."
+   ],
+   "verbatim": "Chỉ ra được cách tạo và chỉnh sửa nội dung có khái niệm cụ thể và mang tính phổ thông bằng những định dạng rõ ràng, phổ biến, b-Thể hiện được bản thân thông qua việc tạo ra các nội dung số thông thường và được xác định rõ ràng.",
+   "verbatim_full_muc": "a-Chỉ ra được cách tạo và chỉnh sửa nội dung có khái niệm cụ thể và mang tính phổ thông bằng những định dạng rõ ràng, phổ biến, b-Thể hiện được bản thân thông qua việc tạo ra các nội dung số thông thường và được xác định rõ ràng.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.TC2a",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chỉ ra được cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau."
+   ],
+   "verbatim": "Chỉ ra được cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau.",
+   "verbatim_full_muc": "a-Chỉ ra được cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau, b-Thể hiện được bản thân thông qua việc tạo ra các nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.TC2b",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Thể hiện được bản thân thông qua việc tạo ra các nội dung số."
+   ],
+   "verbatim": "Thể hiện được bản thân thông qua việc tạo ra các nội dung số.",
+   "verbatim_full_muc": "a-Chỉ ra được cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau, b-Thể hiện được bản thân thông qua việc tạo ra các nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.NC1a",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Áp dụng được các cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau."
+   ],
+   "verbatim": "Áp dụng được các cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau.",
+   "verbatim_full_muc": "a-Áp dụng được các cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau, b-Chỉ ra được những cách thể hiện bản thân thông qua việc tạo ra các nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.1.NC1b",
+   "component": "3.1",
+   "name": "Phát triển nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Chỉ ra được những cách thể hiện bản thân thông qua việc tạo ra các nội dung số."
+   ],
+   "verbatim": "Chỉ ra được những cách thể hiện bản thân thông qua việc tạo ra các nội dung số.",
+   "verbatim_full_muc": "a-Áp dụng được các cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau, b-Chỉ ra được những cách thể hiện bản thân thông qua việc tạo ra các nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.2.CB1a",
+   "component": "3.2",
+   "name": "Tích hợp và tạo lập lại nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo."
+   ],
+   "verbatim": "Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "verbatim_full_muc": "a- Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.2.CB2a",
+   "component": "3.2",
+   "name": "Tích hợp và tạo lập lại nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo."
+   ],
+   "verbatim": "Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "verbatim_full_muc": "a- Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.2.TC1a",
+   "component": "3.2",
+   "name": "Tích hợp và tạo lập lại nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Giải thích được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục nội dung và thông tin mới được xác định rõ ràng để tạo ra những nội dung và thông tin mới và độc đáo."
+   ],
+   "verbatim": "Giải thích được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục nội dung và thông tin mới được xác định rõ ràng để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "verbatim_full_muc": "a-Giải thích được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục nội dung và thông tin mới được xác định rõ ràng để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.2.TC2a",
+   "component": "3.2",
+   "name": "Tích hợp và tạo lập lại nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Thảo luận các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo."
+   ],
+   "verbatim": "Thảo luận các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "verbatim_full_muc": "a-Thảo luận các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.2.NC1a",
+   "component": "3.2",
+   "name": "Tích hợp và tạo lập lại nội dung số",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Làm việc với các mục nội dung và thông tin mới khác nhau, sửa đổi, tinh chỉnh, cải thiện và tích hợp chúng để tạo ra những mục mới và độc đáo."
+   ],
+   "verbatim": "Làm việc với các mục nội dung và thông tin mới khác nhau, sửa đổi, tinh chỉnh, cải thiện và tích hợp chúng để tạo ra những mục mới và độc đáo.",
+   "verbatim_full_muc": "a-Làm việc với các mục nội dung và thông tin mới khác nhau, sửa đổi, tinh chỉnh, cải thiện và tích hợp chúng để tạo ra những mục mới và độc đáo.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.3.CB1a",
+   "component": "3.3",
+   "name": "Thực thi bản quyền và giấy phép",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a-Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.3.CB2a",
+   "component": "3.3",
+   "name": "Thực thi bản quyền và giấy phép",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a-Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.3.TC1a",
+   "component": "3.3",
+   "name": "Thực thi bản quyền và giấy phép",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chỉ ra được các quy tắc thông thường và được xác định rõ ràng về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Chỉ ra được các quy tắc thông thường và được xác định rõ ràng về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a-Chỉ ra được các quy tắc thông thường và được xác định rõ ràng về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.3.TC2a",
+   "component": "3.3",
+   "name": "Thực thi bản quyền và giấy phép",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Thảo luận các quy tắc về bản quyền và giấy phép áp dụng cho thông tin và nội dung số."
+   ],
+   "verbatim": "Thảo luận các quy tắc về bản quyền và giấy phép áp dụng cho thông tin và nội dung số.",
+   "verbatim_full_muc": "a-Thảo luận các quy tắc về bản quyền và giấy phép áp dụng cho thông tin và nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.3.NC1a",
+   "component": "3.3",
+   "name": "Thực thi bản quyền và giấy phép",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Áp dụng được các quy định khác nhau về bản quyền và giấy phép cho dữ liệu, thông tin và nội dung số."
+   ],
+   "verbatim": "Áp dụng được các quy định khác nhau về bản quyền và giấy phép cho dữ liệu, thông tin và nội dung số.",
+   "verbatim_full_muc": "a-Áp dụng được các quy định khác nhau về bản quyền và giấy phép cho dữ liệu, thông tin và nội dung số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.4.CB1a",
+   "component": "3.4",
+   "name": "Lập trình",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản."
+   ],
+   "verbatim": "Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản.",
+   "verbatim_full_muc": "a-Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.4.CB2a",
+   "component": "3.4",
+   "name": "Lập trình",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản."
+   ],
+   "verbatim": "Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản.",
+   "verbatim_full_muc": "a-Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.4.TC1a",
+   "component": "3.4",
+   "name": "Lập trình",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Liệt kê được các hướng dẫn thông thường và được xác định rõ ràng cho một hệ thống máy tính để giải quyết các vấn đề thường ngày hoặc thực hiện các tác vụ thường ngày."
+   ],
+   "verbatim": "Liệt kê được các hướng dẫn thông thường và được xác định rõ ràng cho một hệ thống máy tính để giải quyết các vấn đề thường ngày hoặc thực hiện các tác vụ thường ngày.",
+   "verbatim_full_muc": "a-Liệt kê được các hướng dẫn thông thường và được xác định rõ ràng cho một hệ thống máy tính để giải quyết các vấn đề thường ngày hoặc thực hiện các tác vụ thường ngày.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.4.TC2a",
+   "component": "3.4",
+   "name": "Lập trình",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Liệt kê được các hướng dẫn cho một hệ thống máy tính để giải quyết một vấn đề nhất định hoặc thực hiện một nhiệm vụ cụ thể."
+   ],
+   "verbatim": "Liệt kê được các hướng dẫn cho một hệ thống máy tính để giải quyết một vấn đề nhất định hoặc thực hiện một nhiệm vụ cụ thể.",
+   "verbatim_full_muc": "a-Liệt kê được các hướng dẫn cho một hệ thống máy tính để giải quyết một vấn đề nhất định hoặc thực hiện một nhiệm vụ cụ thể.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "3.4.NC1a",
+   "component": "3.4",
+   "name": "Lập trình",
+   "domain": "3. Sáng tạo nội dung số",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Tự thao tác được bằng các hướng dẫn dành cho hệ thống máy tính để giải quyết một vấn đề khác hoặc thực hiện các nhiệm vụ khác nhau."
+   ],
+   "verbatim": "Tự thao tác được bằng các hướng dẫn dành cho hệ thống máy tính để giải quyết một vấn đề khác hoặc thực hiện các nhiệm vụ khác nhau.",
+   "verbatim_full_muc": "a-Tự thao tác được bằng các hướng dẫn dành cho hệ thống máy tính để giải quyết một vấn đề khác hoặc thực hiện các nhiệm vụ khác nhau.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.1.CB1",
+   "component": "4.1",
+   "name": "Bảo vệ thiết bị",
+   "domain": "4. An toàn",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản. Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật đơn giản. Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "verbatim_full_muc": "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản. Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật đơn giản. Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "items": [
+    "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản. Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật đơn giản. Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.1.CB2",
+   "component": "4.1",
+   "name": "Bảo vệ thiết bị",
+   "domain": "4. An toàn",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản. Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số. Tuân theo được các biện pháp an toàn và bảo mật đơn giản. Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "verbatim_full_muc": "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản. Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số. Tuân theo được các biện pháp an toàn và bảo mật đơn giản. Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "items": [
+    "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản. Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số. Tuân theo được các biện pháp an toàn và bảo mật đơn giản. Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.1.TC1",
+   "component": "4.1",
+   "name": "Bảo vệ thiết bị",
+   "domain": "4. An toàn",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Chỉ ra được những cách thức cơ bản và phổ biến để bảo vệ thiết bị và nội dung số. Phân biệt được những rủi ro và mối đe dọa cơ bản và phổ biến trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật rõ ràng và thường xuyên. Chỉ ra được những cách thức cơ bản và phổ biến để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "verbatim_full_muc": "Chỉ ra được những cách thức cơ bản và phổ biến để bảo vệ thiết bị và nội dung số. Phân biệt được những rủi ro và mối đe dọa cơ bản và phổ biến trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật rõ ràng và thường xuyên. Chỉ ra được những cách thức cơ bản và phổ biến để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "items": [
+    "Chỉ ra được những cách thức cơ bản và phổ biến để bảo vệ thiết bị và nội dung số. Phân biệt được những rủi ro và mối đe dọa cơ bản và phổ biến trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật rõ ràng và thường xuyên. Chỉ ra được những cách thức cơ bản và phổ biến để quan tâm đến mức độ tin cậy và quyền riêng tư."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.1.TC2",
+   "component": "4.1",
+   "name": "Bảo vệ thiết bị",
+   "domain": "4. An toàn",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thiết lập được những cách thức bảo vệ thiết bị và nội dung số. Phân biệt được rủi ro và mối đe dọa trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật. Giải thích được các cách thức để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "verbatim_full_muc": "Thiết lập được những cách thức bảo vệ thiết bị và nội dung số. Phân biệt được rủi ro và mối đe dọa trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật. Giải thích được các cách thức để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "items": [
+    "Thiết lập được những cách thức bảo vệ thiết bị và nội dung số. Phân biệt được rủi ro và mối đe dọa trong môi trường số. Chọn lựa được các biện pháp an toàn và bảo mật. Giải thích được các cách thức để quan tâm đến mức độ tin cậy và quyền riêng tư."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.1.NC1",
+   "component": "4.1",
+   "name": "Bảo vệ thiết bị",
+   "domain": "4. An toàn",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Áp dụng được các cách khác nhau để bảo vệ thiết bị và nội dung số. Nhận thức được sự đa dạng của các rủi ro và đe dọa trong môi trường số. c-Áp dụng được các biện pháp an toàn và bảo mật. d-Sử dụng được các cách thức khác nhau để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "verbatim_full_muc": "Áp dụng được các cách khác nhau để bảo vệ thiết bị và nội dung số. Nhận thức được sự đa dạng của các rủi ro và đe dọa trong môi trường số. c-Áp dụng được các biện pháp an toàn và bảo mật. d-Sử dụng được các cách thức khác nhau để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+   "items": [
+    "Áp dụng được các cách khác nhau để bảo vệ thiết bị và nội dung số. Nhận thức được sự đa dạng của các rủi ro và đe dọa trong môi trường số. c-Áp dụng được các biện pháp an toàn và bảo mật. d-Sử dụng được các cách thức khác nhau để quan tâm đến mức độ tin cậy và quyền riêng tư."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.2.CB1a",
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác. c- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số."
+   ],
+   "verbatim": "Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác. c- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số.",
+   "verbatim_full_muc": "a- Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác. c- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.2.CB2a",
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác. c- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số."
+   ],
+   "verbatim": "Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác. c- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số.",
+   "verbatim_full_muc": "a- Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác. c- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.2.TC1a",
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Giải thích được các cách thức cơ bản và phổ biến để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Giải thích được các cách thức cơ bản và phổ biến để sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố cơ bản và phổ biến trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+   ],
+   "verbatim": "Giải thích được các cách thức cơ bản và phổ biến để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Giải thích được các cách thức cơ bản và phổ biến để sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố cơ bản và phổ biến trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "verbatim_full_muc": "a. Giải thích được các cách thức cơ bản và phổ biến để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Giải thích được các cách thức cơ bản và phổ biến để sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố cơ bản và phổ biến trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.2.TC2a",
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Thảo luận về cách bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số."
+   ],
+   "verbatim": "Thảo luận về cách bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số.",
+   "verbatim_full_muc": "a-Thảo luận về cách bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Thảo luận về cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.2.TC2b",
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Thảo luận về cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+   ],
+   "verbatim": "Thảo luận về cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "verbatim_full_muc": "a-Thảo luận về cách bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Thảo luận về cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn. c-Chỉ ra được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.2.NC1a",
+   "component": "4.2",
+   "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+   "domain": "4. An toàn",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Áp dụng được các cách thức khác nhau để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Áp dụng được các cách thức đặc thù để chia sẻ dữ liệu cá nhân một cách an toàn. c-Giải thích được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+   ],
+   "verbatim": "Áp dụng được các cách thức khác nhau để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Áp dụng được các cách thức đặc thù để chia sẻ dữ liệu cá nhân một cách an toàn. c-Giải thích được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "verbatim_full_muc": "a-Áp dụng được các cách thức khác nhau để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b-Áp dụng được các cách thức đặc thù để chia sẻ dữ liệu cá nhân một cách an toàn. c-Giải thích được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.3.CB1a",
+   "component": "4.3",
+   "name": "Bảo vệ sức khỏe và an sinh số",
+   "domain": "4. An toàn",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số. Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+   ],
+   "verbatim": "Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số. Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "verbatim_full_muc": "a- Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số. Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.3.CB2a",
+   "component": "4.3",
+   "name": "Bảo vệ sức khỏe và an sinh số",
+   "domain": "4. An toàn",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b- Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số. c- Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+   ],
+   "verbatim": "Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b- Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số. c- Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "verbatim_full_muc": "a- Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b- Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số. c- Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.3.TC1a",
+   "component": "4.3",
+   "name": "Bảo vệ sức khỏe và an sinh số",
+   "domain": "4. An toàn",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Giải thích được những cách thức cơ bản và phổ biến để tránh rủi ro và đe dọa đối với sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Lựa chọn được những cách thức cơ bản và phổ biến để bảo vệ bản thân khỏi nguy cơ trong môi trường số. c-Chỉ ra được những công nghệ số cơ bản và phổ biến giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+   ],
+   "verbatim": "Giải thích được những cách thức cơ bản và phổ biến để tránh rủi ro và đe dọa đối với sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Lựa chọn được những cách thức cơ bản và phổ biến để bảo vệ bản thân khỏi nguy cơ trong môi trường số. c-Chỉ ra được những công nghệ số cơ bản và phổ biến giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "verbatim_full_muc": "a-Giải thích được những cách thức cơ bản và phổ biến để tránh rủi ro và đe dọa đối với sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Lựa chọn được những cách thức cơ bản và phổ biến để bảo vệ bản thân khỏi nguy cơ trong môi trường số. c-Chỉ ra được những công nghệ số cơ bản và phổ biến giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.3.TC2a",
+   "component": "4.3",
+   "name": "Bảo vệ sức khỏe và an sinh số",
+   "domain": "4. An toàn",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Giải thích được những cách thức để tránh những sự đe dọa liên quan đến việc sử dụng công nghệ số đối với sức khỏe thể chất và tinh thần. b-Lựa chọn được cách thức bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số. c- Thảo luận về những công nghệ số giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+   ],
+   "verbatim": "Giải thích được những cách thức để tránh những sự đe dọa liên quan đến việc sử dụng công nghệ số đối với sức khỏe thể chất và tinh thần. b-Lựa chọn được cách thức bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số. c- Thảo luận về những công nghệ số giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "verbatim_full_muc": "a-Giải thích được những cách thức để tránh những sự đe dọa liên quan đến việc sử dụng công nghệ số đối với sức khỏe thể chất và tinh thần. b-Lựa chọn được cách thức bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số. c- Thảo luận về những công nghệ số giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.3.NC1a",
+   "component": "4.3",
+   "name": "Bảo vệ sức khỏe và an sinh số",
+   "domain": "4. An toàn",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Trình bày được các cách thức khác nhau để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Áp dụng được các cách thức khác nhau để bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số. c-Trình bày được các công nghệ số khác nhau giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+   ],
+   "verbatim": "Trình bày được các cách thức khác nhau để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Áp dụng được các cách thức khác nhau để bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số. c-Trình bày được các công nghệ số khác nhau giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "verbatim_full_muc": "a-Trình bày được các cách thức khác nhau để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Áp dụng được các cách thức khác nhau để bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số. c-Trình bày được các công nghệ số khác nhau giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.4.CB1a",
+   "component": "4.4",
+   "name": "Bảo vệ môi trường",
+   "domain": "4. An toàn",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường."
+   ],
+   "verbatim": "Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+   "verbatim_full_muc": "a.Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.4.CB2a",
+   "component": "4.4",
+   "name": "Bảo vệ môi trường",
+   "domain": "4. An toàn",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường."
+   ],
+   "verbatim": "Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+   "verbatim_full_muc": "a. Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.4.TC1a",
+   "component": "4.4",
+   "name": "Bảo vệ môi trường",
+   "domain": "4. An toàn",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Chỉ ra được những tác động cơ bản và phổ biến của công nghệ số và việc sử dụng công nghệ số đối với môi trường."
+   ],
+   "verbatim": "Chỉ ra được những tác động cơ bản và phổ biến của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+   "verbatim_full_muc": "a. Chỉ ra được những tác động cơ bản và phổ biến của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.4.TC2a",
+   "component": "4.4",
+   "name": "Bảo vệ môi trường",
+   "domain": "4. An toàn",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Thảo luận về các cách thức bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số."
+   ],
+   "verbatim": "Thảo luận về các cách thức bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số.",
+   "verbatim_full_muc": "a.Thảo luận về các cách thức bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "4.4.NC1a",
+   "component": "4.4",
+   "name": "Bảo vệ môi trường",
+   "domain": "4. An toàn",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "a",
+   "has_letter_code": true,
+   "items": [
+    "Trình bày được các cách thức khác nhau để bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số."
+   ],
+   "verbatim": "Trình bày được các cách thức khác nhau để bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số.",
+   "verbatim_full_muc": "a.Trình bày được các cách thức khác nhau để bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.1.CB1",
+   "component": "5.1",
+   "name": "Giải quyết các vấn đề kỹ thuật",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số. Xác định được các giải pháp đơn giản để giải quyết chúng.",
+   "verbatim_full_muc": "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số. Xác định được các giải pháp đơn giản để giải quyết chúng.",
+   "items": [
+    "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số. Xác định được các giải pháp đơn giản để giải quyết chúng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.1.CB2",
+   "component": "5.1",
+   "name": "Giải quyết các vấn đề kỹ thuật",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số. Xác định được các giải pháp đơn giản để giải quyết chúng.",
+   "verbatim_full_muc": "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số. Xác định được các giải pháp đơn giản để giải quyết chúng.",
+   "items": [
+    "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số. Xác định được các giải pháp đơn giản để giải quyết chúng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.1.TC1",
+   "component": "5.1",
+   "name": "Giải quyết các vấn đề kỹ thuật",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Chỉ ra được các vấn đề kỹ thuật thông thường và được xác định rõ ràng khi vận hành thiết bị và sử dụng môi trường số. Chọn được các giải pháp được xác định rõ ràng và thông thường cho chúng.",
+   "verbatim_full_muc": "Chỉ ra được các vấn đề kỹ thuật thông thường và được xác định rõ ràng khi vận hành thiết bị và sử dụng môi trường số. Chọn được các giải pháp được xác định rõ ràng và thông thường cho chúng.",
+   "items": [
+    "Chỉ ra được các vấn đề kỹ thuật thông thường và được xác định rõ ràng khi vận hành thiết bị và sử dụng môi trường số. Chọn được các giải pháp được xác định rõ ràng và thông thường cho chúng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.1.TC2",
+   "component": "5.1",
+   "name": "Giải quyết các vấn đề kỹ thuật",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân biệt được các vấn đề kỹ thuật khi vận hành thiết bị và sử dụng môi trường số. Chọn được giải pháp cho chúng.",
+   "verbatim_full_muc": "Phân biệt được các vấn đề kỹ thuật khi vận hành thiết bị và sử dụng môi trường số. Chọn được giải pháp cho chúng.",
+   "items": [
+    "Phân biệt được các vấn đề kỹ thuật khi vận hành thiết bị và sử dụng môi trường số. Chọn được giải pháp cho chúng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.1.NC1",
+   "component": "5.1",
+   "name": "Giải quyết các vấn đề kỹ thuật",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Đánh giá được các vấn đề kỹ thuật khi sử dụng môi trường số và vận hành các thiết bị số. Áp dụng được các giải pháp khác nhau cho chúng.",
+   "verbatim_full_muc": "Đánh giá được các vấn đề kỹ thuật khi sử dụng môi trường số và vận hành các thiết bị số. Áp dụng được các giải pháp khác nhau cho chúng.",
+   "items": [
+    "Đánh giá được các vấn đề kỹ thuật khi sử dụng môi trường số và vận hành các thiết bị số. Áp dụng được các giải pháp khác nhau cho chúng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.2.CB1",
+   "component": "5.2",
+   "name": "Xác định nhu cầu và giải pháp công nghệ",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được nhu cầu cá nhân. Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "verbatim_full_muc": "Xác định được nhu cầu cá nhân. Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "items": [
+    "Xác định được nhu cầu cá nhân. Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có.",
+    "để giải quyết những nhu cầu đó. c- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.2.CB2",
+   "component": "5.2",
+   "name": "Xác định nhu cầu và giải pháp công nghệ",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được nhu cầu cá nhân. Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "verbatim_full_muc": "Xác định được nhu cầu cá nhân. Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "items": [
+    "Xác định được nhu cầu cá nhân. Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có.",
+    "để giải quyết những nhu cầu đó. c- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.2.TC1",
+   "component": "5.2",
+   "name": "Xác định nhu cầu và giải pháp công nghệ",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Chỉ ra được những nhu cầu được xác định rõ ràng và thường xuyên, và Chọn được các công cụ số thông thường và được xác định rõ ràng cũng như các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c-Chọn được những cách thông thường và được xác định rõ ràng để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "verbatim_full_muc": "Chỉ ra được những nhu cầu được xác định rõ ràng và thường xuyên, và Chọn được các công cụ số thông thường và được xác định rõ ràng cũng như các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c-Chọn được những cách thông thường và được xác định rõ ràng để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "items": [
+    "Chỉ ra được những nhu cầu được xác định rõ ràng và thường xuyên, và Chọn được các công cụ số thông thường và được xác định rõ ràng cũng như.",
+    "các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c-Chọn được những cách thông thường và được xác định rõ ràng để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.2.TC2c",
+   "component": "5.2",
+   "name": "Xác định nhu cầu và giải pháp công nghệ",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "c",
+   "has_letter_code": true,
+   "items": [
+    "Chọn được cách điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+   ],
+   "verbatim": "Chọn được cách điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "verbatim_full_muc": "Giải thích nhu cầu cá nhân, và Lựa chọn được các công cụ số và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c-Chọn được cách điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.2.NC1",
+   "component": "5.2",
+   "name": "Xác định nhu cầu và giải pháp công nghệ",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Đánh giá được nhu cầu cá nhân, Áp dụng được các công cụ số khác nhau và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c-Sử dụng được các cách khác nhau để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "verbatim_full_muc": "Đánh giá được nhu cầu cá nhân, Áp dụng được các công cụ số khác nhau và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó. c-Sử dụng được các cách khác nhau để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+   "items": [
+    "Đánh giá được nhu cầu cá nhân, Áp dụng được các công cụ số khác nhau và các giải pháp công nghệ có thể có để.",
+    "giải quyết những nhu cầu đó. c-Sử dụng được các cách khác nhau để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.3.CB1",
+   "component": "5.3",
+   "name": "Sử dụng sáng tạo công nghệ số",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm. Thể hiện được sự quan tâm của cá nhân và tập thể đến quá trình xử lý nhận thức đơn giản để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số.",
+   "verbatim_full_muc": "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm. Thể hiện được sự quan tâm của cá nhân và tập thể đến quá trình xử lý nhận thức đơn giản để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số.",
+   "items": [
+    "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm. Thể hiện được sự quan tâm của cá nhân và tập thể đến quá trình xử lý nhận thức đơn giản để.",
+    "hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.3.CB2",
+   "component": "5.3",
+   "name": "Sử dụng sáng tạo công nghệ số",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm. Tuân theo quy trình nhận thức đơn giản của cá nhân và tập thể để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số.",
+   "verbatim_full_muc": "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm. Tuân theo quy trình nhận thức đơn giản của cá nhân và tập thể để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số.",
+   "items": [
+    "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm. Tuân theo quy trình nhận thức đơn giản của cá nhân và tập thể để hiểu và giải quyết các vấn đề khái.",
+    "niệm đơn giản và các tình huống có vấn đề trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.3.TC1",
+   "component": "5.3",
+   "name": "Sử dụng sáng tạo công nghệ số",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Chọn được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức rõ ràng cũng như các quy trình và sản phẩm đổi mới được xác định rõ ràng. Gắn kết được cá nhân và tập thể vào một số quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề mang tính khái niệm và tình huống có vấn đề thông thường và được xác định rõ ràng trong môi trường số.",
+   "verbatim_full_muc": "Chọn được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức rõ ràng cũng như các quy trình và sản phẩm đổi mới được xác định rõ ràng. Gắn kết được cá nhân và tập thể vào một số quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề mang tính khái niệm và tình huống có vấn đề thông thường và được xác định rõ ràng trong môi trường số.",
+   "items": [
+    "Chọn được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức rõ ràng cũng như các quy trình và sản phẩm đổi mới được xác định rõ ràng. Gắn kết được cá nhân và tập thể vào một số quá trình xử lý nhận thức để.",
+    "hiểu và giải quyết các vấn đề mang tính khái niệm và tình huống có vấn đề thông thường và được xác định rõ ràng trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.3.TC2",
+   "component": "5.3",
+   "name": "Sử dụng sáng tạo công nghệ số",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân biệt được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình và sản phẩm. Gắn kết được cá nhân và tập thể vào quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề khái niệm và tình huống có vấn đề trong môi trường số.",
+   "verbatim_full_muc": "Phân biệt được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình và sản phẩm. Gắn kết được cá nhân và tập thể vào quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề khái niệm và tình huống có vấn đề trong môi trường số.",
+   "items": [
+    "Phân biệt được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình và sản phẩm. Gắn kết được cá nhân và tập thể vào quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề khái niệm và.",
+    "tình huống có vấn đề trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.3.NC1",
+   "component": "5.3",
+   "name": "Sử dụng sáng tạo công nghệ số",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Áp dụng được các công cụ và công nghệ số khác nhau để tạo ra kiến thức cũng như các quy trình và sản phẩm đổi mới. Áp dụng xử lý nhận thức của cá nhân và tập thể để giải quyết các vấn đề khái niệm và tình huống có vấn đề khác nhau trong môi trường số.",
+   "verbatim_full_muc": "Áp dụng được các công cụ và công nghệ số khác nhau để tạo ra kiến thức cũng như các quy trình và sản phẩm đổi mới. Áp dụng xử lý nhận thức của cá nhân và tập thể để giải quyết các vấn đề khái niệm và tình huống có vấn đề khác nhau trong môi trường số.",
+   "items": [
+    "Áp dụng được các công cụ và công nghệ số khác nhau để tạo ra kiến thức cũng như các quy trình và sản phẩm đổi mới. Áp dụng xử lý nhận thức của cá nhân và tập thể để giải quyết các vấn đề khái niệm và tình huống có vấn đề khác nhau trong môi trường số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.4.CB1",
+   "component": "5.4",
+   "name": "Xác định các vấn đề cần cải thiện về NLS",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu. Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "verbatim_full_muc": "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu. Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "items": [
+    "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu.",
+    "Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.4.CB2",
+   "component": "5.4",
+   "name": "Xác định các vấn đề cần cải thiện về NLS",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu. Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "verbatim_full_muc": "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu. Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "items": [
+    "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu.",
+    "Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.4.TC1b",
+   "component": "5.4",
+   "name": "Xác định các vấn đề cần cải thiện về NLS",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "b",
+   "has_letter_code": true,
+   "items": [
+    "Chỉ ra được nơi để tìm kiếm các cơ hội được xác định rõ ràng để phát triển bản thân và cập nhật sự phát triển công nghệ số."
+   ],
+   "verbatim": "Chỉ ra được nơi để tìm kiếm các cơ hội được xác định rõ ràng để phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "verbatim_full_muc": "Giải thích được NLS của bản thân cần được cải thiện hoặc cập nhật ở đâu, b-Chỉ ra được nơi để tìm kiếm các cơ hội được xác định rõ ràng để phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.4.TC2",
+   "component": "5.4",
+   "name": "Xác định các vấn đề cần cải thiện về NLS",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Thảo luận về lĩnh vực NLS của bản thân cần được cải thiện hoặc cập nhật, Chỉ ra được cách hỗ trợ người khác phát triển NLS của họ. Chỉ ra được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "verbatim_full_muc": "Thảo luận về lĩnh vực NLS của bản thân cần được cải thiện hoặc cập nhật, Chỉ ra được cách hỗ trợ người khác phát triển NLS của họ. Chỉ ra được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "items": [
+    "Thảo luận về lĩnh vực NLS của bản thân cần được cải thiện hoặc cập nhật,.",
+    "Chỉ ra được cách hỗ trợ người khác phát triển NLS của họ. Chỉ ra được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "5.4.NC1",
+   "component": "5.4",
+   "name": "Xác định các vấn đề cần cải thiện về NLS",
+   "domain": "5. Giải quyết vấn đề",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Chứng minh được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu, Minh họa được những cách khác nhau để hỗ trợ người khác phát triển NLS của họ. Đề xuất được các cơ hội khác nhau để phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "verbatim_full_muc": "Chứng minh được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu, Minh họa được những cách khác nhau để hỗ trợ người khác phát triển NLS của họ. Đề xuất được các cơ hội khác nhau để phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+   "items": [
+    "Chứng minh được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu,.",
+    "Minh họa được những cách khác nhau để hỗ trợ người khác phát triển NLS của họ. Đề xuất được các cơ hội khác nhau để phát triển bản thân và cập nhật sự phát triển công nghệ số."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.1.CB2",
+   "component": "6.1",
+   "name": "Hiểu biết về trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Xác định được các khái niệm cơ bản của AI. Nhớ lại được các ứng dụng đơn giản của AI trong cuộc sống hàng ngày.",
+   "verbatim_full_muc": "Xác định được các khái niệm cơ bản của AI. Nhớ lại được các ứng dụng đơn giản của AI trong cuộc sống hàng ngày.",
+   "items": [
+    "Xác định được các khái niệm cơ bản của AI. Nhớ lại được các ứng dụng đơn giản của AI trong cuộc sống hàng ngày."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.1.TC1",
+   "component": "6.1",
+   "name": "Hiểu biết về trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Giải thích được nguyên tắc hoạt động cơ bản của AI. Diễn giải được các thuật ngữ và khái niệm liên quan đến AI.",
+   "verbatim_full_muc": "Giải thích được nguyên tắc hoạt động cơ bản của AI. Diễn giải được các thuật ngữ và khái niệm liên quan đến AI.",
+   "items": [
+    "Giải thích được nguyên tắc hoạt động cơ bản của AI. Diễn giải được các thuật ngữ và khái niệm liên quan đến AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.1.TC2",
+   "component": "6.1",
+   "name": "Hiểu biết về trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Áp dụng được các nguyên tắc cơ bản của AI để giải quyết vấn đề đơn giản. Thực hiện được các thao tác cơ bản trên các công cụ AI.",
+   "verbatim_full_muc": "Áp dụng được các nguyên tắc cơ bản của AI để giải quyết vấn đề đơn giản. Thực hiện được các thao tác cơ bản trên các công cụ AI.",
+   "items": [
+    "Áp dụng được các nguyên tắc cơ bản của AI để giải quyết vấn đề đơn giản. Thực hiện được các thao tác cơ bản trên các công cụ AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.1.NC1",
+   "component": "6.1",
+   "name": "Hiểu biết về trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân tích được cách AI hoạt động trong các ứng dụng cụ thể. b- So sánh được các hệ thống AI khác nhau và cách chúng xử lý dữ liệu.",
+   "verbatim_full_muc": "Phân tích được cách AI hoạt động trong các ứng dụng cụ thể. b- So sánh được các hệ thống AI khác nhau và cách chúng xử lý dữ liệu.",
+   "items": [
+    "Phân tích được cách AI hoạt động trong các ứng dụng cụ thể. b- So sánh được các hệ thống AI khác nhau và cách chúng xử lý dữ liệu."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.2.CB1",
+   "component": "6.2",
+   "name": "Sử dụng trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận diện được các công cụ AI đơn giản. Thực hiện được các thao tác cơ bản với các công cụ AI. Nhận thức được cơ bản về các vấn đề đạo đức và pháp lý liên quan đến AI.",
+   "verbatim_full_muc": "Nhận diện được các công cụ AI đơn giản. Thực hiện được các thao tác cơ bản với các công cụ AI. Nhận thức được cơ bản về các vấn đề đạo đức và pháp lý liên quan đến AI.",
+   "items": [
+    "Nhận diện được các công cụ AI đơn giản. Thực hiện được các thao tác cơ bản với các công cụ AI. Nhận thức được cơ bản về các vấn đề đạo.",
+    "đức và pháp lý liên quan đến AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.2.CB2",
+   "component": "6.2",
+   "name": "Sử dụng trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Áp dụng được các công cụ AI để giải quyết vấn đề đơn giản. Tương tác được với các hệ thống AI cơ bản. Tuân thủ các quy định pháp luật cơ bản khi sử dụng AI.",
+   "verbatim_full_muc": "Áp dụng được các công cụ AI để giải quyết vấn đề đơn giản. Tương tác được với các hệ thống AI cơ bản. Tuân thủ các quy định pháp luật cơ bản khi sử dụng AI.",
+   "items": [
+    "Áp dụng được các công cụ AI để giải quyết vấn đề đơn giản. Tương tác được với các hệ thống AI cơ bản. Tuân thủ các quy định pháp luật cơ bản khi sử dụng AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.2.TC1c",
+   "component": "6.2",
+   "name": "Sử dụng trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "c",
+   "has_letter_code": true,
+   "items": [
+    "Xem xét các khía cạnh đạo đức khi sử dụng AI, bảo đảm không vi phạm quyền riêng tư và bảo mật dữ liệu."
+   ],
+   "verbatim": "Xem xét các khía cạnh đạo đức khi sử dụng AI, bảo đảm không vi phạm quyền riêng tư và bảo mật dữ liệu.",
+   "verbatim_full_muc": "Sử dụng được các công cụ AI trong công việc và học tập hàng ngày. Thực hành được các kỹ năng sử dụng AI thông qua các bài tập và dự án nhỏ. c- Xem xét các khía cạnh đạo đức khi sử dụng AI, bảo đảm không vi phạm quyền riêng tư và bảo mật dữ liệu.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.2.TC2",
+   "component": "6.2",
+   "name": "Sử dụng trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Tối ưu hóa việc sử dụng các công cụ AI để đạt hiệu quả cao hơn. Quản lý được việc triển khai các công cụ AI trong các dự án nhỏ. Bảo vệ được dữ liệu cá nhân và tuân thủ các quy định pháp luật về bảo mật thông tin khi sử dụng AI.",
+   "verbatim_full_muc": "Tối ưu hóa việc sử dụng các công cụ AI để đạt hiệu quả cao hơn. Quản lý được việc triển khai các công cụ AI trong các dự án nhỏ. Bảo vệ được dữ liệu cá nhân và tuân thủ các quy định pháp luật về bảo mật thông tin khi sử dụng AI.",
+   "items": [
+    "Tối ưu hóa việc sử dụng các công cụ AI để đạt hiệu quả cao hơn. Quản lý được việc triển khai các công cụ AI trong các dự án nhỏ. Bảo vệ được dữ liệu cá nhân và tuân thủ các quy.",
+    "định pháp luật về bảo mật thông tin khi sử dụng AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.2.NC1c",
+   "component": "6.2",
+   "name": "Sử dụng trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "c",
+   "has_letter_code": true,
+   "items": [
+    "Đánh giá và giảm thiểu được các rủi ro đạo đức và pháp lý liên quan đến việc sử dụng AI."
+   ],
+   "verbatim": "Đánh giá và giảm thiểu được các rủi ro đạo đức và pháp lý liên quan đến việc sử dụng AI.",
+   "verbatim_full_muc": "Phát triển được các ứng dụng AI tùy chỉnh để giải quyết các vấn đề cụ thể. Điều chỉnh được các hệ thống AI để phù hợp với nhu cầu cụ thể. c- Đánh giá và giảm thiểu được các rủi ro đạo đức và pháp lý liên quan đến việc sử dụng AI.",
+   "code_origin": "mã theo đúng quy ước <thành phần>.<mức><chữ cái> của văn bản",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.3.CB1",
+   "component": "6.3",
+   "name": "Đánh giá trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "CB1",
+   "level_name": "Cơ bản 1",
+   "grades": "L1-L2-L3",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận diện được một số vật dụng/trò chơi thông minh có sử dụng AI Nhớ được rằng không phải mọi thông tin từ máy móc đều đúng",
+   "verbatim_full_muc": "Nhận diện được một số vật dụng/trò chơi thông minh có sử dụng AI Nhớ được rằng không phải mọi thông tin từ máy móc đều đúng",
+   "items": [
+    "Nhận diện được một số vật dụng/trò chơi thông minh có sử dụng AI Nhớ được rằng không phải mọi thông tin từ máy móc đều đúng."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.3.CB2",
+   "component": "6.3",
+   "name": "Đánh giá trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "CB2",
+   "level_name": "Cơ bản 2",
+   "grades": "L4-L5",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Nhận diện được các yếu tố cơ bản của hệ thống AI cần được đánh giá. Mô tả được các chức năng chính của hệ thống AI.",
+   "verbatim_full_muc": "Nhận diện được các yếu tố cơ bản của hệ thống AI cần được đánh giá. Mô tả được các chức năng chính của hệ thống AI.",
+   "items": [
+    "Nhận diện được các yếu tố cơ bản của hệ thống AI cần được đánh giá. Mô tả được các chức năng chính của hệ thống AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.3.TC1",
+   "component": "6.3",
+   "name": "Đánh giá trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "TC1",
+   "level_name": "Trung cấp 1",
+   "grades": "L6-L7",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Giải thích được cách thức hoạt động của các hệ thống AI đơn giản. Tóm tắt được các đặc điểm và ứng dụng của hệ thống AI.",
+   "verbatim_full_muc": "Giải thích được cách thức hoạt động của các hệ thống AI đơn giản. Tóm tắt được các đặc điểm và ứng dụng của hệ thống AI.",
+   "items": [
+    "Giải thích được cách thức hoạt động của các hệ thống AI đơn giản. Tóm tắt được các đặc điểm và ứng dụng của hệ thống AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.3.TC2",
+   "component": "6.3",
+   "name": "Đánh giá trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "TC2",
+   "level_name": "Trung cấp 2",
+   "grades": "L8-L9",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Phân tích được hiệu quả của hệ thống AI trong việc giải quyết các vấn đề cụ thể. So sánh được hiệu suất của các hệ thống AI khác nhau.",
+   "verbatim_full_muc": "Phân tích được hiệu quả của hệ thống AI trong việc giải quyết các vấn đề cụ thể. So sánh được hiệu suất của các hệ thống AI khác nhau.",
+   "items": [
+    "Phân tích được hiệu quả của hệ thống AI trong việc giải quyết các vấn đề cụ thể. So sánh được hiệu suất của các hệ thống AI khác nhau."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  },
+  {
+   "code": "6.3.NC1",
+   "component": "6.3",
+   "name": "Đánh giá trí tuệ nhân tạo",
+   "domain": "6. Ứng dụng trí tuệ nhân tạo",
+   "level": "NC1",
+   "level_name": "Nâng cao 1",
+   "grades": "L10-L11-L12",
+   "indicator_letter": "",
+   "has_letter_code": false,
+   "verbatim": "Đánh giá được độ chính xác và tin cậy của các hệ thống AI. Xem xét được các kết quả và đưa ra nhận xét về hiệu quả của hệ thống AI.",
+   "verbatim_full_muc": "Đánh giá được độ chính xác và tin cậy của các hệ thống AI. Xem xét được các kết quả và đưa ra nhận xét về hiệu quả của hệ thống AI.",
+   "items": [
+    "Đánh giá được độ chính xác và tin cậy của các hệ thống AI. Xem xét được các kết quả và đưa ra nhận xét về hiệu quả của hệ thống AI."
+   ],
+   "code_origin": "văn bản KHÔNG có chữ cái cho mục này — định danh theo thành phần + mức",
+   "source": "Công văn 3456/BGDĐT-GDPT",
+   "source_location": "PHỤ LỤC 1 — Bảng mã chỉ báo năng lực số (theo Công văn 3456/BGDĐT-GDPT) — trang 61–78",
+   "source_document": "Tài liệu tập huấn: Hướng dẫn phát triển năng lực số cho học sinh phổ thông (Bộ GDĐT, Hà Nội 2025)"
+  }
+ ],
+ "thong_ke": {
+  "so_mien": 6,
+  "so_thanh_phan": 24,
+  "so_chi_bao": 137,
+  "co_ma_chu_cai": 74,
+  "khong_co_chu_cai_trong_van_ban": 63
+ }
+}

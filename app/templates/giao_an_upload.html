@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block head %}Giáo án &amp; năng lực số{% endblock %}
+{% block crumb %}Tải giáo án Word → hệ thống đề xuất → giáo viên duyệt → tải bản sao .docx{% endblock %}
+{% block body %}
+<div class="card">
+ <h3>Trợ lý soạn giáo án tích hợp năng lực số</h3>
+ <p class="sub">Tải lên giáo án Word (.docx) — dùng được cho <b>lớp 1 đến lớp 12</b> (tiểu học, THCS, THPT).
+ Hệ thống giữ nguyên toàn bộ nội dung, bảng biểu và định dạng gốc, rồi đề xuất phần “Tích hợp năng lực số”
+ và các lỗi chính tả cần sửa. Giáo viên duyệt từng mục trước khi tải file.</p>
+ <p class="sub">Mức năng lực số tra theo khối lớp: lớp 1–3 mức CB1, lớp 4–5 mức CB2, lớp 6–7 mức TC1,
+ lớp 8–9 mức TC2, lớp 10–12 mức NC1. Lời đề xuất hoạt động được viết theo lứa tuổi: lớp nhỏ thì
+ giáo viên làm mẫu và học sinh quan sát, nói lại; lớp lớn thì học sinh tự thực hiện và phản biện.</p>
+ <form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  <label class="f" style="margin-bottom:14px">File giáo án Word (.docx, tối đa 8 MB)
+   <input type="file" name="file" accept=".docx" required></label>
+  <div class="row">
+   <label class="f" style="flex:1;min-width:180px">Lớp (nếu file không ghi rõ)
+    <select name="grade">
+     <option value="">— Để hệ thống tự đọc trong file —</option>
+     <optgroup label="Tiểu học (mức CB1–CB2)">
+      {% for i in range(1,6) %}<option value="{{i}}">Lớp {{i}}</option>{% endfor %}
+     </optgroup>
+     <optgroup label="THCS (mức TC1–TC2)">
+      {% for i in range(6,10) %}<option value="{{i}}">Lớp {{i}}</option>{% endfor %}
+     </optgroup>
+     <optgroup label="THPT (mức NC1)">
+      {% for i in range(10,13) %}<option value="{{i}}">Lớp {{i}}</option>{% endfor %}
+     </optgroup>
+    </select></label>
+   <label class="f" style="flex:2;min-width:160px">Môn (nếu file không ghi rõ)
+    <input name="subject" maxlength="80" value="{{user['subject'] or ''}}" placeholder="Ví dụ: Tin học"></label>
+  </div>
+  <div class="row">
+   <label class="f" style="flex:1;min-width:200px">Điều kiện thiết bị của lớp
+    <select name="thiet_bi">
+     <option value="co">Có thiết bị số cho học sinh</option>
+     <option value="khong_co">Không có thiết bị — cần phương án thay thế</option>
+    </select></label>
+   <label class="f" style="flex:1;min-width:150px">Thời lượng hoạt động mới (phút)
+    <input type="number" name="thoi_luong" value="6" min="3" max="20"></label>
+   <label class="f" style="flex:1;min-width:150px">Số tiêu chí tối đa
+    <input type="number" name="toi_da" value="3" min="1" max="5"></label>
+  </div>
+  <button class="ok" style="margin-top:16px">Phân tích và tạo bản xem trước</button>
+ </form>
+</div>
+
+<div class="card">
+ <h3>Hệ thống làm gì — và không làm gì</h3>
+ <p><b>Có làm:</b> đối chiếu nội dung bài với kho chỉ báo đã kiểm chứng ({{luat.so_mien}} miền,
+ {{luat.so_thanh_phan}} năng lực thành phần, {{luat.so_chi_bao}} chỉ báo), chèn mục “Tích hợp năng lực số”
+ cuối phần MỤC TIÊU và hoạt động tương ứng vào đúng vị trí trong tiến trình bài dạy; kiểm tra chính tả
+ theo từ điển thuật ngữ giáo dục ({{tu_dien.so_thuat_ngu}} thuật ngữ được bảo vệ); tô đỏ toàn bộ
+ nội dung do hệ thống tạo.</p>
+ <p>Bài chưa có hoạt động số nào (ví dụ bài tập đọc thuần giấy ở tiểu học) sẽ được đánh dấu
+ <b>“cần giáo viên duyệt”</b> và mặc định không tích — hệ thống không gán tiêu chí tràn lan.</p>
+ <p><b>Không làm:</b> không gửi bài của thầy/cô ra Google/Gemini hay bất kỳ dịch vụ AI bên ngoài;
+ không chạy macro trong file Word; không tự sửa những câu đúng hoặc thuật ngữ, tên riêng, công thức,
+ mã chỉ báo; không tự tạo mã chỉ báo nếu kho không có.</p>
+ <p class="muted">{{nhan}}</p>
+</div>
+{% endblock %}

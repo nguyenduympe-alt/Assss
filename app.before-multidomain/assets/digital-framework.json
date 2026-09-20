@@ -1,0 +1,2424 @@
+{
+  "version": "2026-09-20",
+  "basis": "Thông tư 02/2025/TT-BGDĐT; tham khảo Công văn 3456/BGDĐT-GDPT",
+  "source": "https://thcsmyduc.haiphong.edu.vn/tai-nguyen/bang-ma-chi-bao-nang-luc-so/ctmb/1163/505213",
+  "source_note": "Bảng chỉ báo do THCS Mỹ Đức công bố; giáo viên đối chiếu hướng dẫn của đơn vị.",
+  "grade_levels": {
+    "1": "CB1",
+    "2": "CB1",
+    "3": "CB1",
+    "4": "CB2",
+    "5": "CB2",
+    "6": "TC1",
+    "7": "TC1",
+    "8": "TC2",
+    "9": "TC2",
+    "10": "NC1",
+    "11": "NC1",
+    "12": "NC1"
+  },
+  "components": {
+    "1.1": {
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "levels": {
+        "CB1": " a- Xác định được nhu cầu thông tin, tìm kiếm dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số, b- Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng,\nc- Xác định được các chiến lược tìm kiếm đơn giản.",
+        "CB2": " a- Xác định được nhu cầu\nthông tin.\nb- Tìm được dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số,\nc- Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng,\nd- Xác định được các chiến lược tìm kiếm đơn giản.",
+        "TC1": " a- Giải thích được nhu cầu thông tin,\nb- Thực hiện được rõ ràng và theo quy trình các tìm kiếm để tìm dữ liệu, thông tin và nội dung trong môi trường số,\nc- Giải thích được cách truy cập và điều hướng các kết quả tìm kiếm,\nd- Giải thích được rõ ràng và theo quy trình chiến lược tìm kiếm.",
+        "TC2": " a- Minh họa được nhu cầu\nthông tin,\nb- Tổ chức được tìm kiếm dữ liệu, thông tin và nội dung trong môi trường số, c-Mô tả được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng,\nd-Tổ chức được các chiến lược tìm kiếm.",
+        "NC1": " a- Đáp ứng được nhu cầu\nthông tin,\nb- Áp dụng được kỹ thuật tìm kiếm để lấy được dữ liệu, thông tin và nội dung trong môi trường số,\nc- Chỉ cho người khác cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng.\nd- Tự đề xuất được chiến\nlược tìm kiếm."
+      }
+    },
+    "1.2": {
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "levels": {
+        "CB1": " a-Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số.",
+        "CB2": " a- Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số.",
+        "TC1": " a- Thực hiện phân tích, so sánh, đánh giá được độ tin cậy và độ chính xác của các nguồn dữ liệu, thông tin và nội dung số đã được tổ chức rõ ràng.\nb- Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung\nsố được xác định rõ ràng.",
+        "TC2": " a- Thực hiện phân tích, so sánh và đánh giá được các nguồn dữ liệu, thông tin và nội dung số.\nb- Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số.",
+        "NC1": " a- Thực hiện đánh giá được độ tin cậy và độ tin cậy của các nguồn dữ liệu, thông tin và nội dung số. b-Tiến hành đánh giá được các dữ liệu, thông tin và nội dung số khác nhau."
+      }
+    },
+    "1.3": {
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "levels": {
+        "CB1": " a- Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số.\nb- Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có\ncấu trúc.",
+        "CB2": " a- Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số.\nb- Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc.",
+        "TC1": " a- Lựa chọn được dữ liệu, thông tin và nội dung để tổ chức, lưu trữ và truy xuất chúng một cách thường xuyên trong môi trường số.\nb- Sắp xếp chúng một cách trật tự trong một môi trường có cấu trúc.",
+        "TC2": " a- Sắp xếp được thông tin, dữ liệu, nội dung để dễ dàng lưu trữ và truy xuất.\nb- Tổ chức được thông tin, dữ liệu và nội dung trong một môi trường có cấu trúc.",
+        "NC1": " a- Thao tác được thông tin, dữ liệu và nội dung để tổ chức, lưu trữ và truy xuất dễ dàng hơn.\nb- Triển khai được việc tổ chức và sắp xếp dữ liệu, thông tin và nội dung trong môi trường có cấu trúc."
+      }
+    },
+    "2.1": {
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "levels": {
+        "CB1": " a- Lựa chọn được các công nghệ số đơn giản để tương tác. b-  Xác  định  được  các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể. ",
+        "CB2": " a- Lựa chọn được các công nghệ số đơn giản để tương tác. b-  Xác  định  được  các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể. ",
+        "TC1": " a- Thực hiện được các tương tác được xác định rõ ràng và thường xuyên với các công nghệ số. b- Lựa chọn được  các phương tiện giao tiếp số phù hợp, được xác định rõ ràng cho phù hợp với bối\ncảnh nhất định.",
+        "TC2": " a- Lựa chọn được nhiều công nghệ số để tương tác. b-Lựa  chọn  được  nhiều phương tiện truyền thông số cho phù hợp với bối cảnh nhất định.  ",
+        "NC1": " a- Sử dụng được nhiều công nghệ số để tương tác. b-Cho  người  khác  thấy phương tiện giao tiếp số phù hợp nhất cho một bối cảnh cụ thể.  "
+      }
+    },
+    "2.2": {
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "levels": {
+        "CB1": " a-Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số. b-Nhận biết được phương pháp  trích  dẫn  và  ghi nguồn cơ bản.        ",
+        "CB2": " a- Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số. b- Xác định được phương pháp trích dẫn và ghi nguồn cơ bản.        ",
+        "TC1": " a- Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số. b- Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên, c- Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn.",
+        "TC2": " a- Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số. b- Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c-  Áp\tdụng\tđược\tcác phương pháp tham chiếu và ghi chú nguồn.   ",
+        "NC1": " a- Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp, b- Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số. c-Áp\tdụng\tđược\tnhiều phương pháp tham chiếu và ghi nguồn khác nhau.    "
+      }
+    },
+    "2.3": {
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "levels": {
+        "CB1": " a- Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội.\nb- Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách\nlà một công dân.",
+        "CB2": " a- Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội.\nb- Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công\ndân.",
+        "TC1": " a- Lựa chọn được các dịch vụ số được xác định rõ ràng và phổ biến để tham gia vào xã hội.\nb- Xác định được các công nghệ số rõ ràng và thích hợp để tự mình trang bị và tham gia vào xã hội như\nmột công dân.",
+        "TC2": " a- Lựa chọn được các dịch vụ số để tham gia vào xã hội.\nb- Thảo luận về các công nghệ số phù hợp để nâng cao năng lực của bản thân và tham gia vào xã hội với tư cách là một công.",
+        "NC1": " a- Đề xuất được các dịch vụ số khác nhau để tham gia vào xã hội.\nb- Sử dụng được các công nghệ số thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân."
+      }
+    },
+    "2.4": {
+      "component": "2.4",
+      "name": "Hợp tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "levels": {
+        "CB1": " a-Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác.",
+        "CB2": " a-Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác.",
+        "TC1": " a-Lựa chọn được các công cụ và công nghệ số được xác định rõ ràng và thường xuyên cho các quá trình\nhợp tác.",
+        "TC2": " a-Lựa chọn được các công cụ và công nghệ số cho các quá trình hợp tác.",
+        "NC1": " a-Đề xuất được các công cụ và công nghệ số khác nhau cho các quá trình hợp tác."
+      }
+    },
+    "2.5": {
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "levels": {
+        "CB1": " a- Phân biệt được các chuẩn mực hành vi đơn giản và biết cách sử dụng công nghệ số và tương tác trong môi trường số.\nb- Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số.\nc- Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số.",
+        "CB2": " a- Phân biệt được các chuẩn mực hành vi đơn giản và bí quyết sử dụng công nghệ số và tương tác trong môi trường số.\nb- Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số.\nc- Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số.",
+        "TC1": " a- Làm rõ được các chuẩn mực hành vi thường xuyên và được xác định rõ ràng cũng như bí quyết khi sử dụng công nghệ số và tương tác trong môi trường số.\nb- Thể hiện được các chiến lược giao tiếp thường xuyên và xác định rõ ràng phương thức giao tiếp phù hợp trong môi trường số.\nc- Mô tả các khía cạnh đa dạng về văn hóa và thế hệ được xác định rõ ràng và thông thường cần xem xét\ntrong môi trường số.",
+        "TC2": " a- Thảo luận về các chuẩn mực hành vi và cách sử dụng công nghệ số và tương tác trong môi trường số.\nb- Thảo luận các chiến lược giao tiếp phù hợp trong môi trường số.\nc- Thảo luận các khía cạnh đa dạng về văn hóa và thế hệ cần xem xét trong môi trường số.",
+        "NC1": " a- Áp dụng được các chuẩn mực hành vi và bí quyết khác nhau khi sử dụng công nghệ số và tương tác trong môi trường số.\nb- Áp dụng được các chiến lược giao tiếp khác nhau trong môi trường số một cách phù hợp.\nc- Áp dụng được các khía cạnh đa dạng về văn hóa và thế hệ khác nhau để xem xét trong môi trường số."
+      }
+    },
+    "2.6": {
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "levels": {
+        "CB1": " a- Xác định được danh tính số.\nb- Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân.\nc- Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ\nsố.",
+        "CB2": " a- Xác định được danh tính số.\nb- Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân.\nc- Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+        "TC1": " a- Phân biệt được một loạt các danh tính số thông thường và được xác định rõ ràng.\nb- Giải thích được những cách được xác định rõ ràng và thường xuyên để bảo vệ danh tiếng trực tuyến của bản thân.\nc- Mô tả dữ liệu được xác định rõ ràng mà bạn thường xuyên thu được thông qua các công cụ, môi\ntrường hoặc dịch vụ số.",
+        "TC2": " a- Hiển thị được nhiều danh tính số cụ thể,\nb- Thảo luận những cách cụ thể để bảo vệ danh tiếng trực tuyến của bản thân.\nc- Thao tác dữ liệu cá nhân tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số.",
+        "NC1": " a- Sử dụng được nhiều danh tính số khác nhau.\nb- Áp dụng được các cách khác nhau để bảo vệ danh tính trực tuyến của bản thân.\nc- Sử dụng được dữ liệu tạo ra thông qua công cụ, môi trường\nvà một số dịch vụ số."
+      }
+    },
+    "3.1": {
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "levels": {
+        "CB1": " a- Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng\nđơn giản, b- Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+        "CB2": " a- Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng\nđơn giản, b- Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản.",
+        "TC1": " a-Chỉ ra được cách tạo và chỉnh sửa nội dung có khái niệm cụ thể và mang tính phổ thông bằng những định dạng rõ ràng, phổ biến,\nb-Thể hiện được bản thân thông qua việc tạo ra các nội dung số thông thường\nvà được xác định rõ ràng.",
+        "TC2": " a-Chỉ ra được cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau, b-Thể hiện được bản thân thông qua việc tạo ra các nội dung số.",
+        "NC1": " a-Áp dụng được các cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau, b-Chỉ ra được những cách thể hiện bản thân thông qua việc tạo ra các nội dung số."
+      }
+    },
+    "3.2": {
+      "component": "3.2",
+      "name": "Tích hợp và tạo lập lại nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "levels": {
+        "CB1": " a- Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông\ntin mới và độc đáo.",
+        "CB2": " a- Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+        "TC1": " a-Giải thích được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục nội dung và thông tin mới được xác định rõ ràng để tạo ra những nội dung và\nthông tin mới và độc đáo.",
+        "TC2": " a-Thảo luận các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo.",
+        "NC1": " a-Làm việc với các mục nội dung và thông tin mới khác nhau, sửa đổi, tinh chỉnh, cải thiện và tích hợp chúng để tạo ra những mục mới và độc đáo."
+      }
+    },
+    "3.3": {
+      "component": "3.3",
+      "name": "Thực thi bản quyền và giấy phép",
+      "domain": "3. Sáng tạo nội dung số",
+      "levels": {
+        "CB1": " a-Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+        "CB2": " a-Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số.",
+        "TC1": " a-Chỉ ra được các quy tắc thông thường và được xác định rõ ràng về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội\ndung số.",
+        "TC2": " a-Thảo luận các quy tắc về bản quyền và giấy phép áp dụng cho thông tin và nội dung số.",
+        "NC1": " a-Áp dụng được các quy định khác nhau về bản quyền và giấy phép cho dữ liệu, thông tin và nội dung số."
+      }
+    },
+    "3.4": {
+      "component": "3.4",
+      "name": "Lập trình",
+      "domain": "3. Sáng tạo nội dung số",
+      "levels": {
+        "CB1": " a-Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản.",
+        "CB2": " a-Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản.",
+        "TC1": " a-Liệt kê được các hướng dẫn thông thường và được xác định rõ ràng cho một hệ thống máy tính để giải quyết các vấn đề thường ngày hoặc thực hiện các\ntác vụ thường ngày.",
+        "TC2": " a-Liệt kê được các hướng dẫn cho một hệ thống máy tính để giải quyết một vấn đề nhất định hoặc thực hiện một nhiệm vụ cụ thể.",
+        "NC1": " a-Tự thao tác được bằng các hướng dẫn dành cho hệ thống máy tính để giải quyết một vấn đề khác hoặc thực hiện các nhiệm vụ khác nhau."
+      }
+    },
+    "4.1": {
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "levels": {
+        "CB1": " a- Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản.\nb- Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số.\nc- Chọn lựa được các biện pháp an toàn và bảo mật đơn giản.\nd- Nhận biết được những cách thức đơn giản để quan tâm đến mức  độ  tin  cậy  và\nquyền riêng tư.",
+        "CB2": " a- Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản.\nb- Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số.\nc- Tuân theo được các biện pháp an toàn và bảo mật đơn giản.\nd- Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+        "TC1": " a- Chỉ ra được những cách thức cơ bản và phổ biến để bảo vệ thiết bị và nội dung số.\nb- Phân biệt được những rủi ro và mối đe dọa cơ bản và phổ biến trong môi trường số.\nc- Chọn lựa được các biện pháp an toàn và bảo mật rõ ràng và thường xuyên.\nd- Chỉ ra được những cách thức cơ bản và phổ biến để quan tâm đến mức độ tin\ncậy và quyền riêng tư.",
+        "TC2": " a- Thiết lập được những cách thức bảo vệ thiết bị và nội dung số.\nb- Phân biệt được rủi ro và mối đe dọa trong môi trường số.\nc- Chọn lựa được các biện pháp an toàn và bảo mật.\nd- Giải thích được các cách thức để quan tâm đến mức độ tin cậy và quyền riêng tư.",
+        "NC1": " a- Áp dụng được các cách khác nhau để bảo vệ thiết bị và nội dung số.\nb- Nhận thức được sự đa dạng của các rủi ro và đe dọa trong môi trường số. c-Áp dụng được các biện pháp an toàn và bảo mật. d-Sử dụng được các cách thức khác nhau để quan tâm đến mức độ tin cậy và quyền riêng tư."
+      }
+    },
+    "4.2": {
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "levels": {
+        "CB1": " a-\tLựa\tchọn\tđược\nnhững cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số. b- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác.\nc- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch\nvụ số.",
+        "CB2": " a- Lựa chọn được những\ncách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số.\nb- Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác.\nc- Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số.",
+        "TC1": " a. Giải thích được các cách thức cơ bản và phổ biến để\nbảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số.\nb-Giải thích được các cách thức cơ bản và phổ biến để sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn.\nc-Chỉ ra được các tuyên bố cơ bản và phổ biến trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+        "TC2": " a-Thảo luận về cách bảo vệ dữ liệu cá nhân và quyền\nriêng tư trong môi trường số. b-Thảo luận về cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn.\nc-Chỉ ra được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số.",
+        "NC1": " a-Áp dụng được các cách\nthức khác nhau để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số.\nb-Áp dụng được các cách thức đặc thù để chia sẻ dữ liệu cá nhân một cách an toàn.\nc-Giải thích được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+      }
+    },
+    "4.3": {
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "levels": {
+        "CB1": " a- Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa\nđến sức khỏe thể chất và tinh thần khi sử dụng\ncông nghệ số.\nb- Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số.\nc- Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+        "CB2": " a- Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số.\nb- Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số.\nc- Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+        "TC1": " a-Giải thích được những cách thức cơ bản và phổ biến để tránh rủi ro và đe\ndọa đối với sức khỏe thể chất và tinh thần khi sử dụng công nghệ số.\nb-Lựa chọn được những cách thức cơ bản và phổ biến để bảo vệ bản thân khỏi nguy cơ trong môi trường số.\nc-Chỉ ra được những công nghệ số cơ bản và phổ biến giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+        "TC2": " a-Giải thích được những cách thức để tránh những sự đe dọa liên quan đến việc sử\ndụng công nghệ số đối với sức khỏe thể chất và tinh thần.\nb-Lựa chọn được cách thức bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số.\nc- Thảo luận về những công nghệ số giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội.",
+        "NC1": " a-Trình bày được các cách thức khác nhau để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số. b-Áp dụng được các cách thức khác nhau để bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số.\nc-Trình bày được các công nghệ số khác nhau giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+      }
+    },
+    "4.4": {
+      "component": "4.4",
+      "name": "Bảo vệ môi trường",
+      "domain": "4. An toàn",
+      "levels": {
+        "CB1": " a.Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+        "CB2": " a. Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường.",
+        "TC1": " a. Chỉ ra được những tác động cơ bản và phổ biến của công nghệ số và việc sử dụng công nghệ số đối với\nmôi trường.",
+        "TC2": " a.Thảo luận về các cách thức bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng\ncông nghệ số.",
+        "NC1": " a.Trình bày được các cách thức khác nhau để bảo vệ môi trường khỏi tác động của công nghệ số và việc\nsử dụng công nghệ số."
+      }
+    },
+    "5.1": {
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "levels": {
+        "CB1": " a- Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số.\nb- Xác định được các giải pháp đơn giản để giải quyết chúng.",
+        "CB2": " a- Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số.\nb- Xác định được các giải pháp đơn giản để giải quyết chúng.",
+        "TC1": " a- Chỉ ra được các vấn đề kỹ thuật thông thường và được xác định rõ ràng khi vận hành thiết bị và sử dụng môi trường số.\nb- Chọn được các giải pháp\nđược xác định rõ ràng và\nthông thường cho chúng.",
+        "TC2": " a- Phân biệt được các vấn đề kỹ thuật khi vận hành thiết bị và sử dụng môi trường số.\nb- Chọn được giải pháp cho chúng.",
+        "NC1": " a- Đánh giá được các vấn đề kỹ thuật khi sử dụng môi trường số và vận hành các thiết bị số.\nb- Áp dụng được các giải pháp khác nhau cho chúng."
+      }
+    },
+    "5.2": {
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "levels": {
+        "CB1": " a- Xác định được nhu cầu\ncá nhân.\nb- Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó.\nc- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+        "CB2": " a- Xác định được nhu cầu\ncá nhân.\nb- Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó.\nc- Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+        "TC1": " a- Chỉ ra được những nhu cầu được xác định rõ ràng và thường xuyên, và\nb- Chọn được các công cụ\nsố thông thường và được xác định rõ ràng cũng như các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó.\nc-Chọn được những cách thông thường và được xác định rõ ràng để điều chỉnh và tùy chỉnh môi trường số\ntheo nhu cầu cá nhân.",
+        "TC2": " a- Giải thích nhu cầu cá nhân, và\nb- Lựa chọn được các công cụ số và các giải pháp công nghệ có thể có để giải\nquyết những nhu cầu đó. c-Chọn được cách điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân.",
+        "NC1": " a- Đánh giá được nhu cầu cá nhân,\nb- Áp dụng được các công cụ số khác nhau và các giải pháp công nghệ có thể có để giải quyết những nhu cầu\nđó.\nc-Sử dụng được các cách khác nhau để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+      }
+    },
+    "5.3": {
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "levels": {
+        "CB1": " a- Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm.\nb- Thể hiện được sự quan tâm của cá nhân và tập thể đến quá trình xử lý\nnhận thức đơn giản để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số.",
+        "CB2": " a- Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm.\nb- Tuân theo quy trình nhận thức đơn giản của cá nhân và tập thể để hiểu và\ngiải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số.",
+        "TC1": " a- Chọn được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức rõ ràng cũng như các quy trình và sản phẩm đổi mới được xác định rõ ràng.\nb- Gắn kết được cá nhân\nvà tập thể vào một số quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề mang tính khái niệm và tình huống có vấn đề thông thường và được xác định rõ ràng trong môi\ntrường số.",
+        "TC2": " a- Phân biệt được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình và sản phẩm.\nb- Gắn kết được cá nhân và tập thể vào quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề khái niệm và tình huống có vấn đề trong\nmôi trường số.",
+        "NC1": " a- Áp dụng được các công cụ và công nghệ số khác nhau để tạo ra kiến thức cũng như các quy trình và sản phẩm đổi mới.\nb- Áp dụng xử lý nhận thức của cá nhân và tập thể để giải quyết các vấn đề khái niệm và tình huống có vấn đề khác\nnhau trong môi trường số. "
+      }
+    },
+    "5.4": {
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "levels": {
+        "CB1": " a- Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu.\n b- Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+        "CB2": " a- Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu.\n b- Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+        "TC1": " Giải thích được NLS của bản thân cần được cải thiện hoặc cập nhật ở đâu,  a- b-Chỉ ra được nơi để tìm kiếm các cơ hội được xác định rõ ràng để phát triển bản thân và cập nhật sự phát triển công nghệ số.",
+        "TC2": " a- Thảo luận về lĩnh vực NLS của bản thân cần được cải thiện hoặc cập nhật,\n b- Chỉ ra được cách hỗ trợ người khác phát triển NLS của họ.\nc- Chỉ ra được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát\ntriển công nghệ số.",
+        "NC1": " a- Chứng minh được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu,\n b- Minh họa được những cách khác nhau để hỗ trợ người khác phát triển NLS của họ.\nc- Đề xuất được các cơ hội khác nhau để phát triển bản thân và cập nhật sự phát triển công nghệ số."
+      }
+    },
+    "6.1": {
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "levels": {
+        "CB1": " ",
+        "CB2": " a- Xác định được các khái niệm cơ bản của AI.\nb- Nhớ lại được các ứng dụng đơn giản của AI trong cuộc sống hàng ngày.",
+        "TC1": " a- Giải thích được nguyên tắc hoạt động cơ bản của AI.\nb- Diễn giải được các thuật ngữ và khái niệm liên quan đến AI.",
+        "TC2": " a- Áp dụng được các nguyên tắc cơ bản của AI để giải quyết vấn đề đơn giản.\nb- Thực hiện được các thao tác cơ bản trên các công cụ AI.",
+        "NC1": " a- Phân tích được cách AI hoạt động trong các ứng dụng cụ thể. b- So sánh được các hệ thống AI khác nhau và cách chúng xử lý dữ liệu."
+      }
+    },
+    "6.2": {
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "levels": {
+        "CB1": " a- Nhận diện được các công cụ AI đơn giản.\nb- Thực hiện được các thao tác cơ bản với các công cụ AI.\nc- Nhận thức được cơ bản về các vấn đề đạo đức và pháp lý liên quan đến AI.",
+        "CB2": " a- Áp dụng được các công cụ AI để giải quyết vấn đề đơn giản.\nb- Tương tác được với các hệ thống AI cơ bản.\nc- Tuân thủ các quy định\npháp luật cơ bản khi sử dụng AI. ",
+        "TC1": " a- Sử dụng được các công cụ AI trong công việc và học tập hàng ngày.\nb- Thực hành được các kỹ năng sử dụng AI thông qua các bài tập và dự án nhỏ. c- Xem xét các khía cạnh đạo đức khi sử dụng AI, bảo đảm không vi phạm quyền riêng tư và bảo mật\ndữ liệu.",
+        "TC2": " a- Tối ưu hóa việc sử dụng các công cụ AI để đạt hiệu quả cao hơn.\nb- Quản lý được việc triển khai các công cụ AI trong các dự án nhỏ.\nc- Bảo vệ được dữ liệu cá\nnhân và tuân thủ các quy định pháp luật về bảo mật thông tin khi sử dụng AI.",
+        "NC1": " a- Phát triển được các ứng dụng AI tùy chỉnh để giải quyết các vấn đề cụ thể.\nb- Điều chỉnh được các hệ thống AI để phù hợp với nhu cầu cụ thể. c- Đánh giá và giảm thiểu được các rủi ro đạo đức và pháp lý liên quan đến việc sử dụng AI."
+      }
+    },
+    "6.3": {
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "levels": {
+        "CB1": " a- Nhận diện được một số vật dụng/trò chơi thông minh có sử dụng AI\nb- Nhớ được rằng không\nphải mọi thông tin từ máy móc đều đúng",
+        "CB2": " a- Nhận diện được các yếu tố cơ bản của hệ thống AI cần được đánh giá.\nb- Mô tả được các chức năng chính của hệ thống AI. ",
+        "TC1": " a- Giải thích được cách thức hoạt động của các hệ thống AI đơn giản.\nb- Tóm tắt được các đặc điểm và ứng dụng của hệ thống AI.",
+        "TC2": " a- Phân tích được hiệu quả của hệ thống AI trong việc giải quyết các vấn đề cụ thể.\nb- So sánh được hiệu suất của các hệ thống AI khác nhau.",
+        "NC1": " \na- Đánh giá được độ chính xác và tin cậy của các hệ thống AI.\nb- Xem xét được các kết quả và đưa ra nhận xét về hiệu quả của hệ thống AI."
+      }
+    }
+  },
+  "indicators": [
+    {
+      "code": "1.1.CB1a",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB1",
+      "description": "Xác định được nhu cầu thông tin, tìm kiếm dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số"
+    },
+    {
+      "code": "1.1.CB1b",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB1",
+      "description": "Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng"
+    },
+    {
+      "code": "1.1.CB1c",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB1",
+      "description": "Xác định được các chiến lược tìm kiếm đơn giản."
+    },
+    {
+      "code": "1.1.CB2a",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Xác định được nhu cầu thông tin."
+    },
+    {
+      "code": "1.1.CB2b",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Tìm được dữ liệu, thông tin và nội dung thông qua tìm kiếm đơn giản trong môi trường số"
+    },
+    {
+      "code": "1.1.CB2c",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Tìm được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng"
+    },
+    {
+      "code": "1.1.CB2d",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Xác định được các chiến lược tìm kiếm đơn giản."
+    },
+    {
+      "code": "1.1.TC1a",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Giải thích được nhu cầu thông tin"
+    },
+    {
+      "code": "1.1.TC1b",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Thực hiện được rõ ràng và theo quy trình các tìm kiếm để tìm dữ liệu, thông tin và nội dung trong môi trường số"
+    },
+    {
+      "code": "1.1.TC1c",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Giải thích được cách truy cập và điều hướng các kết quả tìm kiếm"
+    },
+    {
+      "code": "1.1.TC1d",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Giải thích được rõ ràng và theo quy trình chiến lược tìm kiếm."
+    },
+    {
+      "code": "1.1.TC2a",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Minh họa được nhu cầu thông tin"
+    },
+    {
+      "code": "1.1.TC2b",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Tổ chức được tìm kiếm dữ liệu, thông tin và nội dung trong môi trường số"
+    },
+    {
+      "code": "1.1.TC2c",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Mô tả được cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng"
+    },
+    {
+      "code": "1.1.TC2d",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Tổ chức được các chiến lược tìm kiếm."
+    },
+    {
+      "code": "1.1.NC1a",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Đáp ứng được nhu cầu thông tin"
+    },
+    {
+      "code": "1.1.NC1b",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Áp dụng được kỹ thuật tìm kiếm để lấy được dữ liệu, thông tin và nội dung trong môi trường số"
+    },
+    {
+      "code": "1.1.NC1c",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Chỉ cho người khác cách truy cập những dữ liệu, thông tin và nội dung này cũng như điều hướng giữa chúng."
+    },
+    {
+      "code": "1.1.NC1d",
+      "component": "1.1",
+      "name": "Duyệt, tìm kiếm và lọc dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Tự đề xuất được chiến lược tìm kiếm."
+    },
+    {
+      "code": "1.2.CB1a",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB1",
+      "description": "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "1.2.CB2a",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Phát hiện được độ tin cậy và độ chính xác của các nguồn chung của dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "1.2.TC1a",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Thực hiện phân tích, so sánh, đánh giá được độ tin cậy và độ chính xác của các nguồn dữ liệu, thông tin và nội dung số đã được tổ chức rõ ràng."
+    },
+    {
+      "code": "1.2.TC1b",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số được xác định rõ ràng."
+    },
+    {
+      "code": "1.2.TC2a",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Thực hiện phân tích, so sánh và đánh giá được các nguồn dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "1.2.TC2b",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Thực hiện phân tích, diễn giải và đánh giá được dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "1.2.NC1a",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Thực hiện đánh giá được độ tin cậy và độ tin cậy của các nguồn dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "1.2.NC1b",
+      "component": "1.2",
+      "name": "Đánh giá dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Tiến hành đánh giá được các dữ liệu, thông tin và nội dung số khác nhau."
+    },
+    {
+      "code": "1.3.CB1a",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB1",
+      "description": "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số."
+    },
+    {
+      "code": "1.3.CB1b",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB1",
+      "description": "Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc."
+    },
+    {
+      "code": "1.3.CB2a",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Xác định được cách tổ chức, lưu trữ và truy xuất dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường số."
+    },
+    {
+      "code": "1.3.CB2b",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "CB2",
+      "description": "Nhận biết được nơi để sắp xếp dữ liệu, thông tin và nội dung một cách đơn giản trong môi trường có cấu trúc."
+    },
+    {
+      "code": "1.3.TC1a",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Lựa chọn được dữ liệu, thông tin và nội dung để tổ chức, lưu trữ và truy xuất chúng một cách thường xuyên trong môi trường số."
+    },
+    {
+      "code": "1.3.TC1b",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC1",
+      "description": "Sắp xếp chúng một cách trật tự trong một môi trường có cấu trúc."
+    },
+    {
+      "code": "1.3.TC2a",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Sắp xếp được thông tin, dữ liệu, nội dung để dễ dàng lưu trữ và truy xuất."
+    },
+    {
+      "code": "1.3.TC2b",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "TC2",
+      "description": "Tổ chức được thông tin, dữ liệu và nội dung trong một môi trường có cấu trúc."
+    },
+    {
+      "code": "1.3.NC1a",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Thao tác được thông tin, dữ liệu và nội dung để tổ chức, lưu trữ và truy xuất dễ dàng hơn."
+    },
+    {
+      "code": "1.3.NC1b",
+      "component": "1.3",
+      "name": "Quản lý dữ liệu, thông tin và nội dung số",
+      "domain": "1. Khai thác dữ liệu và thông tin",
+      "level": "NC1",
+      "description": "Triển khai được việc tổ chức và sắp xếp dữ liệu, thông tin và nội dung trong môi trường có cấu trúc."
+    },
+    {
+      "code": "2.1.CB1a",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Lựa chọn được các công nghệ số đơn giản để tương tác."
+    },
+    {
+      "code": "2.1.CB1b",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể."
+    },
+    {
+      "code": "2.1.CB2a",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Lựa chọn được các công nghệ số đơn giản để tương tác."
+    },
+    {
+      "code": "2.1.CB2b",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Xác định được các phương tiện giao tiếp đơn giản thích hợp cho một bối cảnh cụ thể."
+    },
+    {
+      "code": "2.1.TC1a",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Thực hiện được các tương tác được xác định rõ ràng và thường xuyên với các công nghệ số."
+    },
+    {
+      "code": "2.1.TC1b",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Lựa chọn được các phương tiện giao tiếp số phù hợp, được xác định rõ ràng cho phù hợp với bối cảnh nhất định."
+    },
+    {
+      "code": "2.1.TC2a",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Lựa chọn được nhiều công nghệ số để tương tác."
+    },
+    {
+      "code": "2.1.TC2b",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Lựa chọn được nhiều phương tiện truyền thông số cho phù hợp với bối cảnh nhất định."
+    },
+    {
+      "code": "2.1.NC1a",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Sử dụng được nhiều công nghệ số để tương tác."
+    },
+    {
+      "code": "2.1.NC1b",
+      "component": "2.1",
+      "name": "Tương tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Cho người khác thấy phương tiện giao tiếp số phù hợp nhất cho một bối cảnh cụ thể."
+    },
+    {
+      "code": "2.2.CB1a",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số."
+    },
+    {
+      "code": "2.2.CB1b",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Nhận biết được phương pháp trích dẫn và ghi nguồn cơ bản."
+    },
+    {
+      "code": "2.2.CB2a",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Nhận biết được các công nghệ số đơn giản, phù hợp để chia sẻ dữ liệu, thông tin và nội dung kỹ thuật số."
+    },
+    {
+      "code": "2.2.CB2b",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Xác định được phương pháp trích dẫn và ghi nguồn cơ bản."
+    },
+    {
+      "code": "2.2.TC1a",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Lựa chọn các công nghệ số phù hợp được xác định rõ để trao đổi dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "2.2.TC1b",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Giải thích cách thức hoạt động như một trung gian để chia sẻ thông tin và nội dung thông qua các công nghệ kỹ thuật số được xác định rõ ràng và thường xuyên"
+    },
+    {
+      "code": "2.2.TC1c",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Minh họa rõ ràng và thường xuyên các phương pháp tham chiếu và ghi chú nguồn."
+    },
+    {
+      "code": "2.2.TC2a",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Vận dụng được các công nghệ số phù hợp để chia sẻ dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "2.2.TC2b",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Giải thích được cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số."
+    },
+    {
+      "code": "2.2.TC2c",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Áp dụng được các phương pháp tham chiếu và ghi chú nguồn."
+    },
+    {
+      "code": "2.2.NC1a",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Chia sẻ dữ liệu, thông tin và nội dung số thông qua nhiều công cụ số phù hợp"
+    },
+    {
+      "code": "2.2.NC1b",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Hướng dẫn người khác cách đóng vai trò trung gian để chia sẻ thông tin và nội dung thông qua công nghệ số."
+    },
+    {
+      "code": "2.2.NC1c",
+      "component": "2.2",
+      "name": "Chia sẻ thông tin và nội dung thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Áp dụng được nhiều phương pháp tham chiếu và ghi nguồn khác nhau."
+    },
+    {
+      "code": "2.3.CB1a",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội."
+    },
+    {
+      "code": "2.3.CB1b",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân."
+    },
+    {
+      "code": "2.3.CB2a",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Xác định được các dịch vụ số đơn giản để có thể tham gia vào xã hội."
+    },
+    {
+      "code": "2.3.CB2b",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Nhận biết được các công nghệ số đơn giản, phù hợp để nâng cao năng lực cho bản thân và tham gia vào xã hội với tư cách là một công dân."
+    },
+    {
+      "code": "2.3.TC1a",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Lựa chọn được các dịch vụ số được xác định rõ ràng và phổ biến để tham gia vào xã hội."
+    },
+    {
+      "code": "2.3.TC1b",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Xác định được các công nghệ số rõ ràng và thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân."
+    },
+    {
+      "code": "2.3.TC2a",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Lựa chọn được các dịch vụ số để tham gia vào xã hội."
+    },
+    {
+      "code": "2.3.TC2b",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Thảo luận về các công nghệ số phù hợp để nâng cao năng lực của bản thân và tham gia vào xã hội với tư cách là một công."
+    },
+    {
+      "code": "2.3.NC1a",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Đề xuất được các dịch vụ số khác nhau để tham gia vào xã hội."
+    },
+    {
+      "code": "2.3.NC1b",
+      "component": "2.3",
+      "name": "Sử dụng công nghệ số để thực hiện trách nhiệm công dân",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Sử dụng được các công nghệ số thích hợp để tự mình trang bị và tham gia vào xã hội như một công dân."
+    },
+    {
+      "code": "2.4.CB1a",
+      "component": "2.4",
+      "name": "Hợp tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác."
+    },
+    {
+      "code": "2.4.CB2a",
+      "component": "2.4",
+      "name": "Hợp tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Chọn được những công cụ và công nghệ số đơn giản cho các quá trình cộng tác."
+    },
+    {
+      "code": "2.4.TC1a",
+      "component": "2.4",
+      "name": "Hợp tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Lựa chọn được các công cụ và công nghệ số được xác định rõ ràng và thường xuyên cho các quá trình hợp tác."
+    },
+    {
+      "code": "2.4.TC2a",
+      "component": "2.4",
+      "name": "Hợp tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Lựa chọn được các công cụ và công nghệ số cho các quá trình hợp tác."
+    },
+    {
+      "code": "2.4.NC1a",
+      "component": "2.4",
+      "name": "Hợp tác thông qua công nghệ số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Đề xuất được các công cụ và công nghệ số khác nhau cho các quá trình hợp tác."
+    },
+    {
+      "code": "2.5.CB1a",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Phân biệt được các chuẩn mực hành vi đơn giản và biết cách sử dụng công nghệ số và tương tác trong môi trường số."
+    },
+    {
+      "code": "2.5.CB1b",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số."
+    },
+    {
+      "code": "2.5.CB1c",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số."
+    },
+    {
+      "code": "2.5.CB2a",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Phân biệt được các chuẩn mực hành vi đơn giản và bí quyết sử dụng công nghệ số và tương tác trong môi trường số."
+    },
+    {
+      "code": "2.5.CB2b",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Chọn được các phương thức và chiến lược giao tiếp đơn giản phù hợp trong môi trường số."
+    },
+    {
+      "code": "2.5.CB2c",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Phân biệt các khía cạnh đơn giản của sự đa dạng về văn hóa và thế hệ cần được tính đến trong môi trường số."
+    },
+    {
+      "code": "2.5.TC1a",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Làm rõ được các chuẩn mực hành vi thường xuyên và được xác định rõ ràng cũng như bí quyết khi sử dụng công nghệ số và tương tác trong môi trường số."
+    },
+    {
+      "code": "2.5.TC1b",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Thể hiện được các chiến lược giao tiếp thường xuyên và xác định rõ ràng phương thức giao tiếp phù hợp trong môi trường số."
+    },
+    {
+      "code": "2.5.TC1c",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Mô tả các khía cạnh đa dạng về văn hóa và thế hệ được xác định rõ ràng và thông thường cần xem xét trong môi trường số."
+    },
+    {
+      "code": "2.5.TC2a",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Thảo luận về các chuẩn mực hành vi và cách sử dụng công nghệ số và tương tác trong môi trường số."
+    },
+    {
+      "code": "2.5.TC2b",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Thảo luận các chiến lược giao tiếp phù hợp trong môi trường số."
+    },
+    {
+      "code": "2.5.TC2c",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Thảo luận các khía cạnh đa dạng về văn hóa và thế hệ cần xem xét trong môi trường số."
+    },
+    {
+      "code": "2.5.NC1a",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Áp dụng được các chuẩn mực hành vi và bí quyết khác nhau khi sử dụng công nghệ số và tương tác trong môi trường số."
+    },
+    {
+      "code": "2.5.NC1b",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Áp dụng được các chiến lược giao tiếp khác nhau trong môi trường số một cách phù hợp."
+    },
+    {
+      "code": "2.5.NC1c",
+      "component": "2.5",
+      "name": "Quy tắc ứng xử trên mạng",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Áp dụng được các khía cạnh đa dạng về văn hóa và thế hệ khác nhau để xem xét trong môi trường số."
+    },
+    {
+      "code": "2.6.CB1a",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Xác định được danh tính số."
+    },
+    {
+      "code": "2.6.CB1b",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân."
+    },
+    {
+      "code": "2.6.CB1c",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB1",
+      "description": "Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số."
+    },
+    {
+      "code": "2.6.CB2a",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Xác định được danh tính số."
+    },
+    {
+      "code": "2.6.CB2b",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Mô tả được những cách đơn giản để bảo vệ danh tiếng trực tuyến của bản thân."
+    },
+    {
+      "code": "2.6.CB2c",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "CB2",
+      "description": "Nhận biết được dữ liệu đơn giản do mình tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số."
+    },
+    {
+      "code": "2.6.TC1a",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Phân biệt được một loạt các danh tính số thông thường và được xác định rõ ràng."
+    },
+    {
+      "code": "2.6.TC1b",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Giải thích được những cách được xác định rõ ràng và thường xuyên để bảo vệ danh tiếng trực tuyến của bản thân."
+    },
+    {
+      "code": "2.6.TC1c",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC1",
+      "description": "Mô tả dữ liệu được xác định rõ ràng mà bạn thường xuyên thu được thông qua các công cụ, môi trường hoặc dịch vụ số."
+    },
+    {
+      "code": "2.6.TC2a",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Hiển thị được nhiều danh tính số cụ thể"
+    },
+    {
+      "code": "2.6.TC2b",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Thảo luận những cách cụ thể để bảo vệ danh tiếng trực tuyến của bản thân."
+    },
+    {
+      "code": "2.6.TC2c",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "TC2",
+      "description": "Thao tác dữ liệu cá nhân tạo ra thông qua các công cụ, môi trường hoặc dịch vụ số."
+    },
+    {
+      "code": "2.6.NC1a",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Sử dụng được nhiều danh tính số khác nhau."
+    },
+    {
+      "code": "2.6.NC1b",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Áp dụng được các cách khác nhau để bảo vệ danh tính trực tuyến của bản thân."
+    },
+    {
+      "code": "2.6.NC1c",
+      "component": "2.6",
+      "name": "Quản lý danh tính số",
+      "domain": "2. Giao tiếp và Hợp tác",
+      "level": "NC1",
+      "description": "Sử dụng được dữ liệu tạo ra thông qua công cụ, môi trường và một số dịch vụ số."
+    },
+    {
+      "code": "3.1.CB1a",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB1",
+      "description": "Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản"
+    },
+    {
+      "code": "3.1.CB1b",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB1",
+      "description": "Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản."
+    },
+    {
+      "code": "3.1.CB2a",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB2",
+      "description": "Xác định được các cách tạo và chỉnh sửa nội dung đơn giản ở các định dạng đơn giản"
+    },
+    {
+      "code": "3.1.CB2b",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB2",
+      "description": "Chọn được cách thể hiện bản thân thông qua việc tạo ra các nội dung số đơn giản."
+    },
+    {
+      "code": "3.1.TC1a",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC1",
+      "description": "Chỉ ra được cách tạo và chỉnh sửa nội dung có khái niệm cụ thể và mang tính phổ thông bằng những định dạng rõ ràng, phổ biến"
+    },
+    {
+      "code": "3.1.TC1b",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC1",
+      "description": "Thể hiện được bản thân thông qua việc tạo ra các nội dung số thông thường và được xác định rõ ràng."
+    },
+    {
+      "code": "3.1.TC2a",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC2",
+      "description": "Chỉ ra được cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau"
+    },
+    {
+      "code": "3.1.TC2b",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC2",
+      "description": "Thể hiện được bản thân thông qua việc tạo ra các nội dung số."
+    },
+    {
+      "code": "3.1.NC1a",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "NC1",
+      "description": "Áp dụng được các cách tạo và chỉnh sửa nội dung ở các định dạng khác nhau"
+    },
+    {
+      "code": "3.1.NC1b",
+      "component": "3.1",
+      "name": "Phát triển nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "NC1",
+      "description": "Chỉ ra được những cách thể hiện bản thân thông qua việc tạo ra các nội dung số."
+    },
+    {
+      "code": "3.2.CB1a",
+      "component": "3.2",
+      "name": "Tích hợp và tạo lập lại nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB1",
+      "description": "Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo."
+    },
+    {
+      "code": "3.2.CB2a",
+      "component": "3.2",
+      "name": "Tích hợp và tạo lập lại nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB2",
+      "description": "Chọn được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục đơn giản có nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo."
+    },
+    {
+      "code": "3.2.TC1a",
+      "component": "3.2",
+      "name": "Tích hợp và tạo lập lại nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC1",
+      "description": "Giải thích được các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp các mục nội dung và thông tin mới được xác định rõ ràng để tạo ra những nội dung và thông tin mới và độc đáo."
+    },
+    {
+      "code": "3.2.TC2a",
+      "component": "3.2",
+      "name": "Tích hợp và tạo lập lại nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC2",
+      "description": "Thảo luận các cách sửa đổi, tinh chỉnh, cải thiện và tích hợp nội dung và thông tin mới để tạo ra những nội dung và thông tin mới và độc đáo."
+    },
+    {
+      "code": "3.2.NC1a",
+      "component": "3.2",
+      "name": "Tích hợp và tạo lập lại nội dung số",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "NC1",
+      "description": "Làm việc với các mục nội dung và thông tin mới khác nhau, sửa đổi, tinh chỉnh, cải thiện và tích hợp chúng để tạo ra những mục mới và độc đáo."
+    },
+    {
+      "code": "3.3.CB1a",
+      "component": "3.3",
+      "name": "Thực thi bản quyền và giấy phép",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB1",
+      "description": "Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "3.3.CB2a",
+      "component": "3.3",
+      "name": "Thực thi bản quyền và giấy phép",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB2",
+      "description": "Xác định được các quy tắc đơn giản về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "3.3.TC1a",
+      "component": "3.3",
+      "name": "Thực thi bản quyền và giấy phép",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC1",
+      "description": "Chỉ ra được các quy tắc thông thường và được xác định rõ ràng về bản quyền và giấy phép áp dụng cho dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "3.3.TC2a",
+      "component": "3.3",
+      "name": "Thực thi bản quyền và giấy phép",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC2",
+      "description": "Thảo luận các quy tắc về bản quyền và giấy phép áp dụng cho thông tin và nội dung số."
+    },
+    {
+      "code": "3.3.NC1a",
+      "component": "3.3",
+      "name": "Thực thi bản quyền và giấy phép",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "NC1",
+      "description": "Áp dụng được các quy định khác nhau về bản quyền và giấy phép cho dữ liệu, thông tin và nội dung số."
+    },
+    {
+      "code": "3.4.CB1a",
+      "component": "3.4",
+      "name": "Lập trình",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB1",
+      "description": "Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản."
+    },
+    {
+      "code": "3.4.CB2a",
+      "component": "3.4",
+      "name": "Lập trình",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "CB2",
+      "description": "Liệt kê được các hướng dẫn đơn giản để hệ thống máy tính giải quyết một vấn đề đơn giản hoặc thực hiện một nhiệm vụ đơn giản."
+    },
+    {
+      "code": "3.4.TC1a",
+      "component": "3.4",
+      "name": "Lập trình",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC1",
+      "description": "Liệt kê được các hướng dẫn thông thường và được xác định rõ ràng cho một hệ thống máy tính để giải quyết các vấn đề thường ngày hoặc thực hiện các tác vụ thường ngày."
+    },
+    {
+      "code": "3.4.TC2a",
+      "component": "3.4",
+      "name": "Lập trình",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "TC2",
+      "description": "Liệt kê được các hướng dẫn cho một hệ thống máy tính để giải quyết một vấn đề nhất định hoặc thực hiện một nhiệm vụ cụ thể."
+    },
+    {
+      "code": "3.4.NC1a",
+      "component": "3.4",
+      "name": "Lập trình",
+      "domain": "3. Sáng tạo nội dung số",
+      "level": "NC1",
+      "description": "Tự thao tác được bằng các hướng dẫn dành cho hệ thống máy tính để giải quyết một vấn đề khác hoặc thực hiện các nhiệm vụ khác nhau."
+    },
+    {
+      "code": "4.1.CB1a",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản."
+    },
+    {
+      "code": "4.1.CB1b",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số."
+    },
+    {
+      "code": "4.1.CB1c",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Chọn lựa được các biện pháp an toàn và bảo mật đơn giản."
+    },
+    {
+      "code": "4.1.CB1d",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư."
+    },
+    {
+      "code": "4.1.CB2a",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Nhận biết được cách bảo vệ thiết bị và nội dung số một cách đơn giản."
+    },
+    {
+      "code": "4.1.CB2b",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Phân biệt được rủi ro và mối đe dọa đơn giản trong môi trường số."
+    },
+    {
+      "code": "4.1.CB2c",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Tuân theo được các biện pháp an toàn và bảo mật đơn giản."
+    },
+    {
+      "code": "4.1.CB2d",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Nhận biết được những cách thức đơn giản để quan tâm đến mức độ tin cậy và quyền riêng tư."
+    },
+    {
+      "code": "4.1.TC1a",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Chỉ ra được những cách thức cơ bản và phổ biến để bảo vệ thiết bị và nội dung số."
+    },
+    {
+      "code": "4.1.TC1b",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Phân biệt được những rủi ro và mối đe dọa cơ bản và phổ biến trong môi trường số."
+    },
+    {
+      "code": "4.1.TC1c",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Chọn lựa được các biện pháp an toàn và bảo mật rõ ràng và thường xuyên."
+    },
+    {
+      "code": "4.1.TC1d",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Chỉ ra được những cách thức cơ bản và phổ biến để quan tâm đến mức độ tin cậy và quyền riêng tư."
+    },
+    {
+      "code": "4.1.TC2a",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Thiết lập được những cách thức bảo vệ thiết bị và nội dung số."
+    },
+    {
+      "code": "4.1.TC2b",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Phân biệt được rủi ro và mối đe dọa trong môi trường số."
+    },
+    {
+      "code": "4.1.TC2c",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Chọn lựa được các biện pháp an toàn và bảo mật."
+    },
+    {
+      "code": "4.1.TC2d",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Giải thích được các cách thức để quan tâm đến mức độ tin cậy và quyền riêng tư."
+    },
+    {
+      "code": "4.1.NC1a",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Áp dụng được các cách khác nhau để bảo vệ thiết bị và nội dung số."
+    },
+    {
+      "code": "4.1.NC1b",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Nhận thức được sự đa dạng của các rủi ro và đe dọa trong môi trường số."
+    },
+    {
+      "code": "4.1.NC1c",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Áp dụng được các biện pháp an toàn và bảo mật."
+    },
+    {
+      "code": "4.1.NC1d",
+      "component": "4.1",
+      "name": "Bảo vệ thiết bị",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Sử dụng được các cách thức khác nhau để quan tâm đến mức độ tin cậy và quyền riêng tư."
+    },
+    {
+      "code": "4.2.CB1a",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số."
+    },
+    {
+      "code": "4.2.CB1b",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác."
+    },
+    {
+      "code": "4.2.CB1c",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số."
+    },
+    {
+      "code": "4.2.CB2a",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Lựa chọn được những cách thức đơn giản để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số."
+    },
+    {
+      "code": "4.2.CB2b",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Nhận biết được các cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn, có khả năng bảo vệ bản thân và người khác."
+    },
+    {
+      "code": "4.2.CB2c",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Nhận diện được các tuyên bố cơ bản trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong dịch vụ số."
+    },
+    {
+      "code": "4.2.TC1a",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Giải thích được các cách thức cơ bản và phổ biến để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số."
+    },
+    {
+      "code": "4.2.TC1b",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Giải thích được các cách thức cơ bản và phổ biến để sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn."
+    },
+    {
+      "code": "4.2.TC1c",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Chỉ ra được các tuyên bố cơ bản và phổ biến trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+    },
+    {
+      "code": "4.2.TC2a",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Thảo luận về cách bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số."
+    },
+    {
+      "code": "4.2.TC2b",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Thảo luận về cách sử dụng và chia sẻ thông tin định danh cá nhân một cách an toàn."
+    },
+    {
+      "code": "4.2.TC2c",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Chỉ ra được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+    },
+    {
+      "code": "4.2.NC1a",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Áp dụng được các cách thức khác nhau để bảo vệ dữ liệu cá nhân và quyền riêng tư trong môi trường số."
+    },
+    {
+      "code": "4.2.NC1b",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Áp dụng được các cách thức đặc thù để chia sẻ dữ liệu cá nhân một cách an toàn."
+    },
+    {
+      "code": "4.2.NC1c",
+      "component": "4.2",
+      "name": "Bảo vệ dữ liệu cá nhân và quyền riêng tư",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Giải thích được các tuyên bố trong chính sách quyền riêng tư về cách sử dụng dữ liệu cá nhân trong các dịch vụ số."
+    },
+    {
+      "code": "4.3.CB1a",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số."
+    },
+    {
+      "code": "4.3.CB1b",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số."
+    },
+    {
+      "code": "4.3.CB1c",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+    },
+    {
+      "code": "4.3.CB2a",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Phân biệt được các cách thức đơn giản để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số."
+    },
+    {
+      "code": "4.3.CB2b",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Lựa chọn được những cách thức đơn giản để bảo vệ bản thân khỏi nguy cơ trong môi trường số."
+    },
+    {
+      "code": "4.3.CB2c",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Nhận biết được những công nghệ số đơn giản cho tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+    },
+    {
+      "code": "4.3.TC1a",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Giải thích được những cách thức cơ bản và phổ biến để tránh rủi ro và đe dọa đối với sức khỏe thể chất và tinh thần khi sử dụng công nghệ số."
+    },
+    {
+      "code": "4.3.TC1b",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Lựa chọn được những cách thức cơ bản và phổ biến để bảo vệ bản thân khỏi nguy cơ trong môi trường số."
+    },
+    {
+      "code": "4.3.TC1c",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Chỉ ra được những công nghệ số cơ bản và phổ biến giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+    },
+    {
+      "code": "4.3.TC2a",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Giải thích được những cách thức để tránh những sự đe dọa liên quan đến việc sử dụng công nghệ số đối với sức khỏe thể chất và tinh thần."
+    },
+    {
+      "code": "4.3.TC2b",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Lựa chọn được cách thức bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số."
+    },
+    {
+      "code": "4.3.TC2c",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Thảo luận về những công nghệ số giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+    },
+    {
+      "code": "4.3.NC1a",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Trình bày được các cách thức khác nhau để tránh rủi ro và đe dọa đến sức khỏe thể chất và tinh thần khi sử dụng công nghệ số."
+    },
+    {
+      "code": "4.3.NC1b",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Áp dụng được các cách thức khác nhau để bảo vệ bản thân và người khác khỏi nguy cơ trong môi trường số."
+    },
+    {
+      "code": "4.3.NC1c",
+      "component": "4.3",
+      "name": "Bảo vệ sức khỏe và an sinh số",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Trình bày được các công nghệ số khác nhau giúp tăng cường thịnh vượng xã hội và sự hòa hợp trong xã hội."
+    },
+    {
+      "code": "4.4.CB1a",
+      "component": "4.4",
+      "name": "Bảo vệ môi trường",
+      "domain": "4. An toàn",
+      "level": "CB1",
+      "description": "Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường."
+    },
+    {
+      "code": "4.4.CB2a",
+      "component": "4.4",
+      "name": "Bảo vệ môi trường",
+      "domain": "4. An toàn",
+      "level": "CB2",
+      "description": "Nhận biết được tác động cơ bản của công nghệ số và việc sử dụng công nghệ số đối với môi trường."
+    },
+    {
+      "code": "4.4.TC1a",
+      "component": "4.4",
+      "name": "Bảo vệ môi trường",
+      "domain": "4. An toàn",
+      "level": "TC1",
+      "description": "Chỉ ra được những tác động cơ bản và phổ biến của công nghệ số và việc sử dụng công nghệ số đối với môi trường."
+    },
+    {
+      "code": "4.4.TC2a",
+      "component": "4.4",
+      "name": "Bảo vệ môi trường",
+      "domain": "4. An toàn",
+      "level": "TC2",
+      "description": "Thảo luận về các cách thức bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số."
+    },
+    {
+      "code": "4.4.NC1a",
+      "component": "4.4",
+      "name": "Bảo vệ môi trường",
+      "domain": "4. An toàn",
+      "level": "NC1",
+      "description": "Trình bày được các cách thức khác nhau để bảo vệ môi trường khỏi tác động của công nghệ số và việc sử dụng công nghệ số."
+    },
+    {
+      "code": "5.1.CB1a",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số."
+    },
+    {
+      "code": "5.1.CB1b",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Xác định được các giải pháp đơn giản để giải quyết chúng."
+    },
+    {
+      "code": "5.1.CB2a",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Xác định được các vấn đề kỹ thuật đơn giản khi vận hành thiết bị và sử dụng môi trường số."
+    },
+    {
+      "code": "5.1.CB2b",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Xác định được các giải pháp đơn giản để giải quyết chúng."
+    },
+    {
+      "code": "5.1.TC1a",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chỉ ra được các vấn đề kỹ thuật thông thường và được xác định rõ ràng khi vận hành thiết bị và sử dụng môi trường số."
+    },
+    {
+      "code": "5.1.TC1b",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chọn được các giải pháp được xác định rõ ràng và thông thường cho chúng."
+    },
+    {
+      "code": "5.1.TC2a",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Phân biệt được các vấn đề kỹ thuật khi vận hành thiết bị và sử dụng môi trường số."
+    },
+    {
+      "code": "5.1.TC2b",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Chọn được giải pháp cho chúng."
+    },
+    {
+      "code": "5.1.NC1a",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Đánh giá được các vấn đề kỹ thuật khi sử dụng môi trường số và vận hành các thiết bị số."
+    },
+    {
+      "code": "5.1.NC1b",
+      "component": "5.1",
+      "name": "Giải quyết các vấn đề kỹ thuật",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Áp dụng được các giải pháp khác nhau cho chúng."
+    },
+    {
+      "code": "5.2.CB1a",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Xác định được nhu cầu cá nhân."
+    },
+    {
+      "code": "5.2.CB1b",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó."
+    },
+    {
+      "code": "5.2.CB1c",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+    },
+    {
+      "code": "5.2.CB2a",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Xác định được nhu cầu cá nhân."
+    },
+    {
+      "code": "5.2.CB2b",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Nhận ra được các công cụ số đơn giản và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó."
+    },
+    {
+      "code": "5.2.CB2c",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Chọn được những cách đơn giản để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+    },
+    {
+      "code": "5.2.TC1a",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chỉ ra được những nhu cầu được xác định rõ ràng và thường xuyên, và"
+    },
+    {
+      "code": "5.2.TC1b",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chọn được các công cụ số thông thường và được xác định rõ ràng cũng như các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó."
+    },
+    {
+      "code": "5.2.TC1c",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chọn được những cách thông thường và được xác định rõ ràng để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+    },
+    {
+      "code": "5.2.TC2a",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Giải thích nhu cầu cá nhân, và"
+    },
+    {
+      "code": "5.2.TC2b",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Lựa chọn được các công cụ số và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó."
+    },
+    {
+      "code": "5.2.TC2c",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Chọn được cách điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+    },
+    {
+      "code": "5.2.NC1a",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Đánh giá được nhu cầu cá nhân"
+    },
+    {
+      "code": "5.2.NC1b",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Áp dụng được các công cụ số khác nhau và các giải pháp công nghệ có thể có để giải quyết những nhu cầu đó."
+    },
+    {
+      "code": "5.2.NC1c",
+      "component": "5.2",
+      "name": "Xác định nhu cầu và giải pháp công nghệ",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Sử dụng được các cách khác nhau để điều chỉnh và tùy chỉnh môi trường số theo nhu cầu cá nhân."
+    },
+    {
+      "code": "5.3.CB1a",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm."
+    },
+    {
+      "code": "5.3.CB1b",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Thể hiện được sự quan tâm của cá nhân và tập thể đến quá trình xử lý nhận thức đơn giản để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số."
+    },
+    {
+      "code": "5.3.CB2a",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Xác định được các công cụ và công nghệ số đơn giản có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình cũng như sản phẩm."
+    },
+    {
+      "code": "5.3.CB2b",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Tuân theo quy trình nhận thức đơn giản của cá nhân và tập thể để hiểu và giải quyết các vấn đề khái niệm đơn giản và các tình huống có vấn đề trong môi trường số."
+    },
+    {
+      "code": "5.3.TC1a",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chọn được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức rõ ràng cũng như các quy trình và sản phẩm đổi mới được xác định rõ ràng."
+    },
+    {
+      "code": "5.3.TC1b",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Gắn kết được cá nhân và tập thể vào một số quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề mang tính khái niệm và tình huống có vấn đề thông thường và được xác định rõ ràng trong môi trường số."
+    },
+    {
+      "code": "5.3.TC2a",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Phân biệt được các công cụ và công nghệ số có thể được sử dụng để tạo ra kiến thức và đổi mới quy trình và sản phẩm."
+    },
+    {
+      "code": "5.3.TC2b",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Gắn kết được cá nhân và tập thể vào quá trình xử lý nhận thức để hiểu và giải quyết các vấn đề khái niệm và tình huống có vấn đề trong môi trường số."
+    },
+    {
+      "code": "5.3.NC1a",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Áp dụng được các công cụ và công nghệ số khác nhau để tạo ra kiến thức cũng như các quy trình và sản phẩm đổi mới."
+    },
+    {
+      "code": "5.3.NC1b",
+      "component": "5.3",
+      "name": "Sử dụng sáng tạo công nghệ số",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Áp dụng xử lý nhận thức của cá nhân và tập thể để giải quyết các vấn đề khái niệm và tình huống có vấn đề khác nhau trong môi trường số."
+    },
+    {
+      "code": "5.4.CB1a",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu."
+    },
+    {
+      "code": "5.4.CB1b",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB1",
+      "description": "Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số."
+    },
+    {
+      "code": "5.4.CB2a",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Nhận ra được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu."
+    },
+    {
+      "code": "5.4.CB2b",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "CB2",
+      "description": "Xác định được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số."
+    },
+    {
+      "code": "5.4.TC1b",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC1",
+      "description": "Chỉ ra được nơi để tìm kiếm các cơ hội được xác định rõ ràng để phát triển bản thân và cập nhật sự phát triển công nghệ số."
+    },
+    {
+      "code": "5.4.TC2a",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Thảo luận về lĩnh vực NLS của bản thân cần được cải thiện hoặc cập nhật"
+    },
+    {
+      "code": "5.4.TC2b",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Chỉ ra được cách hỗ trợ người khác phát triển NLS của họ."
+    },
+    {
+      "code": "5.4.TC2c",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "TC2",
+      "description": "Chỉ ra được nơi để tìm kiếm cơ hội phát triển bản thân và cập nhật sự phát triển công nghệ số."
+    },
+    {
+      "code": "5.4.NC1a",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Chứng minh được NLS của tôi cần được cải thiện hoặc cập nhật ở đâu"
+    },
+    {
+      "code": "5.4.NC1b",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Minh họa được những cách khác nhau để hỗ trợ người khác phát triển NLS của họ."
+    },
+    {
+      "code": "5.4.NC1c",
+      "component": "5.4",
+      "name": "Xác định các vấn đề cần cải thiện về NLS",
+      "domain": "5. Giải quyết vấn đề",
+      "level": "NC1",
+      "description": "Đề xuất được các cơ hội khác nhau để phát triển bản thân và cập nhật sự phát triển công nghệ số."
+    },
+    {
+      "code": "6.1.CB2a",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Xác định được các khái niệm cơ bản của AI."
+    },
+    {
+      "code": "6.1.CB2b",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Nhớ lại được các ứng dụng đơn giản của AI trong cuộc sống hàng ngày."
+    },
+    {
+      "code": "6.1.TC1a",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Giải thích được nguyên tắc hoạt động cơ bản của AI."
+    },
+    {
+      "code": "6.1.TC1b",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Diễn giải được các thuật ngữ và khái niệm liên quan đến AI."
+    },
+    {
+      "code": "6.1.TC2a",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "Áp dụng được các nguyên tắc cơ bản của AI để giải quyết vấn đề đơn giản."
+    },
+    {
+      "code": "6.1.TC2b",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "Thực hiện được các thao tác cơ bản trên các công cụ AI."
+    },
+    {
+      "code": "6.1.NC1a",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "Phân tích được cách AI hoạt động trong các ứng dụng cụ thể."
+    },
+    {
+      "code": "6.1.NC1b",
+      "component": "6.1",
+      "name": "Hiểu biết về trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "So sánh được các hệ thống AI khác nhau và cách chúng xử lý dữ liệu."
+    },
+    {
+      "code": "6.2.CB1a",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB1",
+      "description": "Nhận diện được các công cụ AI đơn giản."
+    },
+    {
+      "code": "6.2.CB1b",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB1",
+      "description": "Thực hiện được các thao tác cơ bản với các công cụ AI."
+    },
+    {
+      "code": "6.2.CB1c",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB1",
+      "description": "Nhận thức được cơ bản về các vấn đề đạo đức và pháp lý liên quan đến AI."
+    },
+    {
+      "code": "6.2.CB2a",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Áp dụng được các công cụ AI để giải quyết vấn đề đơn giản."
+    },
+    {
+      "code": "6.2.CB2b",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Tương tác được với các hệ thống AI cơ bản."
+    },
+    {
+      "code": "6.2.CB2c",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Tuân thủ các quy định pháp luật cơ bản khi sử dụng AI."
+    },
+    {
+      "code": "6.2.TC1a",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Sử dụng được các công cụ AI trong công việc và học tập hàng ngày."
+    },
+    {
+      "code": "6.2.TC1b",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Thực hành được các kỹ năng sử dụng AI thông qua các bài tập và dự án nhỏ."
+    },
+    {
+      "code": "6.2.TC1c",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Xem xét các khía cạnh đạo đức khi sử dụng AI, bảo đảm không vi phạm quyền riêng tư và bảo mật dữ liệu."
+    },
+    {
+      "code": "6.2.TC2a",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "Tối ưu hóa việc sử dụng các công cụ AI để đạt hiệu quả cao hơn."
+    },
+    {
+      "code": "6.2.TC2b",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "Quản lý được việc triển khai các công cụ AI trong các dự án nhỏ."
+    },
+    {
+      "code": "6.2.TC2c",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "Bảo vệ được dữ liệu cá nhân và tuân thủ các quy định pháp luật về bảo mật thông tin khi sử dụng AI."
+    },
+    {
+      "code": "6.2.NC1a",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "Phát triển được các ứng dụng AI tùy chỉnh để giải quyết các vấn đề cụ thể."
+    },
+    {
+      "code": "6.2.NC1b",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "Điều chỉnh được các hệ thống AI để phù hợp với nhu cầu cụ thể."
+    },
+    {
+      "code": "6.2.NC1c",
+      "component": "6.2",
+      "name": "Sử dụng trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "Đánh giá và giảm thiểu được các rủi ro đạo đức và pháp lý liên quan đến việc sử dụng AI."
+    },
+    {
+      "code": "6.3.CB1a",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB1",
+      "description": "Nhận diện được một số vật dụng/trò chơi thông minh có sử dụng AI"
+    },
+    {
+      "code": "6.3.CB1b",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB1",
+      "description": "Nhớ được rằng không phải mọi thông tin từ máy móc đều đúng"
+    },
+    {
+      "code": "6.3.CB2a",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Nhận diện được các yếu tố cơ bản của hệ thống AI cần được đánh giá."
+    },
+    {
+      "code": "6.3.CB2b",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "CB2",
+      "description": "Mô tả được các chức năng chính của hệ thống AI."
+    },
+    {
+      "code": "6.3.TC1a",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Giải thích được cách thức hoạt động của các hệ thống AI đơn giản."
+    },
+    {
+      "code": "6.3.TC1b",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC1",
+      "description": "Tóm tắt được các đặc điểm và ứng dụng của hệ thống AI."
+    },
+    {
+      "code": "6.3.TC2a",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "Phân tích được hiệu quả của hệ thống AI trong việc giải quyết các vấn đề cụ thể."
+    },
+    {
+      "code": "6.3.TC2b",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "TC2",
+      "description": "So sánh được hiệu suất của các hệ thống AI khác nhau."
+    },
+    {
+      "code": "6.3.NC1a",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "Đánh giá được độ chính xác và tin cậy của các hệ thống AI."
+    },
+    {
+      "code": "6.3.NC1b",
+      "component": "6.3",
+      "name": "Đánh giá trí tuệ nhân tạo",
+      "domain": "6. Ứng dụng trí tuệ nhân tạo",
+      "level": "NC1",
+      "description": "Xem xét được các kết quả và đưa ra nhận xét về hiệu quả của hệ thống AI."
+    }
+  ]
+}

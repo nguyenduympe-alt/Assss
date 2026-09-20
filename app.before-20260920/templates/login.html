@@ -1,0 +1,73 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng nhập — EduAssist</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;font-family:"Inter",system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+ color:#0f172a;background:#f3f8f6}
+.left{flex:1;background:#0a1f1c;color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:center;
+ position:relative;overflow:hidden;
+ background-image:radial-gradient(900px 500px at 15% 10%,#0d9488 0%,transparent 55%),
+  radial-gradient(800px 520px at 85% 90%,#059669 0%,transparent 55%)}
+.left::after{content:"";position:absolute;inset:0;
+ background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px}
+.left>*{position:relative;z-index:1}
+.lg{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:800;margin-bottom:34px}
+.lg .mk{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:22px;
+ background:linear-gradient(135deg,#0d9488,#059669);box-shadow:0 10px 30px -8px #14b8a6}
+.left h2{font-size:31px;line-height:1.25;margin:0 0 14px;font-weight:750;letter-spacing:-.5px}
+.left p{color:#9fc7bd;font-size:14.5px;line-height:1.65;margin:0 0 30px;max-width:430px}
+.fe{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;max-width:430px}
+.fe i{font-style:normal;width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;
+ background:rgba(255,255,255,.09);font-size:17px}
+.fe b{display:block;font-size:14px;margin-bottom:2px}
+.fe span{color:#8aa8a1;font-size:12.5px;line-height:1.5}
+.right{width:470px;flex:0 0 470px;display:flex;align-items:center;justify-content:center;padding:32px}
+.box{width:100%;max-width:370px}
+.box h1{font-size:25px;margin:0 0 6px;font-weight:750;letter-spacing:-.4px}
+.box .s{color:#64748b;font-size:14px;margin:0 0 26px}
+label{display:block;font-size:12.5px;font-weight:650;color:#475569;margin:0 0 6px}
+input{width:100%;padding:12px 14px;margin-bottom:16px;border:1px solid #d8e6e1;border-radius:11px;font:inherit;
+ outline:none;transition:.15s;background:#fff}
+input:focus{border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.13)}
+button{width:100%;padding:13px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;border:0;
+ border-radius:11px;font:inherit;font-weight:650;font-size:15px;cursor:pointer;transition:.16s;
+ box-shadow:0 10px 24px -12px #14b8a6}
+button:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.err{background:#fff1f2;color:#9f1239;padding:11px 14px;border-radius:11px;margin-bottom:16px;font-size:13.5px;
+ border:1px solid #fecdd3}
+.ok{background:#ecfdf5;color:#065f46;padding:11px 14px;border-radius:11px;margin-bottom:16px;font-size:13.5px;border:1px solid #a7f3d0}
+.or{display:flex;align-items:center;gap:12px;margin:18px 0;color:#94a3b8;font-size:12.5px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:#e4eeea}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border:1px solid #d8e6e1;
+ border-radius:11px;font-weight:600;font-size:14.5px;color:#334155;background:#fff;text-decoration:none;transition:.15s}
+.gbtn:hover{background:#f7fdfb;border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+.hint{margin-top:20px;text-align:center;font-size:13px;color:#64748b}
+.hint a{color:#0d9488;font-weight:650;text-decoration:none}
+.demo{margin-top:14px;padding:12px;border-radius:11px;background:#ecfdf5;border:1px solid #c7f0e4;font-size:12.5px;color:#475569;text-align:center}
+.demo b{color:#0d9488}
+@media(max-width:900px){.left{display:none}.right{flex:1;width:auto}}
+</style></head><body>
+<div class="left">
+ <div class="lg"><span class="mk">🎓</span>EduAssist</div>
+ <h2>Trợ lý số cho<br>giáo viên hiện đại</h2>
+ <p>Quản lý phân phối chương trình, thời khoá biểu, xuất lịch báo giảng chuẩn mẫu và nhận xét học sinh tự động bằng AI.</p>
+ <div class="fe"><i>🖨️</i><div><b>Lịch báo giảng tự động</b><span>Ghép TKB × PPCT, xuất PDF A4 đúng biểu mẫu nhà trường</span></div></div>
+ <div class="fe"><i>🤖</i><div><b>Nhận xét học sinh bằng AI</b><span>Từ điểm số hoặc CHT / HT / HTT, sinh nhận xét cá nhân hoá</span></div></div>
+ <div class="fe"><i>📊</i><div><b>Dashboard thống kê</b><span>Phổ điểm, tỉ lệ hoàn thành, chất lượng theo từng lớp</span></div></div>
+</div>
+<div class="right"><form class="box" method="post">
+ <h1>Đăng nhập</h1><p class="s">Chào mừng trở lại! Vui lòng nhập thông tin tài khoản.</p>
+ {% with ms=get_flashed_messages(with_categories=true) %}{% for c,m in ms %}<div class="{{'ok' if c=='ok' else 'err'}}">{{m}}</div>{% endfor %}{% endwith %}
+ <label>Tài khoản</label><input name="username" placeholder="Nhập tên đăng nhập" required autofocus>
+ <label>Mật khẩu</label><input name="password" type="password" placeholder="••••••••" required>
+ <button>Đăng nhập →</button>
+ {% if google_enabled %}
+ <div class="or"><span>hoặc</span></div>
+ <a class="gbtn" href="{{url_for('auth.google_login')}}">
+  <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.4z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.1 2 20.4 2 24s.8 6.9 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C35 4.3 30 2 24 2 15.4 2 7.9 7 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>
+  Đăng nhập bằng Google</a>
+ {% endif %}
+ <div class="hint">Chưa có tài khoản? <a href="{{url_for('auth.register')}}">Đăng ký ngay</a></div>
+</form></div>
+</body></html>

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block head %}Lịch nghỉ &amp; tuần bỏ qua{% endblock %}
+{% block crumb %}Khai báo nghỉ Tết, nghỉ lễ — hệ thống tự dồn tuần PPCT cho khớp{% endblock %}
+{% block body %}
+
+<div class="card" style="border-left:4px solid #0d9488">
+ <div style="display:flex;gap:12px;align-items:flex-start">
+  <span style="font-size:24px">💡</span>
+  <div><b>Hai kiểu nghỉ</b>
+   <div class="muted" style="margin-top:5px;line-height:1.7">
+    <b style="color:#0f766e">• Nghỉ trọn tuần</b> (Tết, hè): tuần đó <b>không tính</b> vào phân phối chương trình.
+    Bài của tuần học kế tiếp sẽ tự dồn sang tuần lịch sau — không bị lệch bài.<br>
+    <b style="color:#b45309">• Nghỉ ngày lẻ</b> (2/9, 30/4, 1/5): tuần vẫn học bình thường, chỉ những
+    tiết rơi vào ngày nghỉ được đánh dấu <b>"NGHỈ"</b> và bài dạy tự lùi sang tiết sau.</div></div>
+ </div>
+</div>
+
+<div class="kpis">
+ <div class="kpi" style="--c:#0d9488"><div class="ic">📚</div><b>{{max_tuan}}</b><span>Tuần học thực dạy</span></div>
+ <div class="kpi" style="--c:#f43f5e"><div class="ic">🎋</div><b>{{n_tuan_nghi}}</b><span>Tuần nghỉ trọn</span></div>
+ <div class="kpi" style="--c:#06b6d4"><div class="ic">🗓️</div><b style="font-size:19px">{{tuan1.strftime('%d/%m/%Y')}}</b><span>Khai giảng (tuần 1)</span></div>
+ <div class="kpi" style="--c:#059669"><div class="ic">🏁</div>
+  <b style="font-size:19px">{{ ket_thuc.strftime('%d/%m/%Y') if ket_thuc else '—' }}</b><span>Dự kiến kết thúc</span></div>
+</div>
+
+<div class="g2">
+ <div class="card">
+  <h3>➕ Thêm kỳ nghỉ</h3><p class="sub">Nhập theo thông báo của Phòng/Sở Giáo dục</p>
+  <form method="post">
+   <div class="row">
+    <label class="f" style="flex:1;min-width:180px">Tên kỳ nghỉ
+     <input name="ten" placeholder="Nghỉ Tết Nguyên đán" required></label>
+    <label class="f">Kiểu nghỉ<select name="kieu" id="kieu">
+     <option value="tuan">Nghỉ trọn tuần (không tính PPCT)</option>
+     <option value="ngay">Nghỉ ngày lẻ (vẫn tính tuần)</option></select></label>
+   </div>
+   <div class="row" style="margin-top:11px">
+    <label class="f">Từ ngày<input type="date" name="tu_ngay" required></label>
+    <label class="f">Đến ngày<input type="date" name="den_ngay"></label>
+    <button class="ok">+ Thêm kỳ nghỉ</button>
+   </div>
+  </form>
+  <hr class="s">
+  <form method="post" class="row">
+   <input type="hidden" name="act" value="tet">
+   <label class="f">Thêm nhanh nghỉ Tết năm
+    <select name="nam">{% for y in [nam_nay, nam_nay+1] %}<option value="{{y}}">{{y}}</option>{% endfor %}</select></label>
+   <button class="sec">🎋 Thêm 2 tuần nghỉ Tết</button>
+  </form>
+  <p class="muted" style="margin:8px 0 0">Hệ thống điền sẵn khoảng ước lượng — bạn nên sửa lại cho khớp thông báo chính thức.</p>
+ </div>
+
+ <div class="card">
+  <div class="chead"><h3>Các kỳ nghỉ đã khai báo</h3><span class="chip">{{breaks|length}} kỳ</span></div>
+  {% if breaks %}
+  <div style="display:flex;flex-direction:column;gap:9px">
+  {% for b in breaks %}
+   <div style="display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);
+    border-radius:12px;background:{{'#fff1f2' if b.kieu=='tuan' else '#fff7ed'}}">
+    <span style="font-size:20px">{{ '🎋' if b.kieu=='tuan' else '🏖️' }}</span>
+    <div style="flex:1">
+     <b>{{b.ten}}</b>
+     <div class="muted" style="font-size:12px">{{b.tu.strftime('%d/%m/%Y')}} → {{b.den.strftime('%d/%m/%Y')}}
+      · {{ (b.den - b.tu).days + 1 }} ngày</div></div>
+    <span class="badge {{'CHT' if b.kieu=='tuan' else 'HT'}}">{{ 'Trọn tuần' if b.kieu=='tuan' else 'Ngày lẻ' }}</span>
+    <form method="post" onsubmit="return confirm('Xoá kỳ nghỉ này?')">
+     <input type="hidden" name="act" value="del"><input type="hidden" name="id" value="{{b.id}}">
+     <button class="dan">Xoá</button></form>
+   </div>
+  {% endfor %}</div>
+  {% else %}<div class="empty"><span class="e">🗓️</span>Chưa khai báo kỳ nghỉ nào.<br>
+   <span class="muted">Bấm "Thêm 2 tuần nghỉ Tết" để bắt đầu nhanh.</span></div>{% endif %}
+ </div>
+</div>
+
+<div class="card">
+ <div class="chead"><h3>📆 Lịch năm học</h3>
+  <span class="muted">Tuần lịch ↔ tuần học (đã trừ các kỳ nghỉ)</span></div>
+ {% if cal %}
+ <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:340px;overflow-y:auto;padding:12px;
+  background:#f7fdfb;border:1px solid var(--line);border-radius:12px">
+  {% for c in cal %}
+   <div title="{{ c.monday.strftime('%d/%m/%Y') }} - {{ (c.monday + timedelta(6)).strftime('%d/%m/%Y') if timedelta else '' }}"
+    style="min-width:74px;text-align:center;padding:8px 6px;border-radius:10px;
+    background:{{'#fff1f2' if c.nghi else '#fff'}};
+    border:1px solid {{'#fecdd3' if c.nghi else '#c7f0e4'}}">
+    {% if c.nghi %}
+     <div style="font-size:16px">🎋</div>
+     <div style="font-size:10px;font-weight:700;color:#be123c;line-height:1.25">NGHỈ</div>
+    {% else %}
+     <div style="font-size:15px;font-weight:800;color:#0f766e">{{c.hoc}}</div>
+     <div style="font-size:9.5px;color:#64748b">tuần học</div>
+    {% endif %}
+    <div style="font-size:10px;color:#94a3b8;margin-top:3px">{{c.monday.strftime('%d/%m')}}</div>
+   </div>
+  {% endfor %}
+ </div>
+ <div class="legend" style="margin-top:10px">
+  <span><i style="background:#fff;border:1px solid #c7f0e4"></i>Tuần học (tính PPCT)</span>
+  <span><i style="background:#fff1f2;border:1px solid #fecdd3"></i>Tuần nghỉ (bỏ qua)</span>
+ </div>
+ <p class="muted" style="margin-top:10px">
+  ➜ Năm học gồm <b>{{max_tuan}} tuần thực dạy</b>, trải qua <b>{{cal|length}} tuần lịch</b>
+  (trong đó {{n_tuan_nghi}} tuần nghỉ), kết thúc khoảng <b>{{ ket_thuc.strftime('%d/%m/%Y') if ket_thuc else '—' }}</b>.</p>
+ {% endif %}
+ <hr class="s">
+ <a class="btn" href="{{url_for('core.bao_giang')}}">🖨️ Sang trang Lịch báo giảng</a>
+</div>
+{% endblock %}

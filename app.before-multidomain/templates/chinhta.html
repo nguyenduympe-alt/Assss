@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block head %}Kiểm tra lỗi chính tả{% endblock %}
+{% block crumb %}Tải file Word tiếng Việt — hệ thống dò lỗi và gợi ý sửa{% endblock %}
+{% block body %}
+
+{% if issues is none %}
+<div class="card">
+ <h3>📄 Chọn văn bản cần kiểm tra</h3>
+ <p class="sub">Hỗ trợ file Word (.docx) và văn bản thuần (.txt) — hoặc dán trực tiếp nội dung</p>
+ <p class="muted">Hiện kiểm tra bằng quy tắc trên VPS. Chế độ AI chưa kích hoạt; kết quả có thể bỏ sót hoặc nhầm từ tùy ngữ cảnh.</p>
+ <form method="post" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  <div class="tabs">
+   <button type="button" class="on" onclick="tab(0,this)">📎 Tải file lên</button>
+   <button type="button" onclick="tab(1,this)">✍️ Dán nội dung</button>
+  </div>
+  <div id="t0">
+   <div style="border:2px dashed #c7f0e4;background:linear-gradient(135deg,#f7fdfb,#ecfdf5);border-radius:14px;
+    padding:30px;text-align:center">
+    <div style="font-size:38px">📝</div>
+    <div style="font-weight:700;margin:8px 0 4px;font-size:15px">Chọn file Word cần kiểm tra chính tả</div>
+    <p class="muted" style="margin:0 0 15px">Định dạng gốc (font, cỡ chữ, in đậm, bảng biểu) sẽ được <b>giữ nguyên</b> sau khi sửa</p>
+    <input type="file" name="file" accept=".docx,.txt"
+     onchange="document.getElementById('fn').textContent=this.files[0]?.name||''">
+    <div id="fn" style="margin-top:10px;font-weight:650;color:#0d9488"></div>
+   </div>
+  </div>
+  <div id="t1" style="display:none">
+   <textarea name="noi_dung" rows="9" placeholder="Dán đoạn nhận xét hoặc văn bản cần kiểm tra vào đây…"></textarea>
+  </div>
+  <hr class="s">
+  <div class="row">
+   <label class="f" style="flex-direction:row;align-items:center;gap:7px;color:#334155">
+    <input type="checkbox" name="mat_dau" checked style="width:16px;height:16px"> Bắt lỗi thiếu dấu tiếng Việt</label>
+   <label class="f" style="flex-direction:row;align-items:center;gap:7px;color:#334155">
+    <input type="checkbox" name="lap_tu" checked style="width:16px;height:16px"> Bắt lỗi lặp từ</label>
+   <button class="ok">🔍 Kiểm tra chính tả</button>
+   <span class="muted">{{ '👑 Không giới hạn' if is_pro else 'Còn ' ~ remaining ~ ' lượt — kiểm tra miễn phí, chỉ tính lượt khi tải bản đã sửa' }}</span>
+  </div>
+ </form>
+</div>
+
+<div class="card">
+ <h3>🔎 Hệ thống bắt được những lỗi nào?</h3>
+ <div class="g3" style="margin-top:12px">
+  {% for ic,t,d in [('🔤','Sai cấu trúc âm tiết','“khôngg”, “bàiii” — chữ không hợp lệ trong tiếng Việt'),
+                     ('💬','Viết tắt / teencode','“ko” → “không”, “dc” → “được”, “nhìu” → “nhiều”'),
+                     ('✍️','Thiếu dấu tiếng Việt','“hoc sinh” → “học sinh”, “bai tap” → “bài tập”'),
+                     ('📚','Dùng từ sai','“sữa chữa” → “sửa chữa”, “bổ xung” → “bổ sung”'),
+                     ('🔁','Lặp từ','“Em em rất chăm chỉ” → “Em rất chăm chỉ”'),
+                     ('✅','Sai hỏi / ngã','“cũng cố” → “củng cố”, “suy nghỉ” → “suy nghĩ”')] %}
+  <div style="border:1px solid var(--line);border-radius:12px;padding:13px;background:#f7fdfb">
+   <div style="font-size:20px">{{ic}}</div><b style="font-size:13.5px">{{t}}</b>
+   <div class="muted" style="font-size:12px;margin-top:3px">{{d}}</div></div>
+  {% endfor %}
+ </div>
+</div>
+
+{% else %}
+<!-- ================= KẾT QUẢ ================= -->
+<div class="kpis">
+ <div class="kpi" style="--c:{{ '#f43f5e' if stats.tong else '#10b981' }}">
+  <div class="ic">{{ '⚠️' if stats.tong else '✅' }}</div><b>{{stats.tong}}</b><span>Lỗi phát hiện</span></div>
+ <div class="kpi" style="--c:#0d9488"><div class="ic">📝</div><b>{{stats.so_tu}}</b><span>Tổng số từ</span></div>
+ <div class="kpi" style="--c:#06b6d4"><div class="ic">📄</div><b>{{stats.so_doan}}</b><span>Đoạn văn bản</span></div>
+ <div class="kpi" style="--c:#059669"><div class="ic">🎯</div>
+  <b>Quy tắc</b><span>Phương pháp kiểm tra</span></div>
+</div>
+
+{% if not stats.tong %}
+<div class="card" style="text-align:center;padding:40px">
+ <div style="font-size:52px">🎉</div>
+ <h3 style="font-size:19px;margin:10px 0 5px">Tuyệt vời! Không phát hiện lỗi chính tả</h3>
+ <p class="muted">Bộ kiểm tra chưa tìm thấy lỗi trong “{{name}}”. Bạn nên đọc lại tên riêng và các từ phụ thuộc ngữ cảnh.</p>
+ <a class="btn" style="margin-top:14px" href="{{url_for('core.chinh_ta')}}">Kiểm tra văn bản khác</a>
+</div>
+{% else %}
+
+<form method="post" action="{{url_for('core.chinh_ta_sua')}}" id="frm">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<div class="card">
+ <div class="chead">
+  <div><h3>Danh sách lỗi — {{name}}</h3>
+   <p class="sub" style="margin:2px 0 0">Bỏ chọn những lỗi bạn không muốn sửa</p></div>
+  <div class="row" style="gap:8px">
+   <button type="button" class="sec sm" onclick="all(true)">Chọn tất cả</button>
+   <button type="button" class="sec sm" onclick="all(false)">Bỏ chọn</button>
+  </div>
+ </div>
+
+ <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">
+  {% for k,n in stats.theo_loai.items() %}
+   <span class="chip" style="background:{{KIND[k][1]}}1f;color:{{KIND[k][1]}};font-weight:700">
+    {{KIND[k][0]}}: {{n}}</span>
+  {% endfor %}
+ </div>
+
+ <div class="tbl-wrap" style="max-height:520px;overflow-y:auto">
+ <table><thead style="position:sticky;top:0;z-index:2"><tr>
+  <th style="width:40px"><input type="checkbox" checked onclick="all(this.checked)" style="width:16px;height:16px"></th>
+  <th style="width:150px">Loại lỗi</th><th>Từ sai</th><th>Gợi ý sửa</th><th>Ngữ cảnh</th></tr></thead>
+ <tbody>
+ {% for o in issues %}
+  <tr>
+   <td><input type="checkbox" class="cb" name="fix" value="{{o.id}}" checked style="width:16px;height:16px"></td>
+   <td><span class="chip" style="background:{{KIND[o.kind][1]}}1f;color:{{KIND[o.kind][1]}};font-weight:700;
+    font-size:11.5px">{{KIND[o.kind][0]}}</span></td>
+   <td><b style="color:#be123c;text-decoration:underline wavy #f43f5e">{{o.word}}</b></td>
+   <td>{% if o.suggest %}<b style="color:#047857">{{o.suggest}}</b>
+       {% elif o.kind=='lap_tu' %}<i class="muted">xoá từ lặp</i>
+       {% else %}<i class="muted">chưa có gợi ý</i>{% endif %}</td>
+   <td class="muted" style="font-size:12.5px">
+    {% set p = paras[o.para] %}
+    …{{ p[[0, o.start-34]|max : o.start] }}<b style="background:#ffe4e6;color:#be123c;padding:1px 3px;
+     border-radius:4px">{{o.word}}</b>{{ p[o.end : o.end+34] }}…
+   </td>
+  </tr>
+ {% endfor %}
+ </tbody></table></div>
+</div>
+
+<div class="card">
+ <div class="row">
+  {% if is_pro or remaining > 0 %}
+   <button class="ok">✅ Sửa ngay &amp; tải file Word đã sửa (<span id="cnt">{{issues|length}}</span> lỗi)</button>
+   <span class="muted">{{ '👑 Gói VIP không giới hạn' if is_pro else 'Còn ' ~ remaining ~ '/' ~ (FREE_QUOTA) ~ ' lượt — thao tác này tính 1 lượt' }}</span>
+  {% else %}
+   <a class="btn" href="{{url_for('core.nang_cap', need='chinhta')}}"
+    style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết lượt — Nâng cấp để tải bản đã sửa</a>
+  {% endif %}
+  <button type="button" class="sec" onclick="xem()">👁️ Xem trước kết quả</button>
+  <a class="btn sec" href="{{url_for('core.chinh_ta')}}">↩ Kiểm tra file khác</a>
+ </div>
+ <p class="muted" style="margin:11px 0 0">
+  💡 File tải về <b>giữ nguyên định dạng gốc</b> — font chữ, cỡ chữ, in đậm, bảng biểu không thay đổi.</p>
+</div>
+</form>
+
+<div class="card" id="preview" style="display:none">
+ <div class="chead"><h3>👁️ Xem trước sau khi sửa</h3>
+  <button type="button" class="sec sm" onclick="document.getElementById('preview').style.display='none'">Đóng</button></div>
+ <div id="pv" style="max-height:420px;overflow-y:auto;background:#f7fdfb;border:1px solid var(--line);
+  border-radius:12px;padding:16px;line-height:1.8;font-size:14px"></div>
+</div>
+{% endif %}
+{% endif %}
+
+<script>
+function tab(i,b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ document.getElementById('t0').style.display=i==0?'':'none';document.getElementById('t1').style.display=i==1?'':'none';}
+function all(v){document.querySelectorAll('.cb').forEach(c=>c.checked=v);cnt();}
+function cnt(){const n=document.querySelectorAll('.cb:checked').length;const e=document.getElementById('cnt');if(e)e.textContent=n;}
+document.addEventListener('change',e=>{if(e.target.classList.contains('cb'))cnt();});
+function xem(){
+ const ids=[...document.querySelectorAll('.cb:checked')].map(c=>+c.value);
+ fetch('{{url_for("core.chinh_ta_xem")}}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':{{csrf_token()|tojson}}},
+  body:JSON.stringify({ids})}).then(r=>r.json()).then(d=>{
+   if(!d.ok){alert(d.msg);return;}
+   document.getElementById('pv').innerHTML=d.paras.filter(p=>p.trim()).map(p=>
+    '<p style="margin:0 0 9px">'+p.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</p>').join('');
+   document.getElementById('preview').style.display='';
+   document.getElementById('preview').scrollIntoView({behavior:'smooth'});
+  });}
+</script>
+{% endblock %}
