@@ -51,8 +51,13 @@ def qr_svg(text, box=7, border=2, dark="#0f172a", light="#ffffff"):
     m = qr.get_matrix()
     n = len(m)
     size = n * box
+    # LUU Y: truoc day SVG ghi thang width/height = so module * 7 (thuong 259-315 px) nhung
+    # khung hien thi chi rong 210 px va khong khoa tran -> phan thua cua ma QR tran sang phai,
+    # bi cac o chu ben canh de len => khong quet duoc. Nay SVG luon co gian vua dung khung chua.
     parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" '
-             f'viewBox="0 0 {n} {n}" shape-rendering="crispEdges" role="img" aria-label="Ma QR chuyen khoan">',
+             f'viewBox="0 0 {n} {n}" preserveAspectRatio="xMidYMid meet" '
+             f'style="display:block;width:100%;height:100%;max-width:100%;max-height:100%" '
+             f'shape-rendering="crispEdges" role="img" aria-label="Ma QR chuyen khoan">',
              f'<rect width="{n}" height="{n}" fill="{light}"/>']
     for y, row in enumerate(m):
         x = 0

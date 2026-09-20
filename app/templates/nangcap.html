@@ -70,34 +70,52 @@
 <div class="g2">
  <!-- QR chuyen khoan -->
  <div class="card">
-  <h3>① Quét mã QR để chuyển khoản
+  <style>
+   /* Ma QR: khung co dinh + khoa tran => ma QR luon vuong, khong bi cac o chu de len */
+   .qrwrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start}
+   .qrbox{width:236px;height:236px;flex:0 0 auto;padding:12px;background:#fff;border:1px solid var(--line);
+    border-radius:16px;box-shadow:0 6px 20px -10px rgba(13,148,136,.5);overflow:hidden;display:flex;
+    align-items:center;justify-content:center}
+   .qrbox svg{display:block;width:100%;height:100%;max-width:100%;max-height:100%}
+   .qrinfo{display:flex;flex-direction:column;gap:8px;min-width:0}
+   .qrrow{border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#f7fdfb;min-width:0}
+   .qrrow .lb{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b}
+   .qrrow .vl{display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap}
+   /* Số tài khoản / số tiền KHÔNG bao giờ được ngắt dòng giữa chừng: hết chỗ thì nút Chép
+      tự xuống dòng dưới, chứ không cắt số ra làm hai (giáo viên đọc nhầm là mất tiền). */
+   .qrrow .vl b{font-size:15px;flex:1 1 auto;min-width:0;white-space:nowrap;letter-spacing:.2px;
+    font-variant-numeric:tabular-nums}
+   .qrrow .vl button{flex:0 0 auto}
+   @media (max-width:620px){
+    .qrwrap{grid-template-columns:1fr;gap:12px}
+    .qrbox{width:210px;height:210px;justify-self:center}
+   }
+  </style>
+  <style>.card h3 .chip{white-space:nowrap}</style>
+  <h3>① Quét mã để chuyển khoản
    <span class="chip" style="background:{{'#d1fae5' if goi=='vip' else '#ccfbf1'}};color:{{'#047857' if goi=='vip' else '#0f766e'}}">
     {{ 'Gói VIP 1 năm' if goi=='vip' else 'Gói lẻ ' ~ BL.LUOT_MOI_GOI ~ ' lượt' }}</span></h3>
-  <p class="sub">Mở app ngân hàng bất kỳ → quét mã → số tiền và nội dung đã điền sẵn</p>
-  <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
-   <div style="background:#fff;padding:12px;border:1px solid var(--line);border-radius:16px;
-     box-shadow:0 6px 20px -10px rgba(13,148,136,.5);line-height:0">
-    <div style="width:210px;height:210px">{{ qr_svg|safe }}</div>
-   </div>
-   <div style="flex:1;min-width:230px;display:flex;flex-direction:column;gap:10px">
+  <p class="sub">Mở app ngân hàng, quét mã — số tiền và nội dung đã điền sẵn</p>
+  <div class="qrwrap">
+   <div class="qrbox">{{ qr_svg|safe }}</div>
+   <div class="qrinfo">
     {% for lb, val, cp in [('Ngân hàng', BL.BANK_NAME, false),
                             ('Số tài khoản', BL.BANK_ACC, true),
                             ('Số tiền', '{:,}'.format(gia).replace(',','.') ~ ' đ', false),
-                            ('Nội dung chuyển khoản', noi_dung, true)] %}
-    <div style="border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:#f7fdfb">
-     <div class="muted" style="font-size:11.5px;font-weight:600">{{lb}}</div>
-     <div style="display:flex;align-items:center;gap:9px;margin-top:3px">
-      <b style="font-size:15px;letter-spacing:.4px;flex:1;word-break:break-all">{{val}}</b>
-      {% if cp %}<button type="button" class="sec sm" onclick="cp(this,'{{val}}')">Sao chép</button>{% endif %}
-     </div></div>
+                            ('Nội dung CK', noi_dung, true)] %}
+    <div class="qrrow">
+     <div class="lb">{{lb}}</div>
+     <div class="vl"><b>{{val}}</b>
+      {% if cp %}<button type="button" class="sec sm" onclick="cp(this,'{{val}}')">Chép</button>{% endif %}</div>
+    </div>
     {% endfor %}
    </div>
   </div>
-  <div class="flash ok" style="margin:14px 0 0;align-items:flex-start">
-   <span>⚡</span><div style="font-weight:400">Vui lòng ghi <b>đúng nội dung</b>
-   <code style="background:#fff;padding:2px 7px;border-radius:6px;font-weight:700">{{noi_dung}}</code>.
-   Hệ thống <b>tự động kiểm tra chuyển khoản</b> và kích hoạt tài khoản
-   {{ 'ngay trong vài giây' if tudong else 'sau khi quản trị viên xác nhận' }} — thầy/cô không cần nhắn tin xác nhận.</div>
+  <div class="flash ok" style="margin:12px 0 0;align-items:flex-start">
+   <span>⚡</span><div style="font-weight:400">Ghi <b>đúng nội dung</b>
+   <code style="background:#fff;padding:2px 7px;border-radius:6px;font-weight:700">{{noi_dung}}</code>
+   để hệ thống tự kích hoạt tài khoản
+   {{ 'trong vài giây' if tudong else 'sau khi quản trị viên xác nhận' }}.</div>
   </div>
 
   <form method="post" action="{{url_for('core.luu_sdt')}}" class="row"
