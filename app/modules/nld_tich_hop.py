@@ -23,10 +23,10 @@ from .giao_an import (DO, MAU_MOI, NHAN_AI, RE_DONG_DO_HE_THONG, RE_HOAT_DONG_HE
 
 NHAN_QD = "[QUY ĐỊNH]"
 # So khớp trên văn bản ĐÃ BỎ DẤU (khong_dau) nên mẫu cũng phải viết không dấu.
-RE_HOAT_DONG_BANG = re.compile(r"^\s*hoat\s*dong\s*tich\s*hop\s*nang\s*luc\s*so\s*\(", re.I)
+RE_HOAT_DONG_BANG = re.compile(r"^\s*hoat\s*dong\s*tich\s*hop\s*nang\s*luc\s*so\b", re.I)
 # Dòng hoạt động GIÁO DỤC AI do hệ thống chèn (khác dòng hoạt động năng lực số).
 RE_HOAT_DONG_AI_BANG = re.compile(
-    r"^\s*hoat\s*dong\s*tich\s*hop\s*giao\s*duc\s*ai\s*\(", re.I)
+    r"^\s*hoat\s*dong\s*tich\s*hop\s*giao\s*duc\s*ai\b", re.I)
 NHAN_AI_TIEU_DE = "Tích hợp giáo dục trí tuệ nhân tạo (AI)"
 NHAN_DX = "[ĐỀ XUẤT]"
 
@@ -207,6 +207,20 @@ def cap_hoc(lop):
 TEN_CAP = {"tieu_hoc": "tiểu học", "thcs": "THCS", "thpt": "THPT"}
 
 
+def _hoat_dong_theo_ma(ma):
+    """Tên hoạt động / sản phẩm / minh chứng theo THÀNH PHẦN của một mã chỉ báo.
+
+    Dùng khi giáo viên tự chọn mã ở bước duyệt: vẫn lấy đúng hoạt động thật trong bảng
+    ngữ cảnh (không ghép câu kiểu “hoạt động gắn với chỉ báo …”).
+    """
+    comp = ".".join(str(ma).split(".")[:2])
+    for bang in list(BO_THEO_CAP.values()) + [NGU_CANH_CHUNG, NGU_CANH_THPT]:
+        for _tk, comps, ten_hd, san_pham, minh_chung in bang:
+            if comp in comps:
+                return ten_hd, san_pham, minh_chung
+    return "", "", ""
+
+
 def _chon_tu_bang(van_ban, bang, level, toi_da):
     """Chọn tiêu chí từ một bảng ngữ cảnh, ưu tiên cụm từ khoá dài (đặc thù hơn)."""
     ung_vien = []
@@ -347,9 +361,12 @@ def chon_tieu_chi(doc, pt, thiet_bi="", toi_da=3, chon_ma=None):
                 canh_bao2.append(f"Mã “{ma}” thuộc mức {cb.get('level')}, không đúng mức "
                                  f"{level} của lớp {lop} — đã bỏ qua.")
                 continue
-            ra.append({"chi_bao": cb, "ten_hoat_dong": f"Hoạt động gắn với chỉ báo {ma}",
-                       "san_pham": "Sản phẩm học tập của học sinh (phiếu học tập/bản trình bày).",
-                       "minh_chung": "Kết quả nhiệm vụ của học sinh đối chiếu với chỉ báo đã chọn.",
+            _hd, _sp, _mc = _hoat_dong_theo_ma(ma)
+            ra.append({"chi_bao": cb,
+                       "ten_hoat_dong": _hd or ("Thực hiện nhiệm vụ học tập có sử dụng thiết bị số, "
+                                                "học liệu số theo hướng dẫn của giáo viên"),
+                       "san_pham": _sp or "Sản phẩm học tập của học sinh (phiếu học tập/bản trình bày).",
+                       "minh_chung": _mc or "Kết quả nhiệm vụ của học sinh trong hoạt động.",
                        "tu_khoa_khop": "giáo viên tự chọn"})
         return ra, canh_bao + canh_bao2
 
@@ -392,9 +409,9 @@ def soan_muc_tieu(ten_bai, lop, mon, chon):
         if x.get("can_duyet"):
             dong.append((f"{i}. Tiêu chí {cb['code']} — “cần giáo viên duyệt”: bài học chưa có "
                          f"hoạt động số để đối chiếu.", "can_duyet"))
-        dong.append((f"{i}. Tiêu chí {cb['code']} — {cb['domain']} — "
-                     f"{cb['name']} (mức {cb['level']} – {cb['level_name']}, {cb['grades']}; "
-                     f"nguồn: {cb['source']})", "tieuchi"))
+        # Chỉ ghi mã + miền + tên tiêu chí; KHÔNG ghi mức/L1-L2-L3/nguồn và không ghi
+        # dòng “Minh chứng đánh giá” (theo yêu cầu của giáo viên: giữ mục gọn, dễ đọc).
+        dong.append((f"{i}. Tiêu chí {cb['code']} — {cb['domain']} — {cb['name']}", "tieuchi"))
         muc_tieu = (f"Học sinh {_rut_gon(cb['verbatim'])} gắn với nội dung “{ten_bai or 'bài học'}” "
                     f"môn {mon or '…'} lớp {lop or '…'}."
                     if ten_bai else
@@ -403,10 +420,6 @@ def soan_muc_tieu(ten_bai, lop, mon, chon):
             dong.append(("   · CẦN GIÁO VIÊN DUYỆT — bài chưa nêu hoạt động số nào; "
                          "chỉ giữ nếu thầy/cô thật sự tổ chức hoạt động này.", "can_duyet"))
         dong.append((f"   · Mục tiêu: {muc_tieu}", "dexuat"))
-        _mc = (x["minh_chung"] or "").rstrip()
-        if _mc and _mc[-1] not in ".!?…:":
-            _mc += "."
-        dong.append((f"   · Minh chứng đánh giá: {_mc}", "dexuat"))
     return dong
 
 
@@ -422,8 +435,10 @@ def soan_hoat_dong(ten_bai, lop, mon, chon, thoi_luong=6, thiet_bi="co"):
     if not chon:
         return None
     ma = ", ".join(x["chi_bao"]["code"] for x in chon)
-    ten = f"Hoạt động tích hợp năng lực số ({ma})"
-    muc_tieu = "; ".join(f"{x['chi_bao']['code']}: {x['ten_hoat_dong']}" for x in chon)
+    # Thiết kế hoạt động chỉ ghi HOẠT ĐỘNG (việc học sinh làm), không ghi chi tiết năng lực
+    # như “1.1.CB1a”, “3.1.CB1a” — mã tiêu chí đã nêu ở mục “Tích hợp năng lực số”.
+    ten = "Hoạt động tích hợp năng lực số"
+    muc_tieu = "; ".join(dict.fromkeys(x["ten_hoat_dong"] for x in chon))
     return {
         "ten": ten,
         "muc_tieu": muc_tieu,
@@ -625,10 +640,8 @@ def soan_muc_tieu_ai(ten_bai, lop, mon, chon_ai):
             if _mc[-1:] not in ".!?…:":
                 _mc += "."
             dong.append((f"   · Minh chứng đánh giá: {_mc}", "dexuat"))
-        if x.get("co_so"):
-            dong.append((f"   · Căn cứ chọn mạch: {x['co_so']}.", "dexuat"))
-    if chon_ai:
-        dong.append((f"Nguồn: {(chon_ai[0].get('nguon') or '').rstrip('.')}.", "nguon"))
+        # KHÔNG ghi dòng “Căn cứ chọn mạch: …” và dòng “Nguồn: …” trong file Word
+        # (nguồn văn bản vẫn hiển thị ở trang duyệt trên web và ở tên dòng hoạt động AI).
     return dong
 
 
@@ -1071,13 +1084,34 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
             dat.append("Mục giáo dục AI nằm sau mục năng lực số và trước mục Phẩm chất."
                        if i_nld is not None else
                        "Mục giáo dục AI nằm ở cuối phần Năng lực, ngay trước mục Phẩm chất.")
-        # mọi nội dung AI phải ghi rõ nguồn văn bản (không tự bịa căn cứ)
-        if any("2422/QĐ-BGDĐT" in p.text for p in doc.paragraphs):
+        # mọi nội dung AI phải ghi rõ nguồn văn bản (không tự bịa căn cứ) — nguồn có thể nằm
+        # ở dòng hoạt động AI trong bảng tiến trình hoặc ở phần mục tiêu
+        _co_nguon = any("2422/QĐ-BGDĐT" in p.text for p in doc.paragraphs) or any(
+            "2422/QĐ-BGDĐT" in c.text for t in doc.tables for r in t.rows for c in r.cells)
+        if _co_nguon:
             dat.append("Nội dung giáo dục AI có ghi nguồn văn bản (Quyết định 2422/QĐ-BGDĐT) "
                        "và Công văn 5588/BGDĐT-GDPT ngay trong mục tiêu.")
         else:
             loi.append("Nội dung giáo dục AI thiếu ghi nguồn văn bản — không được xuất.")
             cung.append(loi[-1])
+
+    # 2c. thiết kế hoạt động chỉ ghi hoạt động, KHÔNG ghi mã chỉ báo trong dòng hoạt động
+    _mau_ma = re.compile(r"\b\d\.\d\.(?:CB|TC|NC)\d[a-z]?\b")
+    _dong_hd = [r for t in doc.tables for r in t.rows
+                if any(("tích hợp năng lực số" in (c.text or "").lower()
+                        or "tích hợp giáo dục ai" in (c.text or "").lower()) for c in r.cells)]
+    for dong in _dong_hd:
+        for o in dong.cells:
+            if _mau_ma.search(o.text or ""):
+                loi.append("Dòng hoạt động trong bảng còn ghi mã năng lực số — thiết kế hoạt động "
+                           "chỉ ghi hoạt động, không ghi chi tiết năng lực.")
+                cung.append(loi[-1])
+                break
+        else:
+            continue
+        break
+    else:
+        dat.append("Dòng hoạt động trong bảng chỉ ghi hoạt động, không ghi mã chỉ báo.")
 
     # 3. không chèn trùng mục (chỉ tính TIÊU ĐỀ mục, không tính câu có nhắc tới)
     dem = sum(1 for p in doc.paragraphs if la_tieu_de_nld(p.text))
