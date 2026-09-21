@@ -43,15 +43,15 @@
    {% for k,(lb,_) in PROVIDERS.items() %}<option value="{{k}}">{{lb}}</option>{% endfor %}</select></label>
   <label class="f" style="flex-direction:row;align-items:center;gap:7px;padding-bottom:9px;color:#334155">
    <input type="checkbox" name="hien_diem" checked style="width:16px;height:16px"> Kèm điểm &amp; xếp loại</label>
+  <button class="ok">✨ Sinh nhận xét (miễn phí)</button>
   {% if is_pro %}
-  <button class="ok">✨ Sinh nhận xét</button>
   <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
   {% elif remaining and remaining > 0 %}
-  <button class="ok">✨ Sinh nhận xét</button>
-  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) — một lần sinh nhận xét tính 1 lượt</span>
+  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt tải tệp về (dùng chung cho tất cả chức năng) —
+   sinh nhận xét và xem trực tuyến không tính lượt, chỉ tính khi xuất Excel</span>
   {% else %}
-  <a class="btn" href="{{url_for('core.nang_cap', need='nhanxet')}}"
-    style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để sinh nhận xét</a>
+  <span class="muted" style="margin-left:10px">Hết {{FREE_QUOTA}} lượt tải tệp về — vẫn sinh nhận xét và xem trực tuyến được;
+   <a href="{{url_for('core.nang_cap')}}">nâng VIP</a> để tải Excel.</span>
   {% endif %}
  </div>
 </form>

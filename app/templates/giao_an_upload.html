@@ -39,16 +39,15 @@
    <label class="f" style="flex:1;min-width:150px">Số tiêu chí tối đa
     <input type="number" name="toi_da" value="3" min="1" max="5"></label>
   </div>
+  <button class="ok" style="margin-top:16px">Phân tích và tạo bản xem trước (miễn phí)</button>
   {% if is_pro %}
-  <button class="ok" style="margin-top:16px">Phân tích và tạo bản xem trước</button>
   <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
   {% elif remaining and remaining > 0 %}
-  <button class="ok" style="margin-top:16px">Phân tích và tạo bản xem trước</button>
-  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) — một giáo án tính 1 lượt</span>
+  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt tải tệp về (dùng chung cho tất cả chức năng) —
+   soạn và xem trực tuyến không tính lượt</span>
   {% else %}
-  <a class="btn" href="{{url_for('core.nang_cap', need='giaoan')}}"
-    style="margin-top:16px;background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để soạn giáo án tích hợp</a>
-  <div class="muted" style="margin-top:6px">Số lượt miễn phí tính chung cho tất cả chức năng của {{SITE_NAME}}.</div>
+  <span class="muted" style="margin-left:10px">Hết {{FREE_QUOTA}} lượt tải tệp về — vẫn soạn và xem trực tuyến được;
+   <a href="{{url_for('core.nang_cap')}}">nâng VIP</a> để tải tệp.</span>
   {% endif %}
  </form>
 </div>

@@ -13,7 +13,8 @@
 <div class="card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-left:4px solid #f59e0b">
  <span style="font-size:28px">🎁</span>
  <div style="flex:1;min-width:220px"><b>Đang dùng thử — còn {{remaining}} lượt</b>
-  <div class="muted">Số lượt này tính chung cho <b>tất cả chức năng</b> · Nâng cấp
+  <div class="muted">Số lượt này tính chung cho <b>tất cả chức năng</b> — mỗi <b>tệp tải về</b> tính 1 lượt,
+   tạo và xem trực tuyến không tính lượt · Nâng cấp
    {{ '{:,}'.format(BL.PRICE).replace(',','.') }}đ/năm để dùng không giới hạn</div></div>
  <a class="btn" href="{{url_for('core.nang_cap')}}">🚀 Nâng cấp ngay</a></div>
 {% endif %}

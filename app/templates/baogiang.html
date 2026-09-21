@@ -88,13 +88,12 @@
  </form>
  <hr class="s">
  <div class="row" style="gap:9px">
-  {% if is_pro or remaining > 0 %}
    <form method="post" style="display:inline">
     {% for k,v in request.args.items() %}<input type="hidden" name="{{k}}" value="{{v}}">{% endfor %}
     {% if 'tuan' not in request.args %}<input type="hidden" name="tuan" value="{{tuan}}">{% endif %}
     <input type="hidden" name="tu_ngay" value="{{monday}}">
     <input type="hidden" name="act" value="pdf">
-    <button class="ok">📄 Xuất PDF tuần {{tuan}}</button>
+    <button class="ok">📄 PDF tuần {{tuan}} — xem trực tuyến miễn phí</button>
    </form>
    <form method="post" style="display:inline">
     {% for k,v in request.args.items() %}<input type="hidden" name="{{k}}" value="{{v}}">{% endfor %}
@@ -102,18 +101,18 @@
     <input type="hidden" name="tu_ngay" value="{{monday}}">
     <input type="hidden" name="act" value="word">
     <button style="background:linear-gradient(135deg,#1d4ed8,#2563eb);box-shadow:0 6px 16px -8px #2563eb">
-     📝 Tải file Word</button>
+     📝 Tải file Word (1 lượt)</button>
    </form>
    {% if is_pro %}
     <span class="muted">👑 Gói không giới hạn · còn {{days_left}} ngày</span>
+   {% elif remaining and remaining > 0 %}
+    <span class="muted">A4 ngang · font tiếng Việt — <b>còn {{remaining}} lượt tải tệp về</b> ·
+     📄 PDF xem trực tuyến miễn phí, 📝 file Word tính 1 lượt</span>
    {% else %}
-    <span class="muted">A4 ngang · font tiếng Việt — <b>còn {{remaining}} lượt</b></span>
+    <span class="muted">📄 PDF xem trực tuyến <b>miễn phí</b> ·
+     <a href="{{url_for('core.nang_cap', need='word')}}">🔒 nâng VIP</a> để tải file Word</span>
    {% endif %}
-  {% else %}
-   <a class="btn" href="{{url_for('core.nang_cap', need='pdf')}}" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">
-    🔒 Hết lượt miễn phí — Nâng cấp để tải</a>
-   <span class="muted">Chỉ {{ '{:,}'.format(BL.PRICE).replace(',','.') }}đ/năm dùng không giới hạn</span>
-  {% endif %}
+
  </div>
  <p class="muted" style="margin:10px 0 0">
   📄 <b>PDF</b> — in nộp ngay, giữ nguyên định dạng &nbsp;·&nbsp;

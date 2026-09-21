@@ -18,7 +18,8 @@
   </div>
   <label class="f" style="margin-top:6px;flex:1;min-width:260px">File KHDH (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
   <p class="sub">Để trống ô <b>số tiết mỗi tuần</b> thì hệ thống tự suy ra từ KHDH (cột tuần / cột số tiết), rồi thầy/cô sửa lại được.
-  Lưu vào kho <b>không tính lượt</b> — lượt chỉ tính khi tạo bản tích hợp NLS/AI/STEM.</p>
+  Lưu vào kho <b>không tính lượt</b>. Tạo bản tích hợp NLS/AI/STEM rồi <b>xem trực tuyến cũng miễn phí</b> —
+  <b>lượt chỉ tính khi bấm tải tệp Word về</b> (mỗi tệp 1 lượt).</p>
   <button class="ok">＋ Thêm môn + KHDH</button>
   {% if kho_moi %}<span class="muted" style="margin-left:10px">Môn vừa lưu được đánh dấu màu vàng trong bảng dưới.</span>{% endif %}
  </form>
@@ -56,7 +57,7 @@
        </div>
        <label style="display:flex;gap:8px;align-items:flex-start"><input type="hidden" name="cung_bai" value="0">
         <input type="checkbox" name="cung_bai" value="1" checked style="width:18px;margin-top:3px"><span>Tích hợp năng lực số và AI <b>cùng bài</b></span></label>
-       <button class="ok sm">Tạo bản tích hợp (1 lượt)</button>
+       <button class="ok sm">Tạo bản xem trước (miễn phí)</button>
       </form>
      </details>
      {% endif %}
@@ -124,16 +125,15 @@
   <p class="sub">Chọn <b>riêng từng cái</b> hoặc <b>cả ba</b>: bỏ tích ô nào thì cột đó không được đề xuất cho
   cả file. Ở bước rà soát, mỗi dòng bài học còn có ô tích riêng để giữ/bỏ từng cột.</p>
   <label class="f" style="margin:18px 0">File Word (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
+  <button class="ok">Tạo bản xem trước (miễn phí)</button>
   {% if is_pro %}
-  <button class="ok">Tạo bản xem trước</button>
   <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
   {% elif remaining and remaining > 0 %}
-  <button class="ok">Tạo bản xem trước</button>
-  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) — một tài liệu tính 1 lượt</span>
+  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt tải tệp về (dùng chung cho tất cả chức năng) —
+   tạo và xem trực tuyến không tính lượt</span>
   {% else %}
-  <a class="btn" href="{{url_for('core.nang_cap', need='khgd')}}"
-    style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để tích hợp</a>
-  <div class="muted" style="margin-top:6px">Số lượt miễn phí tính chung cho tất cả chức năng của {{SITE_NAME}}.</div>
+  <span class="muted" style="margin-left:10px">Hết {{FREE_QUOTA}} lượt tải tệp về — vẫn tạo và xem trực tuyến được;
+   <a href="{{url_for('core.nang_cap')}}">nâng VIP</a> để tải tệp.</span>
   {% endif %}
  </form>
 </div>

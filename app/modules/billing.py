@@ -92,9 +92,13 @@ CAC_CHUC_NANG = {
 
 
 def thong_bao_het():
-    """Câu báo khi hết lượt — dùng chung ở mọi chức năng để thầy/cô biết đây là hạn mức chung."""
-    return ("Thầy/cô đã dùng hết %d lượt miễn phí (số lượt này tính chung cho TẤT CẢ chức năng). "
-            "Nâng cấp VIP để tiếp tục dùng không giới hạn." % CFG.get_int("FREE_QUOTA", 3))
+    """Câu báo khi hết lượt — dùng chung ở mọi chức năng để thầy/cô biết đây là hạn mức chung.
+
+    (M14) Lượt là LƯỢT TẢI TỆP VỀ: tạo và xem trực tuyến không tính lượt.
+    """
+    return ("Thầy/cô đã dùng hết %d lượt miễn phí (số lượt này tính chung cho TẤT CẢ chức năng — "
+            "mỗi tệp tải về tính 1 lượt, xem trực tuyến không tính lượt). "
+            "Nâng cấp VIP để tải không giới hạn." % CFG.get_int("FREE_QUOTA", 3))
 
 
 def chan_het(user):
@@ -114,6 +118,41 @@ def consume(db, user, kind, detail=""):
     db.execute("UPDATE teacher SET used = COALESCE(used,0) + 1 WHERE id=?", (user["id"],))
     db.execute("INSERT INTO usage_log(teacher_id,kind,detail,created) VALUES(?,?,?,?)",
                (user["id"], kind, detail, datetime.datetime.now().isoformat(timespec="seconds")))
+    db.commit()
+    return True
+
+
+# ---------------- (M14) lượt tính ở bước TẢI TỆP VỀ ----------------
+def da_tra_luot(db, uid, token):
+    """Kết quả này đã trả lượt khi tải rồi? (tải lại cùng kết quả: không trừ thêm)."""
+    if not token:
+        return False
+    try:
+        return bool(db.execute("SELECT 1 FROM usage_log WHERE teacher_id=? AND detail LIKE ? LIMIT 1",
+                               (uid, "%#" + str(token))).fetchone())
+    except Exception:
+        return False
+
+
+def tra_luot_tai(db, user, kind, token, detail=""):
+    """Trừ 1 lượt cho MỘT KẾT QUẢ khi thầy/cô bấm tải tệp về.
+
+    Tạo và xem trực tuyến KHÔNG tính lượt; tải lại cùng một kết quả cũng không trừ thêm.
+    Trả về True nếu được phép tải, False nếu đã hết lượt.
+    """
+    _chi = ("%s #%s" % (detail, token))[:300] if token else (detail or "")[:300]
+    if is_pro(user):
+        db.execute("INSERT INTO usage_log(teacher_id,kind,detail,created) VALUES(?,?,?,?)",
+                   (user["id"], kind, _chi, datetime.datetime.now().isoformat(timespec="seconds")))
+        db.commit()
+        return True
+    if da_tra_luot(db, user["id"], token):
+        return True
+    if remaining(user) <= 0:
+        return False
+    db.execute("UPDATE teacher SET used = COALESCE(used,0) + 1 WHERE id=?", (user["id"],))
+    db.execute("INSERT INTO usage_log(teacher_id,kind,detail,created) VALUES(?,?,?,?)",
+               (user["id"], kind, _chi, datetime.datetime.now().isoformat(timespec="seconds")))
     db.commit()
     return True
 

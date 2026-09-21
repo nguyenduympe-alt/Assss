@@ -392,11 +392,12 @@ def bao_giang():
 
     act = request.form.get("act") if request.method == "POST" else None
     if act in ("pdf", "word"):
-        if not BL.can_use(u):
-            flash(BL.thong_bao_het(), "err")
-            return redirect(url_for("core.nang_cap", need=act))
-        BL.consume(db, u, act, f"Lịch báo giảng tuần {tuan}")
+        # (M14) PDF mở xem trực tuyến: KHÔNG tính lượt. Tải file Word về: tính 1 lượt.
         if act == "word":
+            if not BL.tra_luot_tai(db, u, "baogiang", f"baogiang-{u['id']}-tuan{tuan}",
+                                   f"Lịch báo giảng tuần {tuan} (tải file Word)"):
+                flash(BL.thong_bao_het(), "err")
+                return redirect(url_for("core.nang_cap", need="word"))
             return send_file(build_docx(meta, rows), as_attachment=True,
                              download_name=f"lich-bao-giang-tuan-{tuan}.docx",
                              mimetype="application/vnd.openxmlformats-officedocument."
@@ -427,11 +428,8 @@ def nhan_xet():
     db, uid = get_db(), session["uid"]
     result, cols = None, None
     if request.method == "POST":
-        # (M10) hạn mức dùng chung: tạo nhận xét cho học sinh cũng tính 1 lượt
+        # (M14) sinh nhận xét và xem trực tuyến KHÔNG tính lượt — lượt chỉ tính khi xuất Excel
         u = current_user()
-        if not BL.can_use(u):
-            flash(BL.thong_bao_het(), "err")
-            return redirect(url_for("core.nang_cap", need="nhanxet"))
         provider = request.form.get("provider", "rule")
         thang = float(request.form.get("thang") or 10)
         mon = request.form.get("mon", "")
@@ -483,8 +481,6 @@ def nhan_xet():
                        (uid, rec["lop"], rec["mon"], hocky, rec["ho_ten"], rec["diem"], rec["muc_do"],
                         rec["nhan_xet_goc"], rec["nhan_xet"], datetime.datetime.now().isoformat(timespec="seconds")))
         db.commit()
-        if records:
-            BL.consume(db, u, "nhanxet", "Tạo nhận xét cho %d học sinh" % len(records))
         result = records
         session["last_meta"] = {"lop": lop, "mon": mon, "hocky": hocky}
     return render_template("nhanxet.html", result=result, cols=cols)
@@ -520,9 +516,6 @@ def tao_lai():
 @login_required
 def xuat_excel():
     u = current_user()
-    if not BL.can_use(u):
-        flash(BL.thong_bao_het(), "err")
-        return redirect(url_for("core.nang_cap", need="excel"))
     ids = request.args.get("ids")
     q = "SELECT * FROM danhgia WHERE teacher_id=?"
     p = [session["uid"]]
@@ -533,7 +526,12 @@ def xuat_excel():
     data = [{"ho_ten": r["ho_ten"], "lop": r["lop"], "mon": r["mon"], "diem": r["diem"],
              "muc_do": r["muc_do"], "xep_loai": AI.diem_to_xeploai(r["diem"]) if r["diem"] is not None else "",
              "nhan_xet": r["nhan_xet"]} for r in rows]
-    BL.consume(get_db(), u, "excel", f"Xuất {len(data)} nhận xét")
+    # (M14) lượt tính khi TẢI TỆP VỀ — tải lại đúng bảng nhận xét này không trừ thêm
+    if not BL.tra_luot_tai(get_db(), u, "excel",
+                           "excel-%s-%s-%d" % (u["id"], ids or "all", len(data)),
+                           f"Xuất {len(data)} nhận xét"):
+        flash(BL.thong_bao_het(), "err")
+        return redirect(url_for("core.nang_cap", need="excel"))
     bio = XL.export_xlsx(data, {"tieu_de": "BẢNG NHẬN XÉT HỌC SINH"})
     return send_file(bio, as_attachment=True, download_name="nhan-xet-hoc-sinh.xlsx",
                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

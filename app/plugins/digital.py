@@ -57,10 +57,7 @@ def load(token):
 @login_required
 def index():
     if request.method == 'POST':
-        # (M10) hạn mức dùng chung cho tất cả chức năng: hết 3 lượt thì phải nâng VIP
-        if BL.chan_het(current_user()):
-            flash(BL.thong_bao_het(), 'err')
-            return redirect(url_for('core.nang_cap', need='khgd'))
+        # (M14) tạo bản xem trước KHÔNG tính lượt — lượt chỉ trừ khi bấm tải tệp Word về
         file = request.files.get('file')
         mode, grade, subject = (request.form.get(k, '').strip() for k in ('mode','grade','subject'))
         # (M7) số bài cần tích hợp ở phân phối chương trình (để trống = hệ thống tự chọn bài phù hợp)
@@ -90,10 +87,7 @@ def index():
                                   cung_bai=cung_bai)
                 token = luu_phien(data, rows, mode, grade, subject, file.filename[:200], chon,
                                   so_bai, so_bai_ai, cung_bai)
-                # tính 1 lượt cho một tài liệu đã xử lý xong (bước tải tệp đã duyệt KHÔNG tính thêm)
-                BL.consume(get_db(), current_user(), 'khgd',
-                           '%s: %s' % ('KHGD/PPCT' if mode == 'ppct' else 'Giáo án tích hợp',
-                                       (file.filename or '')[:120]))
+                # (M14) chưa trừ lượt: thầy/cô xem và sửa bản xem trước trước đã
                 return redirect(url_for('digital.review', token=token))
             except ValueError as exc:
                 flash(str(exc), 'err')
@@ -254,9 +248,6 @@ def kho_tich_hop(kid):
     if not row:
         flash('Không tìm thấy môn này trong kho KHDH.', 'err')
         return redirect(url_for('digital.index'))
-    if BL.chan_het(current_user()):
-        flash(BL.thong_bao_het(), 'err')
-        return redirect(url_for('core.nang_cap', need='khgd'))
     chon, so_bai, so_bai_ai, cung_bai = _doc_chon()
     loi = _loi_so_bai(so_bai, so_bai_ai)
     data = KHO.doc_tep(uid, row)
@@ -279,8 +270,7 @@ def kho_tich_hop(kid):
             ten = (row['ten_file'] or 'KHDH')[:200]
             token = luu_phien(data, rows, row['loai'] or 'ppct', row['khoi'], row['mon'], ten,
                               chon, so_bai, so_bai_ai, cung_bai)
-            BL.consume(db, current_user(), 'khgd', 'KHDH trong kho — %s: %s'
-                       % (KHO.ten_mon(row['mon'], row['khoi']), ten[:100]))
+            # (M14) tạo bản xem trước từ kho cũng miễn phí — lượt trừ khi tải tệp Word về
             return redirect(url_for('digital.review', token=token))
     return redirect(url_for('digital.index', kho=kid))
 
@@ -381,6 +371,12 @@ def review(token):
                 _phan.append('STEM')
             _ten = ('KHDH' if ctx['mode'] == 'ppct' else 'Giao-an') + '-tich-hop-' + \
                    ('-'.join(_phan) if _phan else 'trong') + '.docx'
+            # (M14) trừ 1 lượt khi TẢI TỆP VỀ (tải lại cùng bản này không trừ thêm)
+            _loai = 'KHGD/PPCT' if ctx['mode'] == 'ppct' else 'Giáo án tích hợp'
+            if not BL.tra_luot_tai(get_db(), current_user(), 'khgd', token,
+                                   '%s: %s' % (_loai, (ctx.get('name') or '')[:120])):
+                flash(BL.thong_bao_het(), 'err')
+                return redirect(url_for('core.nang_cap', need='khgd'))
             return send_file(output, as_attachment=True, download_name=_ten,
                              mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     return render_template('digital_review.html', ctx=ctx, token=token)

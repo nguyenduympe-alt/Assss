@@ -44,10 +44,7 @@ NHAN_NOI_BO = ("Xử lý ngay trên máy chủ của trường, KHÔNG gửi n�
 @login_required
 def index():
     if request.method == 'POST':
-        # (M10) hạn mức dùng chung cho tất cả chức năng: hết 3 lượt thì phải nâng VIP
-        if BL.chan_het(current_user()):
-            flash(BL.thong_bao_het(), 'err')
-            return redirect(url_for('core.nang_cap', need='giaoan'))
+        # (M14) phân tích và tạo bản xem trước KHÔNG tính lượt — lượt chỉ trừ khi tải tệp về
         file = request.files.get('file')
         if not file or not (file.filename or '').lower().endswith('.docx'):
             flash('Vui lòng chọn file Word .docx. File .doc hoặc .docm không được hỗ trợ.', 'err')
@@ -91,9 +88,7 @@ def index():
                     'thiet_bi': thiet_bi, 'thoi_luong': thoi_luong, 'toi_da': toi_da,
                     'doan_goc': TH.trang_thai_mau_goc(doc),
                 })
-            # tính 1 lượt cho một giáo án đã soạn xong (bước tải file đã soạn KHÔNG tính thêm)
-            BL.consume(get_db(), current_user(), 'giaoan',
-                       'Giáo án: %s — lớp %s' % (TH.lay_ten_bai(doc)[:120], pt['lop'] or '?'))
+            # (M14) chưa trừ lượt: thầy/cô xem bản xem trước trước đã
             return redirect(url_for('giao_an_nls.duyet', token=token))
         except ValueError as exc:
             flash(str(exc), 'err')
@@ -168,6 +163,14 @@ def xuat(token):
         session['loi_cu'] = kt
         flash('Bộ kiểm tra phát hiện lỗi phải sửa trước khi xuất (xem chi tiết bên dưới).', 'err')
         return redirect(url_for('giao_an_nls.duyet', token=token))
+
+    # (M14) trừ 1 lượt khi TẢI TỆP VỀ (tải lại cùng giáo án này không trừ thêm)
+    db, u = get_db(), current_user()
+    if not BL.tra_luot_tai(db, u, 'giaoan', token,
+                           'Giáo án: %s — lớp %s' % ((c.get('ten_bai') or '')[:120],
+                                                     c.get('lop') or '?')):
+        flash(BL.thong_bao_het(), 'err')
+        return redirect(url_for('core.nang_cap', need='giaoan'))
 
     out = io.BytesIO()
     doc_out.save(out)

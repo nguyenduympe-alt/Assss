@@ -176,7 +176,9 @@ def xuat(token):
     # Giữ nguyên chính sách tính lượt như công cụ chính tả trước đây: 1 lượt cho một
     # lần xuất bản đã sửa. Việc bấm “từ này đúng” ở trên KHÔNG tốn lượt.
     db, u = get_db(), current_user()
-    if not BL.can_use(u):
+    # (M14) xem bản sửa trực tuyến KHÔNG tính lượt — chỉ tính khi tải tệp về
+    # (tải lại cùng bản này cũng không trừ thêm)
+    if not (BL.can_use(u) or BL.da_tra_luot(db, u['id'], token)):
         flash(BL.thong_bao_het(), 'err')
         return redirect(url_for('core.nang_cap', need='chinhta'))
 
@@ -191,7 +193,7 @@ def xuat(token):
         flash('Không áp dụng được chỗ nào (văn bản có thể đã thay đổi). Thầy/cô tải lại file giúp em.', 'err')
         return redirect(url_for('chinh_ta.duyet', token=token))
 
-    BL.consume(db, u, 'chinhta', 'Sửa %d chỗ — %s' % (da_sua, c.get('ten') or ''))
+    BL.tra_luot_tai(db, u, 'chinhta', token, 'Sửa %d chỗ — %s' % (da_sua, c.get('ten') or ''))
 
     # GHI PHẢN HỒI: nhận hay bỏ qua từng đề xuất — dữ liệu để hệ thống học dần
     # (xem app/modules/hoc_tu_nguoi_dung.py). Lỗi ghi không được làm hỏng việc xuất tệp.

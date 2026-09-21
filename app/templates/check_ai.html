@@ -37,7 +37,8 @@
     <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
     {% elif remaining and remaining > 0 %}
     <button class="ok" style="margin-top:14px">Phân tích văn phong</button>
-    <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) — thao tác này tính 1 lượt</span>
+    <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) —
+     chức năng này chấm xem trực tuyến (không có tệp tải về) nên tính 1 lượt khi bấm dò</span>
     {% else %}
     <a class="btn" href="{{url_for('core.nang_cap', need='checkai')}}"
       style="margin-top:14px;background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để phân tích</a>
