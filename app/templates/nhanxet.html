@@ -36,7 +36,7 @@
  <hr class="s">
  <div class="row">
   <label class="f">Lớp<input name="lop" style="width:100px" placeholder="5A"></label>
-  <label class="f">Môn<input name="mon" value="{{user['subject'] or ''}}" style="width:140px"></label>
+  <label class="f">Môn<input name="mon" list="goi_y_mon" value="{{user['subject'] or ''}}" style="width:140px"></label>
   <label class="f">Học kỳ<select name="hocky"><option>HK1</option><option>HK2</option><option>Cả năm</option></select></label>
   <label class="f">Thang điểm<select name="thang"><option value="10">Thang 10</option><option value="100">Thang 100</option><option value="4">Thang 4</option></select></label>
   <label class="f">Kiểu nhận xét<select name="provider">

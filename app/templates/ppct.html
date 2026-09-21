@@ -17,7 +17,8 @@ function flt(){const q=document.getElementById('q').value.toLowerCase();
    <input type="hidden" name="act" value="add">
    <label class="f">Tuần<input name="tuan" type="number" min="1" value="{{tuan or 1}}" style="width:82px" required></label>
    <label class="f">Khối/Lớp<input name="khoi" style="width:92px" placeholder="5"></label>
-   <label class="f">Môn<input name="mon" required style="width:130px" placeholder="Toán"></label>
+   <label class="f">Môn<input name="mon" required list="goi_y_mon" style="width:130px" placeholder="Toán"
+     value="{{user['subject'] or ''}}"></label>
    <label class="f">Tiết PPCT<input name="tiet_pp" type="number" style="width:92px"></label>
    <label class="f" style="flex:1;min-width:200px">Tên bài dạy<input name="ten_bai" required></label>
    <label class="f" style="flex:1;min-width:160px">Đồ dùng / Ghi chú<input name="ghi_chu"></label>

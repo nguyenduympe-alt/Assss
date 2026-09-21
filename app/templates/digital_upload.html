@@ -3,24 +3,40 @@
 {% block crumb %}Tải Word → rà soát gợi ý theo bài → tải bản đã tích hợp{% endblock %}
 {% block body %}
 <div class="card" id="kho">
- <div class="chead"><h3>📚 Kho KHDH theo môn</h3><span class="chip">{{kho|length}} môn</span></div>
+ <div class="chead"><h3>📚 Kho KHDH theo môn</h3>
+  <span class="chip">{{kho|length}} môn — khối</span></div>
  <p class="sub">Mỗi <b>môn + khối</b> giữ <b>một</b> KHDH đang dùng (ví dụ: Toán · khối 4; Toán · khối 5 là hai môn riêng).
- Thầy/cô tạo bao nhiêu môn cũng được, mỗi môn tải <b>một</b> KHDH lên. Sang trang
+ <b>Một giáo viên dạy được nhiều môn</b> — thầy/cô tạo bao nhiêu môn cũng được, và nay có thể
+ <b>tải nhiều phân phối chương trình lên cùng một lần</b>; mỗi mục giữ thêm <b>các phiên bản cũ</b> khi thay bản mới. Sang trang
  <a href="{{url_for('core.tkb')}}"><b>Thời khoá biểu</b></a> chỉ cần chọn môn đã tạo và nhập lớp dạy — hệ thống đối chiếu
  <b>số tiết mỗi tuần</b> ghi trong KHDH với số tiết đã xếp.</p>
+ {% if theo_mon %}
+ <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px">
+  {% for t in theo_mon %}
+   <span class="chip" title="Các khối: {{t.khoi|join(', ')}}">{{t.mon}} · {{t.khoi|length}} khối{% if t.ban > t.khoi|length %} · {{t.ban}} phiên bản{% endif %}</span>
+  {% endfor %}
+ </div>
+ {% endif %}
  <form method="post" action="{{url_for('digital.kho_them')}}" enctype="multipart/form-data">
   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
   <div class="row">
-   <label class="f">Môn<input name="mon" maxlength="100" placeholder="Ví dụ: Toán" required style="width:150px"></label>
-   <label class="f">Khối<select name="khoi" required>{% for k in khoi %}<option>{{k}}</option>{% endfor %}</select></label>
+   <label class="f">Môn (để trống: tự đọc từ tên tệp)<input name="mon" list="goi_y_mon" maxlength="100"
+     placeholder="Ví dụ: Toán" style="width:190px"></label>
+   <label class="f">Khối (để trống: tự đọc từ tên tệp)<select name="khoi"><option value="">— tự đọc —</option>
+     {% for k in khoi %}<option>{{k}}</option>{% endfor %}</select></label>
    <label class="f">Loại tài liệu (KHDH)<select name="loai"><option value="ppct">KHDH — Kế hoạch giáo dục / Phân phối chương trình</option><option value="lesson">KHDH — Giáo án / Kế hoạch bài dạy</option></select></label>
    <label class="f">Số tiết mỗi tuần<input name="tiet_tuan" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="để trống: tự suy ra" style="width:150px"></label>
   </div>
-  <label class="f" style="margin-top:6px;flex:1;min-width:260px">File KHDH (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
+  <label class="f" style="margin-top:6px;flex:1;min-width:260px">File KHDH / PPCT (.docx, tối đa 8 MB — <b>chọn được nhiều tệp một lần</b>)
+   <input type="file" name="files" accept=".docx" multiple required></label>
+  <p class="sub" style="margin:4px 0 0">Đặt tên tệp có <b>môn</b> và <b>khối</b> để hệ thống tự xếp vào kho —
+   ví dụ: <code>KHDH Toan 6.docx</code>, <code>PPCT-Ngu-van-7.docx</code>, <code>Tin học 10.docx</code>.
+   Điền ô Môn + Khối ở trên thì áp cho <b>mọi tệp</b> trong lượt này.
+   Môn mới đọc được sẽ <b>tự vào danh sách môn dạy</b> của thầy/cô.</p>
   <p class="sub">Để trống ô <b>số tiết mỗi tuần</b> thì hệ thống tự suy ra từ KHDH (cột tuần / cột số tiết), rồi thầy/cô sửa lại được.
   Lưu vào kho <b>không tính lượt</b>. Tạo bản tích hợp NLS/AI/STEM rồi <b>xem trực tuyến cũng miễn phí</b> —
   <b>lượt chỉ tính khi bấm tải tệp Word về</b> (mỗi tệp 1 lượt).</p>
-  <button class="ok">＋ Thêm môn + KHDH</button>
+  <button class="ok">＋ Nhận KHDH (một hoặc nhiều tệp)</button>
   {% if kho_moi %}<span class="muted" style="margin-left:10px">Môn vừa lưu được đánh dấu màu vàng trong bảng dưới.</span>{% endif %}
  </form>
  {% if kho %}

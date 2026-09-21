@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block head %}Kết quả nhận nhiều KHDH{% endblock %}
+{% block crumb %}Kết quả nhận nhiều phân phối chương trình một lần{% endblock %}
+{% block body %}
+<div class="card">
+ <div class="chead"><h3>📥 Kết quả nhận tệp KHDH / PPCT</h3>
+  <span class="chip">{{ket_qua|length}} tệp</span></div>
+ <p class="sub">Đã thêm mới <b>{{so_moi}}</b> môn · <b>{{so_ban}}</b> phiên bản mới{% if so_loi %} ·
+  <b style="color:#b91c1c">{{so_loi}} tệp chưa lưu được</b>{% endif %}.
+  Lưu vào kho <b>không tính lượt</b>.</p>
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>Tệp</th><th>Môn</th><th>Khối</th><th>Kết quả</th><th>Số bài</th></tr></thead>
+  <tbody>
+  {% for d in ket_qua %}
+   <tr>
+    <td>{{d.ten}}</td>
+    <td>{% if d.mon %}<b>{{d.mon}}</b>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if d.khoi %}<span class="chip">Khối {{d.khoi}}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if d.ok %}<span style="color:#15803d">✔ {{d.ket}}</span>{% else %}<span style="color:#b91c1c">✘ {{d.ket}}</span>{% endif %}</td>
+    <td>{{d.so_dong or '—'}}</td>
+   </tr>
+  {% endfor %}
+  </tbody>
+ </table></div>
+ <div class="row" style="margin-top:14px">
+  <a class="btn" href="{{url_for('digital.index')}}#kho">← Về kho KHDH</a>
+  <span class="muted">Danh sách môn dạy hiện tại: {{mon_day|join(' · ') if mon_day else 'chưa có'}}</span>
+ </div>
+</div>
+{% endblock %}

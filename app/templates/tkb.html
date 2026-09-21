@@ -20,7 +20,7 @@
    <label class="f">Phòng / Ghi chú<input name="phong" style="width:150px"></label>
   </div>
   <div class="row" style="margin-top:6px">
-   <label class="f">Chỉ điền khi chọn “＋ Môn khác” — Tên môn<input name="mon_moi" maxlength="100" style="width:160px" placeholder="Ví dụ: Âm nhạc"></label>
+   <label class="f">Chỉ điền khi chọn “＋ Môn khác” — Tên môn<input name="mon_moi" list="goi_y_mon" maxlength="100" style="width:160px" placeholder="Ví dụ: Âm nhạc"></label>
    <label class="f">Khối của môn mới<select name="khoi_moi"><option value="">Chọn khối</option>{% for k in KHOI %}<option>{{k}}</option>{% endfor %}</select></label>
    <button>+ Thêm tiết</button>
   </div>

@@ -163,7 +163,8 @@ def init_db():
     cols = {r[1] for r in con.execute("PRAGMA table_info(teacher)")}
     for name, ddl in [("email", "TEXT"), ("phone", "TEXT"), ("google_sub", "TEXT"), ("avatar", "TEXT"),
                       ("used", "INTEGER DEFAULT 0"), ("bought", "INTEGER DEFAULT 0"),
-                      ("expires", "TEXT"), ("created", "TEXT")]:
+                      ("expires", "TEXT"), ("created", "TEXT"),
+                      ("subjects", "TEXT")]:        # (M17) một giáo viên dạy nhiều môn
         if name not in cols:
             try:
                 con.execute(f"ALTER TABLE teacher ADD COLUMN {name} {ddl}")
@@ -189,6 +190,9 @@ def init_db():
                 con.execute(f"ALTER TABLE tkb ADD COLUMN {name} {ddl}")
             except sqlite3.OperationalError:
                 pass
+    # (M17) DB cũ: chuyển "môn dạy" đang có thành dòng đầu của danh sách môn
+    con.execute("UPDATE teacher SET subjects=subject WHERE (subjects IS NULL OR TRIM(subjects)='')"
+                " AND subject IS NOT NULL AND TRIM(subject)<>''")
     con.execute("UPDATE teacher SET role='admin' WHERE username='gv' AND (role IS NULL OR role='teacher')")
     con.commit()
     con.close()

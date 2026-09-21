@@ -26,7 +26,23 @@
 <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
    <div class="row">
     <label class="f" style="flex:1;min-width:180px">Họ và tên<input name="fullname" value="{{user['fullname'] or ''}}"></label>
-    <label class="f">Môn dạy<input name="subject" value="{{user['subject'] or ''}}" style="width:150px"></label>
+   </div>
+   <div style="margin-top:11px">
+    <label class="f" style="display:block">Môn dạy — thầy/cô có thể dạy <b>nhiều môn</b>
+     <textarea name="mon_day" rows="3" list="goi_y_mon" style="width:100%;max-width:520px"
+      placeholder="Mỗi dòng một môn, ví dụ:&#10;Toán&#10;Tin học&#10;Hoạt động trải nghiệm">{{mon_day|join('
+')}}</textarea></label>
+    <div class="muted" style="font-size:12.5px;margin-top:4px">
+     Mỗi dòng một môn. <b>Dòng đầu là môn chính</b> — hệ thống tự điền môn này vào lịch báo giảng, nhận xét học sinh…
+     Thêm môn nào thì môn đó xuất hiện trong kho KHDH, phân phối chương trình và thời khoá biểu.</div>
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+     <span class="muted" style="font-size:12.5px;align-self:center">Thêm nhanh:</span>
+     {% for m in GOI_Y_MON[:10] %}
+      <button type="button" class="btn sec sm" style="font-size:12px"
+       onclick="const t=this.closest('div').parentElement.querySelector('textarea[name=mon_day]');
+                if(!t.value.toLowerCase().includes('{{m|lower}}')){t.value=(t.value.trim()?t.value.replace(/\s*$/,'')+'\n':'')+'{{m}}';}">{{m}}</button>
+     {% endfor %}
+    </div>
    </div>
    <div class="row" style="margin-top:11px">
     <label class="f" style="flex:1;min-width:200px">Trường<input name="school" value="{{user['school'] or ''}}"></label>

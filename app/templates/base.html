@@ -216,4 +216,8 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 </main>
 </div>
 {% else %}{% block body_anon %}{% endblock %}{% endif %}
+<datalist id="goi_y_mon">
+{% for m in mon_day or [] %}<option value="{{m}}">{% endfor %}
+{% for m in GOI_Y_MON or [] %}<option value="{{m}}">{% endfor %}
+</datalist>
 </body></html>

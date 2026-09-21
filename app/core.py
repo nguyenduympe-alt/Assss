@@ -10,6 +10,7 @@ from .modules import khdh_kho as KHO
 from .modules.pdf_bao_giang import build_pdf, THU_NAME
 from .modules.word_bao_giang import build_docx
 from .modules import billing as BL
+from .modules import mon_day as MD
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
 from .modules import sms as SMS
@@ -106,7 +107,9 @@ def inject():
             "SITE_TAGLINE": CFG.get("SITE_TAGLINE", "Trợ lý giáo viên"),
             "SITE_LOGO": CFG.get("SITE_LOGO", "🎓"),
             "so_viec_admin": _viec_admin(u),
-            "canh_bao_mk": _mk_mac_dinh(u)}
+            "canh_bao_mk": _mk_mac_dinh(u),
+            # (M17) danh sách môn dạy của giáo viên + gợi ý môn phổ thông
+            "mon_day": MD.danh_sach(u), "GOI_Y_MON": MD.GOI_Y}
 
 
 def _mk_mac_dinh(u):
@@ -569,12 +572,12 @@ def cai_dat():
         if raw and not phone:
             flash("Số điện thoại không hợp lệ. Ví dụ đúng: 0912345678", "err")
             return redirect(url_for("core.cai_dat"))
-        db.execute("UPDATE teacher SET fullname=?,school=?,subject=?,phone=? WHERE id=?",
-                   (request.form["fullname"], request.form["school"],
-                    request.form["subject"], phone, session["uid"]))
-        db.commit()
-        flash("Đã lưu thông tin" + (" · Mã kích hoạt sẽ được nhắn tới " + SMS.mask(phone)
-                                    if phone else ""), "ok")
+        db.execute("UPDATE teacher SET fullname=?,school=?,phone=? WHERE id=?",
+                   (request.form["fullname"], request.form["school"], phone, session["uid"]))
+        # (M17) lưu DANH SÁCH môn dạy; môn đầu tiên là môn chính (ghi vào cột subject cũ)
+        ds_mon = MD.luu(db, session["uid"], MD.tach_mon(request.form.get("mon_day") or ""))
+        flash("Đã lưu thông tin · %s" % MD.tom_tat({"subjects": "\n".join(ds_mon)})
+              + (" · Mã kích hoạt sẽ được nhắn tới " + SMS.mask(phone) if phone else ""), "ok")
         return redirect(url_for("core.cai_dat"))
     return render_template("caidat.html")
 

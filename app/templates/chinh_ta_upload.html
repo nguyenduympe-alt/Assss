@@ -21,7 +21,7 @@
      {% for i in range(1,13) %}<option value="{{i}}">Lớp {{i}}</option>{% endfor %}
     </select></label>
    <label class="f" style="flex:2;min-width:180px">Môn (không bắt buộc)
-    <input name="subject" maxlength="100" value="{{user['subject'] or ''}}" placeholder="Ví dụ: Ngữ văn"></label>
+    <input name="subject" list="goi_y_mon" maxlength="100" value="{{user['subject'] or ''}}" placeholder="Ví dụ: Ngữ văn"></label>
   </div>
   <button class="ok" style="margin-top:16px">Kiểm tra chính tả</button>
   <p class="muted" style="margin-top:8px">Lớp/môn không bắt buộc — điền để chỗ sửa được ghi kèm ngữ cảnh,
