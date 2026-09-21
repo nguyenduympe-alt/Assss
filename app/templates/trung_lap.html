@@ -14,6 +14,28 @@
         Trùng lặp có thể do <b>đề bài, mẫu câu, dẫn chứng, thuật ngữ</b> dùng chung.
         <b>Không dùng để buộc tội, trừ điểm hay kết luận về học sinh</b> — hãy hỏi lại và xem quá trình học.</p>
     </div>
+    <div style="margin-top:16px;border-top:1px dashed var(--line);padding-top:12px">
+      <div class="muted" style="margin-bottom:6px"><b>Nguồn sẽ hỏi:</b> Wikipedia tiếng Việt (kể cả tải toàn văn
+        các bài tìm được), DuckDuckGo, Google Books, Google Tin tức, OpenAlex, Parallel Search
+        {%- set bat = nguon_api | selectattr('da_bat') | list -%}
+        {%- for n in bat %}, {{n.ten}}{% endfor %}.</div>
+      {% set tat = nguon_api | rejectattr('da_bat') | list %}
+      {% if tat %}
+      <details><summary class="muted">Muốn phủ thêm các trang giáo án, blog, báo… thì thêm khoá API tìm kiếm
+        (bấm để xem cách lấy, miễn phí)</summary>
+        <ul class="sub" style="padding-left:18px;line-height:1.8">
+          {% for n in tat %}
+          <li><b>{{n.ten}}</b> — {{n.lay_khoa}}. <span class="muted">{{n.tra}}.</span></li>
+          {% endfor %}
+        </ul>
+        <div class="muted" style="font-size:12.5px">Có khoá rồi thì gửi cho quản trị hệ thống (khoá được lưu
+          trong tệp cấu hình riêng trên máy chủ, không ghi vào mã nguồn). Hệ thống tự đặt hạn mức mỗi tháng
+          để không tiêu quá lượt miễn phí.</div>
+      </details>
+      {% else %}
+      <div class="muted" style="font-size:12.5px">Đã bật: {{ bat | map(attribute='ten') | join(', ') }}.</div>
+      {% endif %}
+    </div>
   </div>
 </div>
 
@@ -37,6 +59,28 @@
           (kể cả khi đổi vài từ), và cùng lúc đối chiếu kho.</span></span>
       </label>
     </div>
+    <div style="margin-top:16px;border-top:1px dashed var(--line);padding-top:12px">
+      <div class="muted" style="margin-bottom:6px"><b>Nguồn sẽ hỏi:</b> Wikipedia tiếng Việt (kể cả tải toàn văn
+        các bài tìm được), DuckDuckGo, Google Books, Google Tin tức, OpenAlex, Parallel Search
+        {%- set bat = nguon_api | selectattr('da_bat') | list -%}
+        {%- for n in bat %}, {{n.ten}}{% endfor %}.</div>
+      {% set tat = nguon_api | rejectattr('da_bat') | list %}
+      {% if tat %}
+      <details><summary class="muted">Muốn phủ thêm các trang giáo án, blog, báo… thì thêm khoá API tìm kiếm
+        (bấm để xem cách lấy, miễn phí)</summary>
+        <ul class="sub" style="padding-left:18px;line-height:1.8">
+          {% for n in tat %}
+          <li><b>{{n.ten}}</b> — {{n.lay_khoa}}. <span class="muted">{{n.tra}}.</span></li>
+          {% endfor %}
+        </ul>
+        <div class="muted" style="font-size:12.5px">Có khoá rồi thì gửi cho quản trị hệ thống (khoá được lưu
+          trong tệp cấu hình riêng trên máy chủ, không ghi vào mã nguồn). Hệ thống tự đặt hạn mức mỗi tháng
+          để không tiêu quá lượt miễn phí.</div>
+      </details>
+      {% else %}
+      <div class="muted" style="font-size:12.5px">Đã bật: {{ bat | map(attribute='ten') | join(', ') }}.</div>
+      {% endif %}
+    </div>
   </div>
 
   <div class="card">
@@ -59,6 +103,28 @@
         <textarea name="text_nhieu" rows="6" placeholder="Mỗi bài cách nhau bằng một dòng có ba dấu gạch:&#10;Bài 1…&#10;---&#10;Bài 2…"
           style="font-family:inherit;padding:9px 11px;border:1px solid #d8e6e1;border-radius:10px"></textarea></label>
     </div>
+    <div style="margin-top:16px;border-top:1px dashed var(--line);padding-top:12px">
+      <div class="muted" style="margin-bottom:6px"><b>Nguồn sẽ hỏi:</b> Wikipedia tiếng Việt (kể cả tải toàn văn
+        các bài tìm được), DuckDuckGo, Google Books, Google Tin tức, OpenAlex, Parallel Search
+        {%- set bat = nguon_api | selectattr('da_bat') | list -%}
+        {%- for n in bat %}, {{n.ten}}{% endfor %}.</div>
+      {% set tat = nguon_api | rejectattr('da_bat') | list %}
+      {% if tat %}
+      <details><summary class="muted">Muốn phủ thêm các trang giáo án, blog, báo… thì thêm khoá API tìm kiếm
+        (bấm để xem cách lấy, miễn phí)</summary>
+        <ul class="sub" style="padding-left:18px;line-height:1.8">
+          {% for n in tat %}
+          <li><b>{{n.ten}}</b> — {{n.lay_khoa}}. <span class="muted">{{n.tra}}.</span></li>
+          {% endfor %}
+        </ul>
+        <div class="muted" style="font-size:12.5px">Có khoá rồi thì gửi cho quản trị hệ thống (khoá được lưu
+          trong tệp cấu hình riêng trên máy chủ, không ghi vào mã nguồn). Hệ thống tự đặt hạn mức mỗi tháng
+          để không tiêu quá lượt miễn phí.</div>
+      </details>
+      {% else %}
+      <div class="muted" style="font-size:12.5px">Đã bật: {{ bat | map(attribute='ten') | join(', ') }}.</div>
+      {% endif %}
+    </div>
   </div>
 
   <div class="card">
@@ -67,8 +133,8 @@
       <input type="checkbox" name="internet" value="1" {% if internet %}checked{% endif %}>
       <span>
         <b>Gửi trích đoạn ngắn ra các nguồn tìm kiếm rồi tải trang về để so khớp.</b><br>
-        <span class="muted">Hệ thống hỏi <b>5 nguồn</b> (Wikipedia tiếng Việt, DuckDuckGo, Google Books,
-        Google Tin tức, OpenAlex) và tự tải <b>toàn văn các bài tìm được</b> — chỉ gửi cụm ngắn, không gửi cả bài —
+        <span class="muted">Hệ thống hỏi <b>6 nguồn miễn phí</b> (Wikipedia tiếng Việt, DuckDuckGo, Google Books,
+        Google Tin tức, OpenAlex, Parallel Search) và tự tải <b>toàn văn các bài tìm được</b> — chỉ gửi cụm ngắn, không gửi cả bài —
         rồi <b>tải các trang tìm được về</b> để so từng câu. Chạy ở luồng riêng nên trang kết quả
         tự làm mới và hiện tiến độ. Nếu không tích, hệ thống chỉ đối chiếu với kho của thầy/cô và các bài nộp.</span>
       </span>
@@ -84,6 +150,28 @@
         </label>
         {% endfor %}
       </div>
+    </div>
+    <div style="margin-top:16px;border-top:1px dashed var(--line);padding-top:12px">
+      <div class="muted" style="margin-bottom:6px"><b>Nguồn sẽ hỏi:</b> Wikipedia tiếng Việt (kể cả tải toàn văn
+        các bài tìm được), DuckDuckGo, Google Books, Google Tin tức, OpenAlex, Parallel Search
+        {%- set bat = nguon_api | selectattr('da_bat') | list -%}
+        {%- for n in bat %}, {{n.ten}}{% endfor %}.</div>
+      {% set tat = nguon_api | rejectattr('da_bat') | list %}
+      {% if tat %}
+      <details><summary class="muted">Muốn phủ thêm các trang giáo án, blog, báo… thì thêm khoá API tìm kiếm
+        (bấm để xem cách lấy, miễn phí)</summary>
+        <ul class="sub" style="padding-left:18px;line-height:1.8">
+          {% for n in tat %}
+          <li><b>{{n.ten}}</b> — {{n.lay_khoa}}. <span class="muted">{{n.tra}}.</span></li>
+          {% endfor %}
+        </ul>
+        <div class="muted" style="font-size:12.5px">Có khoá rồi thì gửi cho quản trị hệ thống (khoá được lưu
+          trong tệp cấu hình riêng trên máy chủ, không ghi vào mã nguồn). Hệ thống tự đặt hạn mức mỗi tháng
+          để không tiêu quá lượt miễn phí.</div>
+      </details>
+      {% else %}
+      <div class="muted" style="font-size:12.5px">Đã bật: {{ bat | map(attribute='ten') | join(', ') }}.</div>
+      {% endif %}
     </div>
   </div>
 

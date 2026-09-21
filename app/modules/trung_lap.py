@@ -1016,6 +1016,196 @@ def _gnews(truy_van, so=10, timeout=15):
     return ra, ""
 
 
+def _tu_khoa_ngan(truy_van, so_tu=6):
+    """Cụm 4–6 từ khoá (máy tìm kiếm dạng API thường cần câu NGẮN, không cần ngoặc kép)."""
+    t = tach_tu_noi_dung((truy_van or "").strip('"'))
+    if len(t) <= so_tu:
+        return " ".join(t)
+    giua = max(0, len(t) // 2 - so_tu // 2)
+    return " ".join(t[giua:giua + so_tu])
+
+
+def _parallel_mcp(truy_van, so=10, timeout=45):
+    """Parallel Web Search — máy tìm kiếm CHẠY ĐƯỢC KHÔNG CẦN KHOÁ (máy chủ MCP công khai).
+
+    Trả về kết quả thật kèm ĐOẠN TRÍCH nội dung trang, nên vẫn so được cả khi trang gốc
+    không tải về được.
+    """
+    import uuid
+    requests = _requests()
+    ra = []
+    q_ngan = _tu_khoa_ngan(truy_van, 6) or truy_van.strip('"')[:60]
+    q_dai = " ".join(tach_tu_noi_dung(truy_van)[:9]) or q_ngan
+    than = {"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+            "params": {"name": "web_search", "arguments": {
+                "objective": "Tìm trang web chứa nguyên văn đoạn văn này (để kiểm tra trùng lặp "
+                             "trong bài làm của học sinh)",
+                "search_queries": [q_ngan, q_dai],
+                "session_id": uuid.uuid4().hex,
+                "max_results": max(3, min(int(so), 20))}}}
+    try:
+        r = requests.post("https://search.parallel.ai/mcp", json=than,
+                          headers={"Content-Type": "application/json",
+                                   "Accept": "application/json, text/event-stream",
+                                   "User-Agent": UA["User-Agent"]}, timeout=timeout)
+        if r.status_code != 200:
+            return ra, "Parallel Search mã %s" % r.status_code
+        j = r.json()
+        khung = (j.get("result") or {}).get("content") or []
+        du = ""
+        for x in khung:
+            if x.get("type") == "text":
+                du += x.get("text") or ""
+        if not du.strip():
+            return ra, ""
+        d = json.loads(du)
+        for x in (d.get("results") or [])[:so]:
+            u = (x.get("url") or "").strip()
+            if not u.startswith("http"):
+                continue
+            nhan = x.get("excerpts") or x.get("snippets") or []
+            if isinstance(nhan, str):
+                nhan = [nhan]
+            ra.append({"url": u, "tieu_de": (x.get("title") or "")[:160],
+                       "trich": " … ".join(nhan)[:1500], "may_tim": "Parallel Search"})
+    except Exception as e:
+        return ra, "Parallel Search lỗi %s" % type(e).__name__
+    return ra, ""
+
+
+def _tavily(truy_van, so=10, timeout=25):
+    """Tavily (cần khoá): kết quả kèm NỘI DUNG trang đã lọc sạch — so được cả khi trang gốc chặn."""
+    k = _khoa("tavily")
+    if not k:
+        return [], ""
+    if not _duoc_dung_api("tavily"):
+        return [], "Tavily: đã chạm hạn mức đặt trước trong tháng"
+    ra = []
+    try:
+        r = _requests().post("https://api.tavily.com/search", json={
+            "api_key": k, "query": truy_van.strip('"'), "max_results": max(3, min(int(so), 20)),
+            "search_depth": "basic", "include_answer": False, "include_raw_content": False},
+            headers={"Content-Type": "application/json"}, timeout=timeout)
+        _tang_dem_api("tavily")
+        if r.status_code != 200:
+            return ra, "Tavily mã %s" % r.status_code
+        for x in ((r.json() or {}).get("results") or [])[:so]:
+            ra.append({"url": x.get("url") or "", "tieu_de": (x.get("title") or "")[:160],
+                       "trich": (x.get("content") or "")[:1500], "may_tim": "Tavily",
+                       "ngay": (x.get("published_date") or "")[:10]})
+    except Exception as e:
+        return ra, "Tavily lỗi %s" % type(e).__name__
+    return [x for x in ra if x["url"].startswith("http")], ""
+
+
+def _serper(truy_van, so=10, timeout=25):
+    """Serper (cần khoá): kết quả Google thật (organic) — bắt được cả trang web giáo án, báo, blog."""
+    k = _khoa("serper")
+    if not k:
+        return [], ""
+    if not _duoc_dung_api("serper"):
+        return [], "Serper: đã chạm hạn mức đặt trước trong tháng"
+    ra = []
+    try:
+        r = _requests().post("https://google.serper.dev/search", json={
+            "q": truy_van.strip('"'), "gl": "vn", "hl": "vi", "num": max(3, min(int(so), 20))},
+            headers={"X-API-KEY": k, "Content-Type": "application/json"}, timeout=timeout)
+        _tang_dem_api("serper")
+        if r.status_code != 200:
+            return ra, "Serper mã %s" % r.status_code
+        j = r.json() or {}
+        for x in (j.get("organic") or [])[:so]:
+            ra.append({"url": x.get("link") or "", "tieu_de": (x.get("title") or "")[:160],
+                       "trich": (x.get("snippet") or "")[:600], "may_tim": "Serper (Google)"})
+        kg = j.get("knowledgeGraph") or {}
+        if kg.get("description"):
+            ra.append({"url": kg.get("descriptionLink") or ("https://www.google.com/search?q=" +
+                                                            _tu_khoa_ngan(truy_van, 6).replace(" ", "+")),
+                       "tieu_de": (kg.get("title") or "")[:160], "trich": kg["description"][:600],
+                       "may_tim": "Serper (Google)", "chi_trich": True})
+    except Exception as e:
+        return ra, "Serper lỗi %s" % type(e).__name__
+    return [x for x in ra if x["url"].startswith("http")], ""
+
+
+def _brave(truy_van, so=10, timeout=25):
+    """Brave Search (cần khoá): chỉ mục riêng, không phụ thuộc Google."""
+    k = _khoa("brave")
+    if not k:
+        return [], ""
+    if not _duoc_dung_api("brave"):
+        return [], "Brave: đã chạm hạn mức đặt trước trong tháng"
+    ra = []
+    try:
+        r = _requests().get("https://api.search.brave.com/res/v1/web/search",
+                            params={"q": truy_van.strip('"'), "count": max(3, min(int(so), 20)),
+                                    "country": "vn", "search_lang": "vi", "extra_snippets": 1},
+                            headers={"X-Subscription-Token": k, "Accept": "application/json"},
+                            timeout=timeout)
+        _tang_dem_api("brave")
+        if r.status_code != 200:
+            return ra, "Brave mã %s" % r.status_code
+        for x in (((r.json() or {}).get("web") or {}).get("results") or [])[:so]:
+            tr = x.get("description") or ""
+            if x.get("extra_snippets"):
+                tr += " … " + " … ".join(x["extra_snippets"])
+            ra.append({"url": x.get("url") or "", "tieu_de": (x.get("title") or "")[:160],
+                       "trich": tr[:1200], "may_tim": "Brave Search"})
+    except Exception as e:
+        return ra, "Brave lỗi %s" % type(e).__name__
+    return [x for x in ra if x["url"].startswith("http")], ""
+
+
+def _exa(truy_van, so=10, timeout=25):
+    """Exa (cần khoá): trả cả đoạn nội dung trang tìm được."""
+    k = _khoa("exa")
+    if not k:
+        return [], ""
+    if not _duoc_dung_api("exa"):
+        return [], "Exa: đã chạm hạn mức đặt trước trong tháng"
+    ra = []
+    try:
+        r = _requests().post("https://api.exa.ai/search", json={
+            "query": truy_van.strip('"'), "numResults": max(3, min(int(so), 20)),
+            "contents": {"text": {"maxCharacters": 1200}}},
+            headers={"x-api-key": k, "Content-Type": "application/json"}, timeout=timeout)
+        _tang_dem_api("exa")
+        if r.status_code != 200:
+            return ra, "Exa mã %s" % r.status_code
+        for x in ((r.json() or {}).get("results") or [])[:so]:
+            ra.append({"url": x.get("url") or "", "tieu_de": (x.get("title") or "")[:160],
+                       "trich": (x.get("text") or "")[:1200], "may_tim": "Exa",
+                       "ngay": (x.get("publishedDate") or "")[:10]})
+    except Exception as e:
+        return ra, "Exa lỗi %s" % type(e).__name__
+    return [x for x in ra if x["url"].startswith("http")], ""
+
+
+def _googlecse(truy_van, so=10, timeout=25):
+    """Google Programmable Search (cần khoá cũ + mã công cụ): 100 lượt/ngày miễn phí."""
+    k, cx = _khoa("googlecse"), (os.environ.get("GOOGLE_CSE_CX") or "").strip()
+    if not k or not cx:
+        return [], ""
+    if not _duoc_dung_api("googlecse"):
+        return [], "Google (Programmable Search): đã chạm hạn mức đặt trước trong tháng"
+    ra = []
+    try:
+        r = _requests().get("https://www.googleapis.com/customsearch/v1",
+                            params={"key": k, "cx": cx, "q": truy_van.strip('"'),
+                                    "num": max(1, min(int(so), 10)), "gl": "vn", "hl": "vi"},
+                            timeout=timeout)
+        _tang_dem_api("googlecse")
+        if r.status_code != 200:
+            return ra, "Google (Programmable Search) mã %s" % r.status_code
+        for x in ((r.json() or {}).get("items") or [])[:so]:
+            ra.append({"url": x.get("link") or "", "tieu_de": (x.get("title") or "")[:160],
+                       "trich": (x.get("snippet") or "")[:600],
+                       "may_tim": "Google (Programmable Search)"})
+    except Exception as e:
+        return ra, "Google (Programmable Search) lỗi %s" % type(e).__name__
+    return [x for x in ra if x["url"].startswith("http")], ""
+
+
 def diem_lien_quan(truy_van, ket_qua, so_tu=6):
     """Điểm liên quan của một kết quả tìm kiếm: trùng bao nhiêu từ với câu truy vấn."""
     tu = set(tach_tu_noi_dung(truy_van))
@@ -1026,7 +1216,91 @@ def diem_lien_quan(truy_van, ket_qua, so_tu=6):
 
 
 NGUON_TIM = {"ddg": "DuckDuckGo", "ddg_lite": "DuckDuckGo (bản nhẹ)", "wiki": "Wikipedia",
-             "gbooks": "Google Books", "gnews": "Google Tin tức", "openalex": "OpenAlex"}
+             "gbooks": "Google Books", "gnews": "Google Tin tức", "openalex": "OpenAlex",
+             "parallel": "Parallel Search", "tavily": "Tavily", "serper": "Serper (Google)",
+             "brave": "Brave Search", "exa": "Exa", "googlecse": "Google (Programmable Search)"}
+
+# Nguồn cần KHOÁ API (thầy/cô tự lấy khoá miễn phí, xem hướng dẫn ở `nguon_api()`).
+# Khoá để trong /etc/eduassist.env (chỉ root đọc được), KHÔNG ghi vào mã nguồn.
+API_TIM_KIEM = {
+    "tavily": {"ten": "Tavily", "bien": "TAVILY_API_KEY",
+               "lay_khoa": "https://app.tavily.com — gói Researcher miễn phí 1.000 lượt/tháng, không cần thẻ",
+               "tra": "trả cả NỘI DUNG trang nên so được cả khi không tải được trang"},
+    "serper": {"ten": "Serper (Google)", "bien": "SERPER_API_KEY",
+               "lay_khoa": "https://serper.dev — 2.500 lượt miễn phí, không cần thẻ",
+               "tra": "kết quả Google y như tìm trên google.com"},
+    "brave": {"ten": "Brave Search", "bien": "BRAVE_API_KEY",
+              "lay_khoa": "https://brave.com/search/api — có 5 USD tín dụng mỗi tháng (cần thẻ)",
+              "tra": "chỉ mục riêng của Brave, không phụ thuộc Google"},
+    "exa": {"ten": "Exa", "bien": "EXA_API_KEY",
+            "lay_khoa": "https://exa.ai — 20 USD tín dụng khi đăng ký, không cần thẻ",
+            "tra": "trả cả nội dung đoạn văn tìm được"},
+    "googlecse": {"ten": "Google (Programmable Search)", "bien": "GOOGLE_CSE_KEY",
+                  "lay_khoa": "khoá cũ + mã công cụ GOOGLE_CSE_CX (Google đã đóng với người mới, "
+                              "ngừng 1/1/2027)",
+                  "tra": "100 lượt/ngày miễn phí cho tài khoản đã có"},
+}
+
+
+def _khoa(ma):
+    """Đọc khoá API của một nguồn từ biến môi trường (trên máy chủ: /etc/eduassist.env)."""
+    return (os.environ.get(API_TIM_KIEM[ma]["bien"]) or "").strip()
+
+
+def nguon_api():
+    """Danh sách các nguồn cần khoá: đã bật hay chưa (để hiện lên giao diện)."""
+    ra = []
+    for ma, tt in API_TIM_KIEM.items():
+        co = bool(_khoa(ma))
+        if ma == "googlecse":
+            co = co and bool((os.environ.get("GOOGLE_CSE_CX") or "").strip())
+        ra.append({"ma": ma, "ten": tt["ten"], "da_bat": co, "lay_khoa": tt["lay_khoa"],
+                   "tra": tt["tra"], "da_dung": _dem_api(ma) if co else 0})
+    return ra
+
+
+def _nguon_api_da_bat():
+    return [x["ma"] for x in nguon_api() if x["da_bat"]]
+
+
+def _tep_dem_api():
+    return Path(os.environ.get("DB_DIR", "data")) / "api-tim-kiem-dem.json"
+
+
+def _gioi_han_api():
+    try:
+        return max(20, int(os.environ.get("API_TIM_KIEM_TOI_DA", "500")))
+    except Exception:
+        return 500
+
+
+def _dem_api(ma):
+    """Số lượt đã gọi API trong THÁNG NÀY (để không tiêu quá hạn mức miễn phí)."""
+    try:
+        d = json.loads(_tep_dem_api().read_text(encoding="utf-8"))
+    except Exception:
+        return 0
+    return int(((d.get(time.strftime("%Y-%m")) or {}).get(ma) or 0))
+
+
+def _tang_dem_api(ma):
+    try:
+        p = _tep_dem_api()
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            d = {}
+        thang = time.strftime("%Y-%m")
+        d = {thang: (d.get(thang) or {})}          # chỉ giữ tháng hiện tại
+        d[thang][ma] = int(d[thang].get(ma, 0)) + 1
+        p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _duoc_dung_api(ma):
+    """Còn trong hạn mức đặt trước cho tháng này thì mới gọi (tránh tiêu hết lượt miễn phí)."""
+    return _dem_api(ma) < _gioi_han_api()
 _SUC_KHOE = {}          # mã nguồn → (số lỗi liên tiếp, lúc lỗi cuối) để tạm bỏ nguồn đang chặn
 
 
@@ -1051,7 +1325,8 @@ def tim_nhieu_nguon(truy_van, so=20, timeout=15, nguon=None):
     Nguồn nào đang bị chặn/hết hạn mức thì tạm bỏ qua trong 5 phút để không làm chậm lượt chạy.
     Trả về (danh sách kết quả, ghi chú) — ghi chú nói rõ nguồn nào không trả lời được.
     """
-    nguon = nguon or ("ddg", "wiki", "ddg_lite", "gnews", "gbooks", "openalex")
+    nguon = nguon or tuple(_nguon_api_da_bat()) + ("parallel", "ddg", "wiki", "ddg_lite",
+                                                   "gnews", "gbooks", "openalex")
     ra, ghi_chu = [], []
     for ma in nguon:
         ten = NGUON_TIM.get(ma, ma)
@@ -1069,6 +1344,18 @@ def tim_nhieu_nguon(truy_van, so=20, timeout=15, nguon=None):
                 kq, gc = _gnews(truy_van, so=10, timeout=timeout)
             elif ma == "openalex":
                 kq, gc = _openalex(truy_van, so=10, timeout=timeout)
+            elif ma == "parallel":
+                kq, gc = _parallel_mcp(truy_van, so=max(6, min(int(so), 20)), timeout=max(30, timeout * 2))
+            elif ma == "tavily":
+                kq, gc = _tavily(truy_van, so=min(15, max(5, int(so))), timeout=timeout)
+            elif ma == "serper":
+                kq, gc = _serper(truy_van, so=min(20, max(5, int(so))), timeout=timeout)
+            elif ma == "brave":
+                kq, gc = _brave(truy_van, so=min(20, max(5, int(so))), timeout=timeout)
+            elif ma == "exa":
+                kq, gc = _exa(truy_van, so=min(20, max(5, int(so))), timeout=timeout)
+            elif ma == "googlecse":
+                kq, gc = _googlecse(truy_van, so=min(10, max(5, int(so))), timeout=timeout)
             else:
                 kq, gc = [], ""
         except Exception as e:
@@ -1262,6 +1549,16 @@ def tai_nhieu_trang(ds, so_song_song=8, gio=None, timeout=12):
             except Exception as e:
                 chu, loi_t, url_cuoi = "", "lỗi %s" % type(e).__name__, k["url"]
             if loi_t or len(tach_tu(chu)) < 40:
+                du_phong = (k.get("trich") or "").strip()
+                if len(tach_tu(du_phong)) >= 12 and not k.get("chi_trich"):
+                    # không mở được trang thì vẫn so được với ĐOẠN TRÍCH mà máy tìm kiếm trả về
+                    ra.append({"url": k["url"], "url_cuoi": k["url"], "chu": du_phong, "lien_ket": [],
+                               "tieu_de": (k.get("tieu_de") or "")[:160], "may_tim": k.get("may_tim", ""),
+                               "ten_mien": k.get("ten_mien", ""), "tu_dem": False, "tu_trich": True,
+                               "so_tu": len(tach_tu(du_phong))})
+                    gio("tai", "%s → không mở được trang (%s), dùng đoạn trích có sẵn (%d từ)"
+                        % (k["url"][:70], loi_t or "ít chữ", len(tach_tu(du_phong))))
+                    continue
                 loi.append({"url": k["url"], "ly_do": loi_t or "trang quá ít chữ"})
                 continue
             ghi_dem(k["url"], chu)
@@ -1464,7 +1761,8 @@ def doi_chieu_internet(doan, ghi_de=(), che_do="tieu_chuan", gio=None, so_truy_v
 
     kq["tai_duoc"] = [{"url": x["url"], "url_cuoi": x.get("url_cuoi", ""), "tieu_de": x["tieu_de"],
                        "so_tu": x["so_tu"], "may_tim": x["may_tim"], "ten_mien": x["ten_mien"],
-                       "tu_dem": x["tu_dem"], "toan_van_wiki": bool(x.get("tu_wiki"))} for x in tai_duoc]
+                       "tu_dem": x["tu_dem"], "toan_van_wiki": bool(x.get("tu_wiki")),
+                       "tu_trich": bool(x.get("tu_trich"))} for x in tai_duoc]
     kq["khong_tai_duoc"] = khong_tai
     kq["so_trang_tai"] = len(tai_duoc)
     kq["so_trang_dem"] = len([x for x in tai_duoc if x["tu_dem"]])

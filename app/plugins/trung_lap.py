@@ -112,7 +112,7 @@ def index():
     if request.method != 'POST':
         return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(),
                                thong_tin=TL.thong_tin(), che_do=TL.CHE_DO,
-                               che_do_chon='tieu_chuan')
+                               che_do_chon='tieu_chuan', nguon_api=TL.nguon_api())
     u = current_user()
     kieu = (request.form.get('kieu') or 'mot_bai').strip()
     internet = (request.form.get('internet') or '') not in ('', '0', 'off')
@@ -130,7 +130,7 @@ def index():
         flash(loi, 'err')
         return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
                                che_do_chon=che_do, thong_tin=TL.thong_tin(), kieu=kieu,
-                               internet=internet)
+                               internet=internet, nguon_api=TL.nguon_api())
     kq = TL.phan_tich_mot_bai(doan, ten, nguon=nguon)
     token = uuid.uuid4().hex
     ho_so = {'token': token, 'uid': u['id'], 'luc': time.strftime('%H:%M %d/%m/%Y'),
@@ -161,11 +161,13 @@ def _xu_ly_nhieu(u, nguon):
         flash('Cần ít nhất 2 bài để so với nhau. Thầy/cô gửi 2 tệp .docx/.pdf, hoặc dán các bài '
               'cách nhau bằng một dòng có ba dấu gạch (---).', 'err')
         return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
-                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai')
+                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai',
+                               nguon_api=TL.nguon_api())
     if len(cac) > TOI_DA_BAI:
         flash('Mỗi lượt so tối đa %d bài. Thầy/cô chia thành các lượt nhỏ hơn.' % TOI_DA_BAI, 'err')
         return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
-                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai')
+                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai',
+                               nguon_api=TL.nguon_api())
     bai, loi_ds = [], []
     for f in cac:
         try:
@@ -181,7 +183,8 @@ def _xu_ly_nhieu(u, nguon):
     if len(bai) < 2:
         flash('Cần ít nhất 2 bài đọc được nội dung để so với nhau.', 'err')
         return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
-                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai')
+                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai',
+                               nguon_api=TL.nguon_api())
     kq = TL.phan_tich_nhieu_bai(bai, nguon=nguon)
     token = uuid.uuid4().hex
     ho_so = {'token': token, 'uid': u['id'], 'luc': time.strftime('%H:%M %d/%m/%Y'),
@@ -220,7 +223,7 @@ def ket_qua(token):
     return render_template('trung_lap_kq.html', h=h, kq=h['kq'], token=token,
                            nguoi=_ten_nguoi(), da_tra=BL.da_tra_luot(db, u['id'], token),
                            con_lai=BL.remaining(u), la_pro=BL.is_pro(u),
-                           che_do=TL.CHE_DO)
+                           che_do=TL.CHE_DO, nguon_api=TL.nguon_api())
 
 
 # ------------------------------------------------------------------ tải báo cáo Word (1 lượt)

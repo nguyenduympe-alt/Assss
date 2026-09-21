@@ -149,7 +149,7 @@
   <table><thead><tr><th>Trang đã đối chiếu</th><th>Nguồn tìm</th><th>Số từ</th></tr></thead><tbody>
     {% for x in kq.internet.tai_duoc %}
     <tr><td><a href="{{x.url}}" rel="nofollow noopener" target="_blank">{{x.tieu_de or x.url}}</a>
-      <br><span class="muted" style="font-size:11.5px">{{x.url[:100]}}</span>{% if x.tu_dem %} <span class="chip" style="font-size:10.5px">bộ nhớ đệm</span>{% endif %}{% if x.toan_van_wiki %} <span class="chip" style="font-size:10.5px">toàn văn Wikipedia</span>{% endif %}</td>
+      <br><span class="muted" style="font-size:11.5px">{{x.url[:100]}}</span>{% if x.tu_dem %} <span class="chip" style="font-size:10.5px">bộ nhớ đệm</span>{% endif %}{% if x.toan_van_wiki %} <span class="chip" style="font-size:10.5px">toàn văn Wikipedia</span>{% endif %}{% if x.tu_trich %} <span class="chip" style="font-size:10.5px">đoạn trích</span>{% endif %}</td>
       <td>{{x.may_tim}}</td><td>{{x.so_tu}}</td></tr>
     {% endfor %}
   </tbody></table>
