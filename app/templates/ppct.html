@@ -25,7 +25,28 @@ function flt(){const q=document.getElementById('q').value.toLowerCase();
    <button>+ Thêm</button>
   </form>
  </div>
- <div class="card">
+ <div class="card" style="background:#f8fbfa">
+ <div class="chead"><h3>🔎 Lọc theo môn · khối</h3>
+  <a class="btn sec sm" href="{{url_for('core.mon_hoc')}}">📚 Quản lý môn học — nhập PPCT cho từng môn</a></div>
+ <form method="get" class="row" style="gap:8px;align-items:flex-end">
+  <label class="f">Môn<select name="mon" style="min-width:190px">
+   <option value="">— tất cả môn —</option>
+   {% for m in mon_hoc %}<option value="{{m.mon}}" {{'selected' if mon_loc==m.mon}}>{{m.mon}}{% if m.khoi %} (khối {{m.khoi}}){% endif %}</option>{% endfor %}</select></label>
+  <label class="f">Khối<select name="khoi" style="width:130px">
+   <option value="">— tất cả khối —</option>
+   {% for k in range(1,13) %}<option {{'selected' if khoi_loc==k|string}}>{{k}}</option>{% endfor %}</select></label>
+  <label class="f">Tuần<input name="tuan" type="number" min="1" max="60" value="{{tuan or ''}}"
+   style="width:96px" placeholder="tất cả"></label>
+  <button class="sec">🔎 Lọc</button>
+  {% if mon_loc or khoi_loc %}<a class="btn sec" href="{{url_for('core.ppct')}}">✕ Bỏ lọc</a>{% endif %}
+ </form>
+ {% if mon_loc or khoi_loc %}
+ <p class="sub" style="margin:9px 0 0">Đang xem: <b>{{mon_loc or 'mọi môn'}}</b>
+  {% if khoi_loc %}· <b>khối {{khoi_loc}}</b>{% endif %} — {{rows|length}} dòng PPCT.</p>
+ {% endif %}
+</div>
+
+<div class="card">
   <h3>⬆ Nhập phân phối chương trình — <span style="color:#0d9488">nhiều môn, nhiều khối một lần</span></h3>
   <p class="sub">Chọn <b>một hoặc nhiều tệp</b> Word (.docx) / Excel (.xlsx, .csv). Hệ thống tự tách theo
    <b>từng môn và từng khối</b>: đọc tiêu đề ngay trên mỗi bảng (vd “MÔN: TOÁN — LỚP 6”), hoặc hai cột

@@ -12,6 +12,7 @@ from .modules.word_bao_giang import build_docx
 from .modules import billing as BL
 from .modules import mon_day as MD
 from .modules import ppct_tach as PT
+from .modules import mon_hoc as MH
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
 from .modules import sms as SMS
@@ -43,6 +44,10 @@ def _cong_cu():
          "the": [], "moi": False},
         {"icon": "🖨️", "ten": "Lịch báo giảng", "endpoint": "core.bao_giang", "mau": "#f59e0b",
          "mo_ta": "Xuất lịch báo giảng ra PDF hoặc Word",
+         "the": [], "moi": False},
+        {"icon": "📚", "ten": "Quản lý môn học", "endpoint": "core.mon_hoc", "mau": "#0d9488",
+         "mo_ta": "Gom mọi môn + khối về một chỗ: nhập phân phối chương trình cho từng môn, sửa tên môn, "
+                  "xoá môn kèm dữ liệu",
          "the": [], "moi": False},
         {"icon": "📘", "ten": "Phân phối chương trình", "endpoint": "core.ppct", "mau": "#0ea5e9",
          "mo_ta": "Nhập và quản lý phân phối chương trình theo tuần, theo bài",
@@ -207,7 +212,9 @@ def dashboard():
         step = 100.0 / (len(spark) - 1)
         pts = " ".join(f"{round(i*step,2)},{round(40 - p['y']*36.0/smax,2)}" for i, p in enumerate(spark))
     elif spark:
-        pts = "0,%s 100,%s" % (round(40 - spark[0]["y"] * 36.0 / smax, 2),) * 2
+        # (M31) sửa lỗi cũ: PPCT chỉ có MỘT tuần làm trang tổng quan báo lỗi (thiếu tham số định dạng)
+        y1 = round(40 - spark[0]["y"] * 36.0 / smax, 2)
+        pts = "0,%s 100,%s" % (y1, y1)
 
     # TKB hom nay
     today = datetime.date.today()
@@ -224,6 +231,63 @@ def dashboard():
 
 
 # ---------------- PPCT ----------------
+# ---------------- (M31) Quản lý môn học ----------------
+@bp.route("/mon-hoc", methods=["GET", "POST"])
+@login_required
+def mon_hoc():
+    """Gom mọi môn + khối về một trang: nhập PPCT cho từng môn, sửa tên, xoá môn kèm dữ liệu."""
+    db, uid, u = get_db(), session["uid"], current_user()
+    if request.method == "POST":
+        act = request.form.get("act")
+        mon = (request.form.get("mon") or "").strip()
+        khoi = (request.form.get("khoi") or "").strip()
+        if act == "them":
+            ok, tb = MH.them_mon(db, uid, request.form.get("mon_moi") or "", request.form.get("khoi_moi") or "")
+            flash(tb, "ok" if ok else "err")
+        elif act == "sua":
+            ok, tb = MH.doi_ten(db, uid, mon, khoi, request.form.get("mon_moi") or "",
+                                request.form.get("khoi_moi") or "")
+            flash(tb, "ok" if ok else "err")
+        elif act == "xoa":
+            ok, tb = MH.xoa_mon(db, uid, mon, khoi,
+                                xoa_ppct=bool(request.form.get("xoa_ppct")),
+                                xoa_tkb=bool(request.form.get("xoa_tkb")),
+                                xoa_kho=bool(request.form.get("xoa_kho")),
+                                bo_danh_sach=bool(request.form.get("bo_danh_sach")))
+            flash(tb, "ok" if ok else "err")
+        elif act == "chinh":
+            ok, tb = MH.dat_chinh(db, uid, mon)
+            flash(tb, "ok" if ok else "err")
+        elif act == "ppct":
+            ds_tep = [f for f in (request.files.getlist("files") + request.files.getlist("file"))
+                      if (getattr(f, "filename", "") or "").strip()]
+            khoi = khoi or (request.form.get("khoi_moi") or "").strip()
+            if not mon or khoi not in KHO.KHOI:
+                flash("Nhập PPCT cho một môn cần có MÔN và KHỐI — thầy/cô chọn khối rồi thử lại.", "err")
+            elif not ds_tep:
+                flash("Vui lòng chọn tệp phân phối chương trình (.docx, .xlsx hoặc .csv).", "err")
+            elif len(ds_tep) > MH.TOI_DA_TEP:
+                flash("Mỗi lượt nhập tối đa %d tệp." % MH.TOI_DA_TEP, "err")
+            else:
+                thay_cu = (request.form.get("thay_cu") or "").lower() in ("1", "on", "true", "yes")
+                ds_mon = MD.danh_sach(u)
+                ket_qua, so_dong, so_loi = MH.nhap_ppct(db, uid, ds_tep, mon, khoi, thay_cu=thay_cu,
+                                                        ds_mon=ds_mon)
+                MD.them(db, uid, mon)
+                if so_dong:
+                    flash("Đã nhập %d dòng PPCT cho môn %s khối %s%s."
+                          % (so_dong, mon, khoi,
+                             " (đã thay PPCT cũ của đúng môn + khối này)" if thay_cu else ""),
+                          "err" if so_loi else "ok")
+                elif so_loi:
+                    flash("Chưa nhập được dòng nào — xem lý do ở bảng bên dưới.", "err")
+        return redirect(url_for("core.mon_hoc"))
+
+    ds = MH.liet_ke(db, uid, u)
+    return render_template("monhoc.html", ds=ds, tk=MH.thong_ke(ds), KHOI=KHO.KHOI,
+                           mon_chinh=MD.mon_chinh(u), TOI_DA_MON=MD.TOI_DA_MON)
+
+
 @bp.route("/ppct", methods=["GET", "POST"])
 @login_required
 def ppct():
@@ -324,13 +388,21 @@ def ppct():
         db.commit()
         return redirect(url_for("core.ppct", tuan=request.args.get("tuan", "")))
     tuan = request.args.get("tuan", "")
+    mon_loc = (request.args.get("mon") or "").strip()
+    khoi_loc = (request.args.get("khoi") or "").strip()
     q = "SELECT * FROM ppct WHERE teacher_id=?"
     p = [uid]
     if tuan:
         q += " AND tuan=?"; p.append(tuan)
+    if mon_loc:
+        q += " AND lower(mon)=lower(?)"; p.append(mon_loc)
+    if khoi_loc:
+        q += " AND COALESCE(khoi,'')=?"; p.append(khoi_loc)
     rows = db.execute(q + " ORDER BY tuan, mon, tiet_pp", p).fetchall()
     tuans = [r[0] for r in db.execute("SELECT DISTINCT tuan FROM ppct WHERE teacher_id=? ORDER BY tuan", (uid,))]
-    return render_template("ppct.html", rows=rows, tuan=tuan, tuans=tuans)
+    ds_mon_hoc = MH.liet_ke(db, uid, current_user())
+    return render_template("ppct.html", rows=rows, tuan=tuan, tuans=tuans, mon_hoc=ds_mon_hoc,
+                           mon_loc=mon_loc, khoi_loc=khoi_loc)
 
 
 # ---------------- TKB ----------------
