@@ -173,6 +173,12 @@ def _nhom_theo_tua(title):
     return hits
 
 
+# (M13) Từ khoá AI RÕ RÀNG trong tựa bài (nhóm đầu của TU_KHOA_AI): bài nói thẳng về trợ lí AI,
+# trí tuệ nhân tạo, chatbot, máy học… được ưu tiên chọn để tích hợp AI hơn các bài chỉ liên quan xa.
+def _la_chu_de_ai_ro(title):
+    return bool(_khop_tu(plain(title or ''), TU_KHOA_AI[0][0]))
+
+
 def _khop_hien(title, k):
     """Cụm từ NGUYÊN VĂN trong tựa bài ứng với từ khoá đã khớp (giữ dấu tiếng Việt cho dễ đọc)."""
     tp = plain(title or '')
@@ -308,19 +314,22 @@ def _khop_tu(t, ds_tu_khoa):
 def goi_y_ma_ai(title, grade, subject, topic='', hits=None):
     """Đọc tựa bài → suy luận bài này có khả năng tích hợp TIÊU CHÍ AI nào (mã thật của đúng lớp).
 
-    Bốn bước, dừng ngay khi có mã: (1) đối chiếu tựa bài với kho mã lớp; (2) theo nhóm nội dung
-    đọc từ tựa bài; (3) theo chủ đề AI nhận ra từ tựa bài; (4) theo mạch của khung sát nội dung bài.
+    Năm bước, dừng ngay khi có mã: (1) đối chiếu tựa bài với kho mã lớp; (2) theo nhóm nội dung
+    đọc từ tựa bài; (3) theo chủ đề AI nhận ra từ tựa bài; (4) theo mạch của khung sát nội dung bài;
+    (5) nếu vẫn không có mã cốt lõi nào sát bài thì lấy MÃ CỐT LÕI GẦN BÀI NHẤT kèm cảnh báo.
+    Không bao giờ đề xuất mã MỞ RỘNG (MR) — mã mở rộng chỉ có trong kho để tra cứu.
     Trả về (danh sách mã, cảnh báo, cách đã chọn). Không tự đặt mã ngoài kho.
     """
     hits = _nhom_theo_tua(title) if hits is None else hits
     topic = topic or ''
-    ds, cb = AIGD.goi_y_ma(grade, ten_bai=title, van_ban=topic, mon=subject)
+    ds, cb = AIGD.goi_y_ma(grade, ten_bai=title, van_ban=topic, mon=subject, gan_bai_nhat=False)
     if ds:
         return ds, cb, 'đối chiếu tựa bài với kho mã lớp %s' % grade
     for n, _ in hits[:2]:
         if n.get('ngu_canh_ai'):
             ds, cb = AIGD.goi_y_ma(grade, ten_bai=title,
-                                   van_ban=(n['ngu_canh_ai'] + ' ' + topic).strip(), mon=subject)
+                                   van_ban=(n['ngu_canh_ai'] + ' ' + topic).strip(), mon=subject,
+                                   gan_bai_nhat=False)
             if ds:
                 return ds, cb, 'theo nhóm nội dung “%s” đọc từ tựa bài' % n['ten']
     t = plain(title or '')
@@ -328,7 +337,7 @@ def goi_y_ma_ai(title, grade, subject, topic='', hits=None):
     for tu_khoa, ngu_canh, mach in TU_KHOA_AI:
         if _khop_tu(t, tu_khoa):
             ds, cb = AIGD.goi_y_ma(grade, ten_bai=title, van_ban=(ngu_canh + ' ' + topic).strip(),
-                                   mon=subject)
+                                   mon=subject, gan_bai_nhat=False)
             if ds:
                 return ds, cb, 'theo chủ đề AI nhận ra từ tựa bài'
             mach_du_phong = mach_du_phong or mach
@@ -338,6 +347,14 @@ def goi_y_ma_ai(title, grade, subject, topic='', hits=None):
         if ds:
             ten_mach = next((m['ten'] for m in AIGD.khoa()['mach'] if m['id'] == mach_du_phong), '')
             return ds, cb, 'theo mạch “%s” sát nội dung bài' % ten_mach
+    # (M13) Vẫn không có mã cốt lõi nào sát bài: nếu trước đây sẽ phải dùng mã MỞ RỘNG (MR) thì nay
+    # lấy MÃ CỐT LÕI GẦN BÀI NHẤT kèm cảnh báo; không có mã nào khớp từ khoá thì để trống.
+    _rong, _ = AIGD.goi_y_ma(grade, ten_bai=title, van_ban=topic, mon=subject,
+                             gan_bai_nhat=False, chi_cot_loi=False)
+    if any(x.get('mo_rong') for x in _rong):
+        ds, cb = AIGD.ma_gan_bai_nhat(grade, ten_bai=title, van_ban=topic, mon=subject, toi_da=1)
+        if ds:
+            return ds, cb, 'mã cốt lõi gần bài nhất (không có mã sát bài)'
     return [], cb, ''
 
 def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, cung_bai=True):
@@ -384,6 +401,8 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
         row['_ds_ai'], row['_cb_ai'], row['_cach_ai'] = _ds_ai, _cb_ai, _cach_ai
         row['diem_nls'] = g['diem'] + (3 if (row['references'] and 'digital' in chon) else 0)
         row['diem_ai'] = sum((x.get('diem') or 1.0) for x in _ds_ai)
+        if _ds_ai and _la_chu_de_ai_ro(_title):
+            row['diem_ai'] += 6.0          # (M13) bài nói rõ về AI được ưu tiên chọn cho cột AI
         row['_diem_tong'] = row['diem_nls'] + row['diem_ai']
 
     # ---- 2) CHỌN BÀI: theo số bài thầy/cô đặt (riêng từng cột hoặc cùng bài) ----
@@ -476,6 +495,10 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
                                   '\nGiáo viên rà soát mã và nội dung AI trước khi dùng.')
                     _phan_can_cu.append('AI: %s (mã %s).' % (row['_cach_ai'],
                                                              ', '.join(x['ma'] for x in _ds_ai)))
+                    if any(x.get('gan_bai') for x in _ds_ai):
+                        # (M13) bài không có mã sát bài → dùng mã cốt lõi gần bài nhất, phải cảnh báo rõ
+                        _notes.append('⚠️ ' + (row['_cb_ai'][0] if row['_cb_ai'] else
+                                               'Đây là mã cốt lõi gần nhất — thầy/cô kiểm lại trước khi dùng.'))
                 else:
                     _notes.append('Bài này chưa suy luận được mã tiêu chí AI nào thật sát trong kho lớp %s — '
                                   'thầy/cô tự chọn mã của lớp; hệ thống không tự đặt mã.' % grade)

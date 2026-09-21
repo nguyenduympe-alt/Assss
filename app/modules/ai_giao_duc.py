@@ -15,6 +15,7 @@ PHÂN BIỆT RÕ HAI LOẠI NỘI DUNG (giữ nguyên nguyên tắc của công 
 Khung KHÔNG có mã chỉ báo cho từng mạch nội dung, nên hệ thống KHÔNG tự đặt mã: mọi chỗ
 đều gọi đúng tên mạch (“Đạo đức AI”, “Các kỹ thuật và ứng dụng AI”…) và ghi rõ nguồn.
 """
+import difflib
 import json
 import re
 from pathlib import Path
@@ -466,12 +467,52 @@ def _diem_ma(x, tu_bai, tho_bai, df_tu, df_cum):
     return round(diem, 2), (cum_khop[:3] or tu_khop[:3])
 
 
-def goi_y_ma(lop, van_ban="", ten_bai="", mon="", toi_da=2, chi_cot_loi=True):
+def _tu_bo_dau(tho):
+    """Tập từ đặc thù (bỏ từ chung, từ ngắn) của một đoạn văn bản đã bỏ dấu."""
+    return {t for t in re.findall(r"[a-z][a-z0-9]{2,}", tho or "") if t not in TU_DUNG}
+
+
+def ma_gan_bai_nhat(lop, ten_bai="", van_ban="", mon="", toi_da=1, ds=None):
+    """(M13) Mã CỐT LÕI gần bài nhất khi không có mã cốt lõi nào sát bài.
+
+    KHÔNG dùng mã mở rộng (MR) làm chỗ lấp: đo “khoảng cách” giữa bài học và từng yêu cầu cần
+    đạt cốt lõi bằng độ trùng từ đặc thù (Jaccard) kết hợp độ giống chuỗi (difflib), rồi lấy mã
+    gần nhất làm điểm bắt đầu. Luôn kèm cảnh báo để giáo viên kiểm lại trước khi dùng.
+    Trả về (danh sách mã, cảnh báo).
+    """
+    ds_kho = list(ds) if ds is not None else ma_theo_lop(lop, gom_mo_rong=False)
+    ds_kho = [x for x in ds_kho if not x.get("mo_rong")]          # chốt: chỉ mã cốt lõi
+    if not ds_kho:
+        return [], [f"Lớp {lop} chưa có mã yêu cầu cần đạt giáo dục AI nào trong kho — để trống ô AI."]
+    tho_bai = gon_kd(" ".join([ten_bai or "", van_ban or "", mon or ""]))
+    tu_bai = _tu_bo_dau(tho_bai)
+    xep = []
+    for x in ds_kho:
+        tho_ma = gon_kd(" ".join([x.get("noi_dung") or "", x.get("yccd") or "",
+                                  x.get("chu_de_ten") or "", x.get("ma") or ""]))
+        tu_ma = _tu_bo_dau(tho_ma)
+        jac = len(tu_bai & tu_ma) / max(1, len(tu_bai | tu_ma))
+        giong = difflib.SequenceMatcher(None, tho_bai, tho_ma).ratio()
+        xep.append(dict(x, do_gan=round(2.0 * jac + giong, 4), khop=[]))
+    xep.sort(key=lambda z: (-z["do_gan"], z["ma"]))
+    ra = xep[:max(1, toi_da)]
+    for x in ra:
+        x["gan_bai"] = True
+    cb = [f"Bài học không có mã cốt lõi nào thật sát trong kho giáo dục AI lớp {lop}. Hệ thống lấy "
+          f"MÃ CỐT LÕI GẦN BÀI NHẤT là {', '.join(x['ma'] for x in ra)} (độ gần "
+          f"{ra[0]['do_gan']:.2f}) làm điểm bắt đầu — KHÔNG dùng mã mở rộng (MR). Thầy/cô kiểm lại "
+          f"mã và nội dung trước khi dùng, hoặc tự chọn mã khác của lớp."]
+    return ra, cb
+
+
+def goi_y_ma(lop, van_ban="", ten_bai="", mon="", toi_da=2, chi_cot_loi=True,
+             gan_bai_nhat=True):
     """Gợi ý mã yêu cầu cần đạt giáo dục AI cho một bài/dòng KHGD.
 
     Xếp hạng theo cụm từ/từ đặc thù trùng giữa bài học với yêu cầu cần đạt của đúng lớp đó;
     bài không có căn cứ thì trả về danh sách rỗng (giáo viên tự chọn trong kho mã của lớp).
-    Mã thuộc phần MỞ RỘNG chỉ được dùng khi không có mã cốt lõi nào sát bài (theo CV 5588).
+    Không bao giờ đề xuất mã MỞ RỘNG (MR): khi bài không có mã cốt lõi nào sát bài thì lấy MÃ
+    CỐT LÕI GẦN BÀI NHẤT kèm cảnh báo (xem ma_gan_bai_nhat).
     """
     ds = ma_theo_lop(lop, gom_mo_rong=not chi_cot_loi)
     if not ds:
@@ -482,24 +523,25 @@ def goi_y_ma(lop, van_ban="", ten_bai="", mon="", toi_da=2, chi_cot_loi=True):
     ket_qua = []
     for x in ds:
         diem, khop = _diem_ma(x, tu_bai, tho_bai, df_tu, df_cum)
-        if diem:
+        if diem and not (chi_cot_loi and x.get("mo_rong")):     # (M13) mã MR không tham gia đề xuất
             ket_qua.append(dict(x, diem=diem, khop=khop))
     if ket_qua:
         ket_qua.sort(key=lambda z: (-z["diem"], z["ma"]))
         nguong = max(1.0, 0.55 * ket_qua[0]["diem"])
-        ra = [x for x in ket_qua if x["diem"] >= nguong][:max(1, toi_da)]
+        ra = [x for x in ket_qua
+              if x["diem"] >= nguong and not (chi_cot_loi and x.get("mo_rong"))][:max(1, toi_da)]
         if ra:
             return ra, [f"Đối chiếu kho mã giáo dục AI lớp {lop} ({len(ds)} yêu cầu cần đạt cốt lõi — "
                         f"{len(ket_qua)} mã có từ khoá liên quan): giữ {len(ra)} mã sát bài học nhất, "
                         f"kèm cụm từ khớp để giáo viên kiểm tra."]
+    # (M13) KHÔNG đề xuất mã MỞ RỘNG (MR) nữa. Trước đây chỗ này trả mã MR khi bài không khớp mã
+    # cốt lõi; nay: nếu có mã (cốt lõi HOẶC mở rộng) thật sự khớp từ khoá mà mã cốt lõi thì không,
+    # hệ thống lấy MÃ CỐT LÕI GẦN BÀI NHẤT làm điểm bắt đầu và ghi cảnh báo để giáo viên kiểm lại.
     if chi_cot_loi:
-        # không có mã cốt lõi nào sát bài: mới xét tới phần mở rộng (tự nguyện theo CV 5588)
-        mr, _ = goi_y_ma(lop, van_ban, ten_bai, mon, toi_da, chi_cot_loi=False)
-        mr = [x for x in mr if x.get("mo_rong")]
-        if mr:
-            return mr, [f"Bài học không khớp mã cốt lõi của lớp {lop}; dưới đây là mã thuộc PHẦN MỞ RỘNG "
-                        f"(tự nguyện, hiệu trưởng quyết định theo Công văn 5588/BGDĐT-GDPT) — chỉ dùng nếu "
-                        f"giáo viên thấy phù hợp."]
+        _rong, _ = goi_y_ma(lop, van_ban, ten_bai, mon, toi_da, chi_cot_loi=False,
+                            gan_bai_nhat=False)
+        if gan_bai_nhat and any(x.get("mo_rong") for x in _rong):
+            return ma_gan_bai_nhat(lop, ten_bai=ten_bai, van_ban=van_ban, mon=mon, toi_da=1)
     return [], [f"Bài học không có cụm từ nào trùng với yêu cầu cần đạt giáo dục AI của lớp {lop} — "
                 f"để trống ô AI, giáo viên tự chọn mã phù hợp nếu vẫn muốn lồng ghép."]
 
