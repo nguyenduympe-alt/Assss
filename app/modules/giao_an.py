@@ -431,8 +431,8 @@ RE_HOAT_DONG_HE_THONG = re.compile(
 
 RE_DONG_DO_HE_THONG = re.compile(
     r"^\s*(?:\d+\s*\.\s*(?:Tiêu chí|Mạch)|·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
-    r"·\s*(?:Mục tiêu|Minh chứng đánh giá|Căn cứ chọn mạch|Hoạt động gợi ý|Nội dung lớp|"
-    r"CẦN GIÁO VIÊN DUYỆT)|"
+    r"·\s*(?:Mục tiêu|Tiêu chí|Mã|Mạch|Minh chứng đánh giá|Căn cứ chọn mạch|Hoạt động gợi ý|"
+    r"Nội dung lớp|CẦN GIÁO VIÊN DUYỆT)|"
     r"Nguồn:\s*(?:Khung nội dung|Thông tư 02/2025|Công văn 3456|Quyết định 2422|Công văn 5588)|"
     r"Hoạt động tích hợp (?:năng lực số|giáo dục AI)|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
     r"Nhiệm vụ của giáo viên:|Nhiệm vụ của học sinh:|Sản phẩm học tập:|"

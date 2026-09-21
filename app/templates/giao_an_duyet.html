@@ -75,8 +75,9 @@
    <b>không làm thay đổi hoặc gia tăng yêu cầu cần đạt</b> của môn học (theo đúng văn bản).
    Mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” được chèn <b>ngay sau mục năng lực số</b> (nếu bài có
    chèn mục đó), vẫn ở cuối phần Năng lực (trước mục Phẩm chất), và thêm một dòng hoạt động vào bảng
-   tiến trình. Trong mục này hệ thống ghi <b>mã yêu cầu cần đạt AI của đúng lớp</b> (do Quyết định
-   2422/QĐ-BGDĐT quy định — hệ thống không tự đặt mã), giống cách mục năng lực số ghi mã tiêu chí. Nếu thầy/cô <b>chỉ muốn phần giáo dục AI</b> cho bài này thì tích ô ở cuối thẻ này —
+   tiến trình. Trong mục này hệ thống ghi <b>tiêu chí theo mã yêu cầu cần đạt AI của đúng lớp</b>
+   (do Quyết định 2422/QĐ-BGDĐT quy định — hệ thống không tự đặt mã), giống cách mục năng lực số
+   ghi tiêu chí. Nếu thầy/cô <b>chỉ muốn phần giáo dục AI</b> cho bài này thì tích ô ở cuối thẻ này —
    hệ thống sẽ bỏ qua các tiêu chí năng lực số ở trên.</p>
   {% if not ctx.chon_ai %}
    <p style="color:#a16207">Chưa chọn được nội dung giáo dục AI. {% for c in ctx.canh_bao_ai %}{{c}} {% endfor %}</p>
@@ -87,9 +88,9 @@
     <input type="checkbox" name="ma_ai" value="{{x.id}}" {% if not x.can_duyet %}checked{% endif %} style="width:18px;margin-top:3px">
     <span><b>Mạch “{{x.ten_mach}}”</b> — {{x.ten_cap}} (lớp {{ctx.lop or '…'}})
      {% if x.can_duyet %}<b style="color:#b45309">· CẦN GIÁO VIÊN DUYỆT</b>{% endif %}<br>
-     {% if x.ma_goi_y %}<span class="muted">Mã yêu cầu cần đạt AI:
+     {% if x.ma_goi_y %}<span class="muted">Tiêu chí AI:
        <b style="color:#0000ff">{{ x.ma_goi_y|map(attribute='ma')|join(' · ') }}</b>
-       — <i>mã này được in vào file Word</i>, giống mã tiêu chí ở mục năng lực số</span><br>
+       — <i>tiêu chí này được in vào file Word</i>, giống mục năng lực số</span><br>
      {% else %}<span class="muted">Chưa có mã nào trong kho sát bài này — hệ thống KHÔNG tự đặt mã;
        thầy/cô tự chọn mã của lớp {{ctx.lop or '…'}}</span><br>{% endif %}
      <span class="muted">{% if x.co_so %}{{x.co_so}}{% else %}bài học chưa nêu hoạt động nào liên quan tới AI — hệ thống KHÔNG tự gán, chỉ tích nếu thầy/cô thật sự tổ chức hoạt động này{% endif %}</span></span>
@@ -101,10 +102,10 @@
    </div>
    <div style="padding:0 12px">
     <b>Nội dung cho bài này</b> — phần này được in vào file Word (tô xanh dương), thầy/cô sửa lại nếu cần:<br>
-    {% if x.ma_goi_y %}<span class="muted">Mã:</span>
+    {% if x.ma_goi_y %}<span class="muted">Tiêu chí:</span>
       {% for m in x.ma_goi_y %}<b>{{m.ma}}</b> ({{m.chu_de_ten}}{% if m.mo_rong %} — nội dung mở rộng{% endif %}):
       “{{m.yccd}}”{% if not loop.last %}<br>{% endif %}{% endfor %}<br>
-    {% else %}<span class="muted">Mã:</span> chưa có mã nào sát bài trong kho mã lớp {{ctx.lop or '…'}}<br>{% endif %}
+    {% else %}<span class="muted">Tiêu chí:</span> chưa có mã nào sát bài trong kho mã lớp {{ctx.lop or '…'}}<br>{% endif %}
     <span class="muted">Mục tiêu:</span> {{x.de_xuat.muc_tieu}}<br>
     <span class="muted">Hoạt động:</span> {{x.de_xuat.hoat_dong}}<br>
     <span class="muted">Sản phẩm học tập:</span> {{x.de_xuat.san_pham}}<br>
