@@ -5,11 +5,15 @@
 <div class="card"><h3>{{ctx.rows|length}} dòng cần rà soát</h3>
  {% if ctx.tom_tat %}
  <p class="sub">Hệ thống đọc <b>tựa bài</b> từng dòng rồi mới đề xuất:
-  <b>{{ctx.tom_tat.so_de_xuat}}/{{ctx.tom_tat.so_dong}} bài</b> được đề xuất tích hợp{% if ctx.tom_tat.so_bai %},
-  đúng theo số bài thầy/cô đặt ({{ctx.tom_tat.so_bai}} bài){% endif %}{% if ctx.tom_tat.so_bai and ctx.tom_tat.so_de_xuat < ctx.tom_tat.so_bai %}.
-  Chỉ có {{ctx.tom_tat.so_phu_hop}} bài có tựa bài phù hợp nên hệ thống <b>không gán thêm</b> cho đủ số{% endif %}.
-  {% if ctx.tom_tat.tin_hoc %}Môn Tin học: tích hợp cho cả file như trước.{% endif %}
-  Dòng nào chưa được đề xuất thì thầy/cô tự nhập nếu thấy phù hợp.</p>
+  <b>{{ctx.tom_tat.so_de_xuat_nls}}/{{ctx.tom_tat.so_dong}} bài</b> được tích hợp <b>năng lực số</b>{% if ctx.tom_tat.so_bai %},
+  đúng số bài thầy/cô đặt ({{ctx.tom_tat.so_bai}} bài){% endif %};
+  <b>{{ctx.tom_tat.so_de_xuat_ai}}/{{ctx.tom_tat.so_dong}} bài</b> được tích hợp <b>AI</b>{% if ctx.tom_tat.so_bai_ai %},
+  đúng số bài thầy/cô đặt ({{ctx.tom_tat.so_bai_ai}} bài){% endif %}.
+  {% if ctx.tom_tat.cung_bai %}Đang bật <b>năng lực số và AI cùng bài</b>: các bài này ghi cả hai cột.
+  {% else %}Đang chọn <b>riêng từng cột</b>: năng lực số và AI có thể ở những bài khác nhau.{% endif %}
+  Chỉ <b>{{ctx.tom_tat.so_phu_hop}} bài</b> có tựa bài phù hợp nên hệ thống <b>không gán thêm</b> cho đủ số.
+  {% if ctx.tom_tat.tin_hoc %}Môn Tin học: để trống ô số bài thì tích hợp cả file như trước.{% endif %}
+ Dòng nào chưa được đề xuất thì thầy/cô tự nhập nếu thấy phù hợp.</p>
  {% endif %}
  <p>Sửa trực tiếp các ô nếu cần, rồi tích “Tôi đã rà soát” ở cuối trang để tải Word. Ô trống nghĩa là
  <b>chưa đủ căn cứ</b>. <b>Ô tích “giữ cột”</b> ở mỗi dòng: bỏ tích để cột đó trống ở riêng dòng ấy.</p>
@@ -25,7 +29,7 @@
  <div class="card">
   <h3>{{loop.index}}. {{row.title}}</h3>
   {% if row.de_xuat_tich_hop is defined %}{% if row.de_xuat_tich_hop %}
-  <p class="sub" style="margin:2px 0 6px"><b>Đề xuất tích hợp</b> — {{row.ly_do}}</p>
+  <p class="sub" style="margin:2px 0 6px"><b>Đề xuất tích hợp{% if row.chon_nls and row.chon_ai %}: năng lực số + AI{% elif row.chon_nls %}: năng lực số{% elif row.chon_ai %}: AI{% endif %}</b> — {{row.ly_do}}</p>
   {% else %}
   <p class="sub" style="margin:2px 0 6px">Chưa đề xuất tích hợp cho bài này (để trống cho thầy/cô tự quyết định;
   cần thì tự nhập nội dung bên dưới).</p>

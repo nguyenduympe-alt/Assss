@@ -278,146 +278,216 @@ def extract_rows(doc):
     return result
 
 
-def preview(data, mode, grade, subject, chon=None, so_bai=None):
+
+# ---------------- (M9) chủ đề AI nhận ra từ tựa bài (khi bài không khớp nhóm nội dung nào) ----------------
+# Mỗi mục: (từ khoá trong tựa bài, ngữ cảnh AI để tra kho mã, mạch của khung làm phương án dự phòng)
+TU_KHOA_AI = [
+    (('tro li', 'thong minh', 'chatbot', 'tri tue nhan tao', 'may hoc', 'ai', 'tu dong'),
+     'ứng dụng trợ lí học tập thông minh, ứng dụng AI trong học tập và đời sống', 'C'),
+    (('tim kiem', 'internet', 'tra cuu', 'nguon thong tin', 'kiem chung', 'tin gia'),
+     'kiểm tra lại kết quả do AI tạo ra, so sánh với nhiều nguồn thông tin', 'A'),
+    (('du lieu', 'bang tinh', 'thong ke', 'bieu do', 'so lieu'),
+     'dữ liệu dùng để dạy AI, kiểm tra dữ liệu thiếu hoặc nhầm lẫn', 'D'),
+    (('an toan', 'mat khau', 'thong tin ca nhan', 'rieng tu', 'bao mat'),
+     'bảo vệ thông tin cá nhân khi dùng AI, rủi ro khi lạm dụng AI', 'B'),
+    (('dao duc', 'trung thuc', 'ban quyen', 'nguon', 'liem chinh', 'ung xu', 'quy tac'),
+     'đạo đức khi dùng AI, trách nhiệm giải trình, trung thực học thuật', 'B'),
+    (('may tinh', 'thiet bi so', 'dien thoai', 'may chieu', 'phuong tien', 'phong may'),
+     'thiết bị số và ứng dụng AI hỗ trợ học tập, sử dụng thiết bị an toàn', 'C'),
+    (('lap trinh', 'thuat toan', 'robot', 'chuong trinh', 'quy trinh', 'mo hinh'),
+     'ý tưởng sử dụng AI để giải quyết vấn đề, quy trình các bước', 'D'),
+    (('san pham', 'trinh chieu', 'van ban', 'thiet ke', 've', 'lam phim'),
+     'sản phẩm hoặc hình ảnh do AI tạo ra có thể không đúng với sự thật', 'B'),
+]
+
+
+def _khop_tu(t, ds_tu_khoa):
+    return any(re.search(r'(?<![a-z0-9])' + re.escape(k) + r'(?![a-z0-9])', t) for k in ds_tu_khoa)
+
+
+def goi_y_ma_ai(title, grade, subject, topic='', hits=None):
+    """Đọc tựa bài → suy luận bài này có khả năng tích hợp TIÊU CHÍ AI nào (mã thật của đúng lớp).
+
+    Bốn bước, dừng ngay khi có mã: (1) đối chiếu tựa bài với kho mã lớp; (2) theo nhóm nội dung
+    đọc từ tựa bài; (3) theo chủ đề AI nhận ra từ tựa bài; (4) theo mạch của khung sát nội dung bài.
+    Trả về (danh sách mã, cảnh báo, cách đã chọn). Không tự đặt mã ngoài kho.
+    """
+    hits = _nhom_theo_tua(title) if hits is None else hits
+    topic = topic or ''
+    ds, cb = AIGD.goi_y_ma(grade, ten_bai=title, van_ban=topic, mon=subject)
+    if ds:
+        return ds, cb, 'đối chiếu tựa bài với kho mã lớp %s' % grade
+    for n, _ in hits[:2]:
+        if n.get('ngu_canh_ai'):
+            ds, cb = AIGD.goi_y_ma(grade, ten_bai=title,
+                                   van_ban=(n['ngu_canh_ai'] + ' ' + topic).strip(), mon=subject)
+            if ds:
+                return ds, cb, 'theo nhóm nội dung “%s” đọc từ tựa bài' % n['ten']
+    t = plain(title or '')
+    mach_du_phong = hits[0][0].get('mach_ai') if hits else None
+    for tu_khoa, ngu_canh, mach in TU_KHOA_AI:
+        if _khop_tu(t, tu_khoa):
+            ds, cb = AIGD.goi_y_ma(grade, ten_bai=title, van_ban=(ngu_canh + ' ' + topic).strip(),
+                                   mon=subject)
+            if ds:
+                return ds, cb, 'theo chủ đề AI nhận ra từ tựa bài'
+            mach_du_phong = mach_du_phong or mach
+            break
+    if mach_du_phong:
+        ds = AIGD.ma_cho_mach(AIGD.ma_theo_lop(grade, gom_mo_rong=False), mach_du_phong, toi_da=2)
+        if ds:
+            ten_mach = next((m['ten'] for m in AIGD.khoa()['mach'] if m['id'] == mach_du_phong), '')
+            return ds, cb, 'theo mạch “%s” sát nội dung bài' % ten_mach
+    return [], cb, ''
+
+def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, cung_bai=True):
     """chon: tập nội dung cần đề xuất — 'digital' (năng lực số), 'ai' (giáo dục AI), 'stem'.
 
-    so_bai (M7): số bài tối đa cần tích hợp ở phân phối chương trình. Để trống thì với môn ngoài
-    Tin học hệ thống chỉ chọn những bài có tựa bài thật sự phù hợp; môn Tin học giữ nguyên cách
-    tích hợp cho cả file. Trong cả hai trường hợp, hệ thống đọc tựa bài rồi mới suy luận nội dung.
+    so_bai / so_bai_ai (M7, M9): số bài cần tích hợp năng lực số và số bài cần tích hợp AI. Để trống
+    thì cột đó chỉ đề xuất cho những bài đọc tựa bài thấy có căn cứ (môn Tin học: cả file như trước).
+    cung_bai (M9): chọn một bộ bài chung — mỗi bài trong bộ được ghi CẢ mã năng lực số và mã AI;
+    tắt thì hai cột chọn bài riêng, có thể khác nhau. Trước khi chọn, hệ thống đọc tựa bài từng dòng để
+    suy luận bài đó có khả năng tích hợp mã tiêu chí nào (năng lực số theo Thông tư 02/2025 + CV 3456,
+    AI theo Quyết định 2422 + CV 5588) — chỉ dùng mã có thật trong kho của Bộ, không tự đặt mã.
     """
     chon = set(chon or ('digital', 'ai', 'stem'))
     tin_hoc = la_tin_hoc(subject)
     doc = read_word(data)
+    _van_ban_doc = ''
     if mode == 'ppct':
         rows = extract_rows(doc)
-        for row in rows:
-            g = cham_bai(row['title'], subject, grade)
-            row['diem_phu_hop'] = g['diem']
-            row['nhom_noi_dung'] = g['nhom']
-            row['_khop'] = g['khop']
-            row['_khop_hien'] = g['hien']
-        if so_bai is None:
-            # để trống: môn Tin học tích hợp cả file, môn khác chỉ những bài tựa bài phù hợp
-            chon_dong = (set(range(len(rows))) if tin_hoc else
-                         {i for i, r in enumerate(rows) if r['diem_phu_hop'] > 0})
-        else:
-            xep = sorted(range(len(rows)), key=lambda i: (-rows[i]['diem_phu_hop'], i))
-            xep = [i for i in xep if rows[i]['diem_phu_hop'] > 0][:max(0, int(so_bai))]
-            chon_dong = set(xep)
     else:
-        text = '\n'.join(p.text for p in doc.paragraphs)
+        _van_ban_doc = '\n'.join(p.text for p in doc.paragraphs)
         for table in doc.tables:
-            text += '\n' + '\n'.join(' | '.join(c.text for c in row.cells) for row in table.rows)
-        if not text.strip():
+            _van_ban_doc += '\n' + '\n'.join(' | '.join(c.text for c in row.cells) for row in table.rows)
+        if not _van_ban_doc.strip():
             raise ValueError('Không tìm thấy văn bản trong file; file ảnh quét chưa được hỗ trợ.')
         title = next((p.text.strip() for p in doc.paragraphs if re.search(r'(bài|chủ đề|tên bài)', p.text, re.I)), '')
         title = title or next((p.text.strip() for p in doc.paragraphs if p.text.strip()), 'Giáo án')
         rows = [dict(week='', topic='', title=title[:500], periods='', digital='', ai='', stem='', notes='')]
-        for row in rows:
-            g = cham_bai(row['title'], subject, grade)
-            row['diem_phu_hop'] = g['diem']
-            row['nhom_noi_dung'] = g['nhom']
-            row['_khop'] = g['khop']
-            row['_khop_hien'] = g['hien']
-        chon_dong = {0}
     from .framework_match import match
-    if 'digital' not in chon:
-        text = ''                      # không đề xuất năng lực số: bỏ luôn phần đối chiếu chỉ báo
+
+    # ---- 1) ĐỌC TỰA BÀI TỪNG DÒNG: bài này có khả năng tích hợp tiêu chí nào? ----
+    for row in rows:
+        _title = row['title']
+        g = cham_bai(_title, subject, grade)
+        row['diem_phu_hop'] = g['diem']
+        row['nhom_noi_dung'] = g['nhom']
+        row['_khop'] = g['khop']
+        row['_khop_hien'] = g['hien']
+        row['_hits'] = _nhom_theo_tua(_title)
+        row['references'] = match(_van_ban_doc if mode == 'lesson' else _title, grade) if 'digital' in chon else []
+        if 'ai' in chon:
+            _ds_ai, _cb_ai, _cach_ai = goi_y_ma_ai(_title, grade, subject, row.get('topic', ''), row['_hits'])
+        else:
+            _ds_ai, _cb_ai, _cach_ai = [], [], ''
+        row['_ds_ai'], row['_cb_ai'], row['_cach_ai'] = _ds_ai, _cb_ai, _cach_ai
+        row['diem_nls'] = g['diem'] + (3 if (row['references'] and 'digital' in chon) else 0)
+        row['diem_ai'] = sum((x.get('diem') or 1.0) for x in _ds_ai)
+        row['_diem_tong'] = row['diem_nls'] + row['diem_ai']
+
+    # ---- 2) CHỌN BÀI: theo số bài thầy/cô đặt (riêng từng cột hoặc cùng bài) ----
+    n1 = int(so_bai) if so_bai else None
+    n2 = int(so_bai_ai) if so_bai_ai else None
+    if mode == 'lesson':
+        set_nls, set_ai = {0}, {0}
+    elif cung_bai:
+        _cand = [i for i, r in enumerate(rows)
+                 if (r['references'] and 'digital' in chon) or r['_ds_ai'] or tin_hoc]
+        _n = max(n1 or 0, n2 or 0)
+        _xep = sorted(_cand, key=lambda i: (-rows[i]['_diem_tong'], i))
+        set_nls = set_ai = set(_xep[:_n] if _n else _xep)
+    else:
+        _co_nls = [i for i, r in enumerate(rows) if (r['references'] and 'digital' in chon) or tin_hoc]
+        _co_ai = [i for i, r in enumerate(rows) if r['_ds_ai'] or ('ai' in chon and tin_hoc)]
+        set_nls = set(sorted(_co_nls, key=lambda i: (-rows[i]['diem_nls'], i))[:n1] if n1 else _co_nls)
+        set_ai = set(sorted(_co_ai, key=lambda i: (-rows[i]['diem_ai'], i))[:n2] if n2 else _co_ai)
+
+    # ---- 3) GHI MÃ + GHI RÕ CĂN CỨ CHO TỪNG DÒNG ----
     for i, row in enumerate(rows):
-        row['original'] = {k: row[k] for k in ('digital','ai','stem','notes')}
-        row['de_xuat_tich_hop'] = i in chon_dong
-        row['ly_do'] = ''
-        row['references'] = []
+        row['original'] = {k: row[k] for k in ('digital', 'ai', 'stem', 'notes')}
+        # chỉ nhận “đề xuất” khi thật sự suy luận được mã (môn Tin học giữ cách cũ: cả file)
+        row['chon_nls'] = ('digital' in chon) and i in set_nls and (bool(row['references']) or tin_hoc)
+        row['chon_ai'] = ('ai' in chon) and i in set_ai and (bool(row['_ds_ai']) or tin_hoc)
+        row['de_xuat_tich_hop'] = row['chon_nls'] or row['chon_ai'] or ('stem' in chon and i in set_nls)
         row['ma_ai'] = []
         row['canh_bao_ai'] = []
         row['chon'] = sorted(chon)
-        if i not in chon_dong:
-            # (M7) bài không nằm trong số bài cần tích hợp: để trống, thầy/cô tự nhập nếu muốn
+        _goc_notes = row['original']['notes'].strip()
+        if not row['de_xuat_tich_hop']:
+            row['ly_do'] = ''
             row['canh_bao_ai'] = ['Bài “%s” chưa được đề xuất tích hợp; thầy/cô có thể tự nhập nếu '
                                   'thấy phù hợp với lớp mình.' % row['title'][:80]]
             continue
         proposal = suggestions(row['title'], grade, subject)
-        _goc_notes = row['original']['notes'].strip()
-        _goi_y = (proposal.get('digital') or '').strip()      # phần diễn giải -> chỉ nằm ở cột Ghi chú
+        _goi_y = (proposal.get('digital') or '').strip()
         _goi_y_ai = (proposal.get('ai') or '').strip()
-        # (M8) cột tích hợp chỉ ghi MÃ TIÊU CHÍ; STEM chưa có hệ mã nên vẫn gợi ý bằng nội dung
-        for key in ('stem',):
-            if key in chon and not row[key]:
-                row[key] = proposal.get(key, '')
-        if 'digital' not in chon:
-            row['digital'] = row['original']['digital']
-            row['digital_cu'] = []
-        if 'stem' not in chon:
-            row['stem'] = row['original']['stem']
-        _notes = []
-        # ---- mã giáo dục AI theo Quyết định 2422/QĐ-BGDĐT (không tự đặt mã) ----
-        if 'ai' in chon and not row['original']['ai']:
-            # (M8b) đọc tựa bài → chọn MÃ TIÊU CHÍ AI: 1) đối chiếu thẳng với kho mã lớp;
-            #        2) theo nhóm nội dung đọc từ tựa bài; 3) theo mạch sát nội dung bài.
-            _hits = _nhom_theo_tua(row['title'])
-            ds_ma, canh_bao_ai = AIGD.goi_y_ma(grade, ten_bai=row['title'],
-                                               van_ban=row.get('topic', ''), mon=subject)
-            _cach_ma = 'đối chiếu tựa bài với kho mã lớp %s' % grade
-            if not ds_ma and _hits:
-                _ctx = '. '.join(n['ngu_canh_ai'] for n, _ in _hits[:2] if n.get('ngu_canh_ai'))
-                if _ctx:
-                    ds_ma, canh_bao_ai = AIGD.goi_y_ma(
-                        grade, ten_bai=row['title'],
-                        van_ban=(_ctx + ' ' + (row.get('topic') or '')).strip(), mon=subject)
-                    _cach_ma = 'theo nhóm nội dung “%s” đọc từ tựa bài' % _hits[0][0]['ten']
-            if not ds_ma and _hits:
-                _mach = _hits[0][0].get('mach_ai')
-                ds_ma = AIGD.ma_cho_mach(AIGD.ma_theo_lop(grade, gom_mo_rong=False), _mach, toi_da=2)
-                if ds_ma:
-                    _cach_ma = 'theo mạch “%s” sát nội dung bài' % next(
-                        (m['ten'] for m in AIGD.khoa()['mach'] if m['id'] == _mach), '')
-            row['ai'] = '\n'.join(x['ma'] for x in ds_ma)
-            row['ma_ai'] = [{'ma': x['ma'], 'yccd': x['yccd'], 'noi_dung': x.get('noi_dung', ''),
-                             'chu_de_ten': x['chu_de_ten'], 'mach_ten': x['mach_ten'],
-                             'mo_rong': x['mo_rong'], 'khop': x.get('khop', []),
-                             'nguon': AIGD.NGUON_MA} for x in ds_ma]
-            row['canh_bao_ai'] = canh_bao_ai
-            if ds_ma:
-                _notes.append('Mã giáo dục AI lớp %s (%s) — Quyết định 2422/QĐ-BGDĐT + Công văn '
-                              '5588/BGDĐT-GDPT: ' % (grade, _cach_ma) +
-                              '; '.join(x['yccd'][:110] for x in ds_ma) +
-                              '\nGiáo viên rà soát mã và nội dung AI trước khi dùng.')
-            elif _goi_y_ai:
-                _notes.append('Hoạt động gợi ý (AI): ' + _goi_y_ai)
-        elif 'ai' not in chon:
-            row['ai'] = row['original']['ai']
-        # ---- (M8) đọc tựa bài → lấy MÃ TIÊU CHÍ năng lực số phù hợp nhất trong khung ----
-        references = match(text if mode == 'lesson' else row['title'], grade)
-        _da_co = {x['code'] for x in references}
-        for _nhom, _ks in _nhom_theo_tua(row['title'])[:2]:
-            if not _nhom.get('ngu_canh'):
-                continue
-            for x in match(_nhom['ngu_canh'], grade, toi_da=2):
-                if x['code'] in _da_co:
-                    continue
-                _da_co.add(x['code'])
-                _x = dict(x)
-                _x['evidence'] = 'tựa bài: ' + '”, “'.join(_khop_hien(row['title'], k) for k in _ks[:2])
-                references.append(_x)
-        references = references[:3]
-        row['references'] = references
-        if 'digital' in chon and not row['original']['digital']:
-            if references:
-                row['digital'] = '\n'.join(x['code'] for x in references)
-                _notes += [x for x in dict.fromkeys(y['activity'] for y in references if y.get('activity'))]
-            elif _goi_y:
-                _notes.append('Chưa có mã chỉ báo năng lực số nào thật sát bài này trong khung — '
-                              'thầy/cô tự chọn mã của lớp; hệ thống không tự đặt mã.')
-            if _goi_y:
-                _notes.append('Nội dung gợi ý: ' + _goi_y)
-        _notes = ([_goc_notes] if _goc_notes else []) + _notes
-        if _notes:
-            _notes.append('Đề xuất tự động theo khung; giáo viên rà soát trước khi sử dụng.')
-        row['notes'] = '\n'.join(_notes)
-        # ---- (M7) ghi rõ căn cứ chọn bài để thầy/cô đối chiếu ----
-        row['ly_do'] = ly_do_chon(row['title'], {'khop': row['_khop'], 'hien': row['_khop_hien'],
-                                                'nhom': row['nhom_noi_dung'], 'tin_hoc': tin_hoc})
-        row['notes'] = (row['ly_do'] + '\n' + row['notes']) if row['notes'] else row['ly_do']
+        _notes, _phan_can_cu = [], []
+        # --- cột năng lực số: chỉ ghi mã tiêu chí ---
+        if row['chon_nls']:
+            if not row['original']['digital']:
+                references = list(row['references'])
+                _da_co = {x['code'] for x in references}
+                for _nhom, _ks in row['_hits'][:2]:
+                    if not _nhom.get('ngu_canh'):
+                        continue
+                    for x in match(_nhom['ngu_canh'], grade, toi_da=2):
+                        if x['code'] in _da_co:
+                            continue
+                        _da_co.add(x['code'])
+                        _x = dict(x)
+                        _x['evidence'] = 'tựa bài: ' + '”, “'.join(_khop_hien(row['title'], k) for k in _ks[:2])
+                        references.append(_x)
+                references = references[:3]
+                row['references'] = references
+                if references:
+                    row['digital'] = '\n'.join(x['code'] for x in references)
+                    _notes += [x for x in dict.fromkeys(y['activity'] for y in references if y.get('activity'))]
+                else:
+                    _notes.append('Chưa có mã chỉ báo năng lực số nào thật sát bài này trong khung — '
+                                  'thầy/cô tự chọn mã của lớp; hệ thống không tự đặt mã.')
+                if _goi_y:
+                    _notes.append('Nội dung gợi ý: ' + _goi_y)
+            if row['_khop']:
+                _phan_can_cu.append(ly_do_chon(row['title'], {'khop': row['_khop'], 'hien': row['_khop_hien'],
+                                                             'nhom': row['nhom_noi_dung'], 'tin_hoc': tin_hoc}))
+            elif row['references']:
+                _phan_can_cu.append('Căn cứ tựa bài: đối chiếu khung năng lực số thấy mã phù hợp (%s).'
+                                    % ', '.join(x['code'] for x in row['references'][:3]))
+            elif tin_hoc:
+                _phan_can_cu.append('Căn cứ: môn Tin học nên mọi bài đều có thể tích hợp năng lực số.')
+            else:
+                _phan_can_cu.append('Chưa có căn cứ rõ cho năng lực số ở bài này; để trống cho thầy/cô tự quyết định.')
+        if 'stem' in chon and i in set_nls and not row['original']['stem']:
+            row['stem'] = proposal.get('stem', '')
+        # --- cột AI: chỉ ghi mã tiêu chí AI (Quyết định 2422/QĐ-BGDĐT) ---
+        if row['chon_ai']:
+            _ds_ai = row['_ds_ai']
+            if not row['original']['ai']:
+                row['ai'] = '\n'.join(x['ma'] for x in _ds_ai)
+                row['ma_ai'] = [{'ma': x['ma'], 'yccd': x['yccd'], 'noi_dung': x.get('noi_dung', ''),
+                                 'chu_de_ten': x['chu_de_ten'], 'mach_ten': x['mach_ten'],
+                                 'mo_rong': x['mo_rong'], 'khop': x.get('khop', []),
+                                 'nguon': AIGD.NGUON_MA} for x in _ds_ai]
+                if _ds_ai:
+                    _notes.append('Mã giáo dục AI lớp %s (%s) — Quyết định 2422/QĐ-BGDĐT + Công văn '
+                                  '5588/BGDĐT-GDPT: ' % (grade, row['_cach_ai']) +
+                                  '; '.join(x['yccd'][:110] for x in _ds_ai) +
+                                  '\nGiáo viên rà soát mã và nội dung AI trước khi dùng.')
+                    _phan_can_cu.append('AI: %s (mã %s).' % (row['_cach_ai'],
+                                                             ', '.join(x['ma'] for x in _ds_ai)))
+                else:
+                    _notes.append('Bài này chưa suy luận được mã tiêu chí AI nào thật sát trong kho lớp %s — '
+                                  'thầy/cô tự chọn mã của lớp; hệ thống không tự đặt mã.' % grade)
+                    if _goi_y_ai:
+                        _notes.append('Hoạt động gợi ý (AI): ' + _goi_y_ai)
+            row['canh_bao_ai'] = row['_cb_ai']
+        row['ly_do'] = (' '.join(_phan_can_cu) or
+                        'Chưa đủ căn cứ để suy luận mã; thầy/cô tự chọn mã phù hợp với lớp.')
+        row['notes'] = '\n'.join(([_goc_notes] if _goc_notes else []) +
+                                  ([row['ly_do']] if row['ly_do'] else []) + _notes +
+                                  (['Đề xuất tự động theo khung; giáo viên rà soát trước khi sử dụng.']
+                                   if _notes else []))
     return rows
 
 

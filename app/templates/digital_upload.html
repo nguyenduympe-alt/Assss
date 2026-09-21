@@ -19,10 +19,20 @@
    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_ai" value="1" checked style="width:18px">Trí tuệ nhân tạo (AI)</label>
    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_stem" value="1" checked style="width:18px">STEM / STEAM</label>
   </div>
-  <label class="f" style="max-width:420px">Số bài cần tích hợp (phân phối chương trình)
-   <input name="so_bai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Ví dụ: 5 — để trống: hệ thống tự chọn bài phù hợp">
-   <span class="sub">Hệ thống đọc <b>tựa bài</b> rồi mới đề xuất: nhập số bài thầy/cô muốn tích hợp
-   (không tích hợp cả file). Môn Tin học thì để trống để giữ nguyên cách tích hợp toàn bộ.</span></label>
+  <div class="row" style="margin-top:6px">
+   <label class="f" style="flex:1;min-width:260px">Số bài cần tích hợp <b>năng lực số</b> (phân phối chương trình)
+    <input name="so_bai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Ví dụ: 5 — để trống: tự chọn bài phù hợp">
+    <span class="sub">Hệ thống đọc <b>tựa bài</b> rồi mới đề xuất, không tích hợp cả file.
+   Môn Tin học: để trống thì vẫn tích hợp cả file như trước.</span></label>
+   <label class="f" style="flex:1;min-width:260px">Số bài cần tích hợp <b>AI</b> (phân phối chương trình)
+    <input name="so_bai_ai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Ví dụ: 3 — để trống: tự chọn bài có tiêu chí AI phù hợp">
+    <span class="sub">App đọc tựa bài và suy luận bài nào có khả năng tích hợp <b>tiêu chí AI</b> nào.</span></label>
+  </div>
+  <label style="display:flex;gap:8px;align-items:flex-start;margin-left:2px">
+   <input type="hidden" name="cung_bai" value="0">
+   <input type="checkbox" name="cung_bai" value="1" checked style="width:18px;margin-top:3px">
+   <span><b>Tích hợp năng lực số và AI cùng bài</b> — mỗi bài được chọn sẽ ghi <b>cả</b> mã năng lực số <b>và</b> mã AI.
+   Bỏ tích nếu muốn hai cột chọn bài riêng (năng lực số và AI có thể khác bài).</span></label>
   <p class="sub">Chọn <b>riêng từng cái</b> hoặc <b>cả hai</b>: bỏ tích ô nào thì cột đó không được đề xuất cho
   cả file. Ở bước rà soát, mỗi dòng bài học còn có ô tích riêng để giữ/bỏ từng cột.</p>
   <label class="f" style="margin:18px 0">File Word (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
