@@ -364,6 +364,7 @@ def bao_giang():
     act = request.form.get("act") if request.method == "POST" else None
     if act in ("pdf", "word"):
         if not BL.can_use(u):
+            flash(BL.thong_bao_het(), "err")
             return redirect(url_for("core.nang_cap", need=act))
         BL.consume(db, u, act, f"Lịch báo giảng tuần {tuan}")
         if act == "word":
@@ -397,6 +398,11 @@ def nhan_xet():
     db, uid = get_db(), session["uid"]
     result, cols = None, None
     if request.method == "POST":
+        # (M10) hạn mức dùng chung: tạo nhận xét cho học sinh cũng tính 1 lượt
+        u = current_user()
+        if not BL.can_use(u):
+            flash(BL.thong_bao_het(), "err")
+            return redirect(url_for("core.nang_cap", need="nhanxet"))
         provider = request.form.get("provider", "rule")
         thang = float(request.form.get("thang") or 10)
         mon = request.form.get("mon", "")
@@ -448,6 +454,8 @@ def nhan_xet():
                        (uid, rec["lop"], rec["mon"], hocky, rec["ho_ten"], rec["diem"], rec["muc_do"],
                         rec["nhan_xet_goc"], rec["nhan_xet"], datetime.datetime.now().isoformat(timespec="seconds")))
         db.commit()
+        if records:
+            BL.consume(db, u, "nhanxet", "Tạo nhận xét cho %d học sinh" % len(records))
         result = records
         session["last_meta"] = {"lop": lop, "mon": mon, "hocky": hocky}
     return render_template("nhanxet.html", result=result, cols=cols)
@@ -484,6 +492,7 @@ def tao_lai():
 def xuat_excel():
     u = current_user()
     if not BL.can_use(u):
+        flash(BL.thong_bao_het(), "err")
         return redirect(url_for("core.nang_cap", need="excel"))
     ids = request.args.get("ids")
     q = "SELECT * FROM danhgia WHERE teacher_id=?"

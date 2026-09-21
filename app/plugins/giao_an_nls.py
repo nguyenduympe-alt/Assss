@@ -24,6 +24,8 @@ from flask import Blueprint, request, render_template, flash, redirect, url_for,
 bp = Blueprint('giao_an_nls', __name__, url_prefix='/giao-an')
 
 from ..auth import login_required, current_user
+from ..db import get_db
+from ..modules import billing as BL
 from ..modules import giao_an as GA
 from ..modules import nld as NLD
 from ..modules import nld_tich_hop as TH
@@ -42,6 +44,10 @@ NHAN_NOI_BO = ("Xử lý ngay trên máy chủ của trường, KHÔNG gửi n�
 @login_required
 def index():
     if request.method == 'POST':
+        # (M10) hạn mức dùng chung cho tất cả chức năng: hết 3 lượt thì phải nâng VIP
+        if BL.chan_het(current_user()):
+            flash(BL.thong_bao_het(), 'err')
+            return redirect(url_for('core.nang_cap', need='giaoan'))
         file = request.files.get('file')
         if not file or not (file.filename or '').lower().endswith('.docx'):
             flash('Vui lòng chọn file Word .docx. File .doc hoặc .docm không được hỗ trợ.', 'err')
@@ -85,6 +91,9 @@ def index():
                     'thiet_bi': thiet_bi, 'thoi_luong': thoi_luong, 'toi_da': toi_da,
                     'doan_goc': TH.trang_thai_mau_goc(doc),
                 })
+            # tính 1 lượt cho một giáo án đã soạn xong (bước tải file đã soạn KHÔNG tính thêm)
+            BL.consume(get_db(), current_user(), 'giaoan',
+                       'Giáo án: %s — lớp %s' % (TH.lay_ten_bai(doc)[:120], pt['lop'] or '?'))
             return redirect(url_for('giao_an_nls.duyet', token=token))
         except ValueError as exc:
             flash(str(exc), 'err')

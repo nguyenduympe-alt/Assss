@@ -76,6 +76,32 @@ def can_use(user):
     return is_pro(user) or remaining(user) > 0
 
 
+# ---------------- (M10) hạn mức dùng chung cho TẤT CẢ chức năng ----------------
+# Một tài khoản dùng thử có FREE_QUOTA lượt (mặc định 3) tính CHUNG cho mọi chức năng:
+# lịch báo giảng, xuất Excel nhận xét, sửa chính tả, tạo giáo án tích hợp, KHGD/phân phối
+# chương trình, dò dấu hiệu văn bản AI, tạo nhận xét học sinh. Hết lượt thì phải nâng VIP.
+CAC_CHUC_NANG = {
+    "baogiang": "Lịch báo giảng",
+    "excel": "Xuất Excel nhận xét",
+    "chinhta": "Sửa lỗi chính tả",
+    "giaoan": "Giáo án tích hợp năng lực số & AI",
+    "khgd": "Kế hoạch giáo dục / phân phối chương trình",
+    "checkai": "Dò dấu hiệu văn bản AI",
+    "nhanxet": "Tạo nhận xét học sinh",
+}
+
+
+def thong_bao_het():
+    """Câu báo khi hết lượt — dùng chung ở mọi chức năng để thầy/cô biết đây là hạn mức chung."""
+    return ("Thầy/cô đã dùng hết %d lượt miễn phí (số lượt này tính chung cho TẤT CẢ chức năng). "
+            "Nâng cấp VIP để tiếp tục dùng không giới hạn." % CFG.get_int("FREE_QUOTA", 3))
+
+
+def chan_het(user):
+    """True nếu phải chặn vì hết lượt (VIP thì luôn False)."""
+    return not can_use(user)
+
+
 def consume(db, user, kind, detail=""):
     """Trừ 1 lượt. Trả về True nếu được phép thực hiện."""
     if is_pro(user):

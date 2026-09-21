@@ -177,6 +177,7 @@ def xuat(token):
     # lần xuất bản đã sửa. Việc bấm “từ này đúng” ở trên KHÔNG tốn lượt.
     db, u = get_db(), current_user()
     if not BL.can_use(u):
+        flash(BL.thong_bao_het(), 'err')
         return redirect(url_for('core.nang_cap', need='chinhta'))
 
     try:

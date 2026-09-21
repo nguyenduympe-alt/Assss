@@ -3,10 +3,12 @@
 Xử lý hoàn toàn trong bộ nhớ: KHÔNG lưu tệp tải lên ra đĩa, KHÔNG gửi dữ liệu ra ngoài.
 Kết quả chỉ mang tính tham khảo — giao diện nói rõ điều này ngay trên đầu trang.
 """
-from flask import Blueprint, render_template, request, session, flash
+from flask import Blueprint, render_template, request, session, flash, redirect, url_for
 
 from ..auth import login_required, current_user
+from ..db import get_db
 from ..modules import doc_ai_check as DA
+from ..modules import billing as BL
 
 bp = Blueprint('check_ai', __name__, url_prefix='/check-van-ban-ai')
 MENU = {'label': 'Kiểm tra văn bản AI', 'endpoint': 'check_ai.index', 'icon': '🕵️'}
@@ -20,6 +22,10 @@ def index():
     kq = None
     ten_tep = ""
     if request.method == 'POST':
+        # (M10) hạn mức dùng chung cho tất cả chức năng: hết 3 lượt thì phải nâng VIP
+        if BL.chan_het(current_user()):
+            flash(BL.thong_bao_het(), 'err')
+            return redirect(url_for('core.nang_cap', need='checkai'))
         blob = b""
         f = request.files.get('file')
         dan = (request.form.get('text') or '').strip()
@@ -56,5 +62,8 @@ def index():
             kq["ten_tep"] = ten_tep
             kq["so_doan"] = len(doan)
             kq["doan"] = doan if len(doan) <= 60 else doan[:60]
+            # tính 1 lượt cho một lần dò (dùng chung hạn mức với các chức năng khác)
+            BL.consume(get_db(), current_user(), 'checkai',
+                       'Dò dấu hiệu văn bản AI: %s (%d đoạn)' % (ten_tep[:120], len(doan)))
     return render_template('check_ai.html', kq=kq, thong_tin=DA.thong_tin(),
                            nguoi=current_user()['fullname'] or current_user()['username'])

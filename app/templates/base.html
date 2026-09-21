@@ -195,7 +195,7 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
       {% else %}
         <a href="{{url_for('core.nang_cap')}}" class="pill" style="background:{{'#fff1f2' if remaining==0 else '#fff7ed'}};
           color:{{'#be123c' if remaining==0 else '#b45309'}};border:1px solid {{'#fecdd3' if remaining==0 else '#fed7aa'}}">
-          {{ '🔒 Hết lượt — Nâng cấp' if remaining==0 else '🎁 Còn ' ~ remaining ~ ' lượt' }}</a>
+          {{ '🔒 Hết lượt — Nâng VIP' if remaining==0 else '🎁 Còn ' ~ remaining ~ '/' ~ FREE_QUOTA ~ ' lượt' }}</a>
       {% endif %}
       <span class="pill">{{ now.strftime('%d/%m/%Y') }}</span></div>
   </div>

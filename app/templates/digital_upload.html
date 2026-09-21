@@ -36,7 +36,17 @@
   <p class="sub">Chọn <b>riêng từng cái</b> hoặc <b>cả hai</b>: bỏ tích ô nào thì cột đó không được đề xuất cho
   cả file. Ở bước rà soát, mỗi dòng bài học còn có ô tích riêng để giữ/bỏ từng cột.</p>
   <label class="f" style="margin:18px 0">File Word (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
+  {% if is_pro %}
   <button class="ok">Tạo bản xem trước</button>
+  <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
+  {% elif remaining and remaining > 0 %}
+  <button class="ok">Tạo bản xem trước</button>
+  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) — một tài liệu tính 1 lượt</span>
+  {% else %}
+  <a class="btn" href="{{url_for('core.nang_cap', need='khgd')}}"
+    style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để tích hợp</a>
+  <div class="muted" style="margin-top:6px">Số lượt miễn phí tính chung cho tất cả chức năng của {{SITE_NAME}}.</div>
+  {% endif %}
  </form>
 </div>
 <div class="card">

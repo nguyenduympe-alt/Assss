@@ -6,6 +6,8 @@ import uuid
 from pathlib import Path
 from flask import Blueprint, request, render_template, session, flash, redirect, url_for, send_file
 from ..auth import login_required, current_user
+from ..db import get_db
+from ..modules import billing as BL
 from ..modules import digital_plan as DP
 
 bp = Blueprint('digital', __name__, url_prefix='/nang-luc-so')
@@ -53,6 +55,10 @@ def load(token):
 @login_required
 def index():
     if request.method == 'POST':
+        # (M10) hạn mức dùng chung cho tất cả chức năng: hết 3 lượt thì phải nâng VIP
+        if BL.chan_het(current_user()):
+            flash(BL.thong_bao_het(), 'err')
+            return redirect(url_for('core.nang_cap', need='khgd'))
         file = request.files.get('file')
         mode, grade, subject = (request.form.get(k, '').strip() for k in ('mode','grade','subject'))
         # (M7) số bài cần tích hợp ở phân phối chương trình (để trống = hệ thống tự chọn bài phù hợp)
@@ -98,6 +104,10 @@ def index():
                                         cung_bai=bool(cung_bai),
                                         tin_hoc=DP.la_tin_hoc(subject)))
                 (root / (token + '.json')).write_text(json.dumps(ctx, ensure_ascii=False), encoding='utf-8')
+                # tính 1 lượt cho một tài liệu đã xử lý xong (bước tải tệp đã duyệt KHÔNG tính thêm)
+                BL.consume(get_db(), current_user(), 'khgd',
+                           '%s: %s' % ('KHGD/PPCT' if mode == 'ppct' else 'Giáo án tích hợp',
+                                       (file.filename or '')[:120]))
                 return redirect(url_for('digital.review', token=token))
             except ValueError as exc:
                 flash(str(exc), 'err')

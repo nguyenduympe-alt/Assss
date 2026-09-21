@@ -32,7 +32,17 @@
         <textarea name="text" rows="5" placeholder="Dán đoạn văn, bài làm, báo cáo cần kiểm tra…"
           style="font-family:inherit;padding:9px 11px;border:1px solid #d8e6e1;border-radius:10px"></textarea></label>
     </div>
+    {% if is_pro %}
     <button class="ok" style="margin-top:14px">Phân tích văn phong</button>
+    <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
+    {% elif remaining and remaining > 0 %}
+    <button class="ok" style="margin-top:14px">Phân tích văn phong</button>
+    <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung cho tất cả chức năng) — thao tác này tính 1 lượt</span>
+    {% else %}
+    <a class="btn" href="{{url_for('core.nang_cap', need='checkai')}}"
+      style="margin-top:14px;background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để phân tích</a>
+    <div class="muted" style="margin-top:6px">Số lượt miễn phí tính chung cho tất cả chức năng của {{SITE_NAME}}.</div>
+    {% endif %}
   </form>
 </div>
 
