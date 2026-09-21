@@ -55,6 +55,8 @@ def index():
     if request.method == 'POST':
         file = request.files.get('file')
         mode, grade, subject = (request.form.get(k, '').strip() for k in ('mode','grade','subject'))
+        # (M7) số bài cần tích hợp ở phân phối chương trình (để trống = hệ thống tự chọn bài phù hợp)
+        so_bai = (request.form.get('so_bai') or '').strip()
         # Giáo viên chọn nội dung cần tích hợp: năng lực số / giáo dục AI / STEM — có thể chọn riêng hoặc cả hai
         chon = tuple('digital' if k == 'nls' else k
                      for k in ('nls', 'ai', 'stem') if request.form.get('chon_' + k))
@@ -62,17 +64,26 @@ def index():
             flash('Vui lòng chọn file Word .docx (không hỗ trợ .doc hoặc file ảnh).', 'err')
         elif mode not in ('ppct','lesson') or grade not in [str(i) for i in range(1,13)] or not 1 <= len(subject) <= 100:
             flash('Vui lòng chọn loại tài liệu, lớp 1–12 và nhập môn học.', 'err')
+        elif so_bai and (not so_bai.isdigit() or not 1 <= int(so_bai) <= 180):
+            flash('Số bài cần tích hợp phải là số từ 1 đến 180, hoặc để trống.', 'err')
         elif not chon:
             flash('Hãy chọn ít nhất một nội dung cần tích hợp: năng lực số, giáo dục AI hoặc STEM.', 'err')
         else:
             try:
                 data = file.read(8 * 1024 * 1024 + 1)
-                rows = DP.preview(data, mode, grade, subject, chon=chon)
+                rows = DP.preview(data, mode, grade, subject, chon=chon,
+                                  so_bai=int(so_bai) if so_bai else None)
                 token = uuid.uuid4().hex
                 root = folder()
                 (root / (token + '.docx')).write_bytes(data)
                 ctx = dict(uid=current_user()['id'], rows=rows, mode=mode, grade=grade, subject=subject,
-                           name=file.filename[:200], chon=list(chon))
+                           name=file.filename[:200], chon=list(chon),
+                           so_bai=int(so_bai) if so_bai else None,
+                           tom_tat=dict(so_dong=len(rows),
+                                        so_de_xuat=sum(1 for r in rows if r.get('de_xuat_tich_hop')),
+                                        so_phu_hop=sum(1 for r in rows if (r.get('diem_phu_hop') or 0) > 0),
+                                        so_bai=int(so_bai) if so_bai else None,
+                                        tin_hoc=DP.la_tin_hoc(subject)))
                 (root / (token + '.json')).write_text(json.dumps(ctx, ensure_ascii=False), encoding='utf-8')
                 return redirect(url_for('digital.review', token=token))
             except ValueError as exc:

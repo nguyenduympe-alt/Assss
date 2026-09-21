@@ -19,6 +19,10 @@
    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_ai" value="1" checked style="width:18px">Trí tuệ nhân tạo (AI)</label>
    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_stem" value="1" checked style="width:18px">STEM / STEAM</label>
   </div>
+  <label class="f" style="max-width:420px">Số bài cần tích hợp (phân phối chương trình)
+   <input name="so_bai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Ví dụ: 5 — để trống: hệ thống tự chọn bài phù hợp">
+   <span class="sub">Hệ thống đọc <b>tựa bài</b> rồi mới đề xuất: nhập số bài thầy/cô muốn tích hợp
+   (không tích hợp cả file). Môn Tin học thì để trống để giữ nguyên cách tích hợp toàn bộ.</span></label>
   <p class="sub">Chọn <b>riêng từng cái</b> hoặc <b>cả hai</b>: bỏ tích ô nào thì cột đó không được đề xuất cho
   cả file. Ở bước rà soát, mỗi dòng bài học còn có ô tích riêng để giữ/bỏ từng cột.</p>
   <label class="f" style="margin:18px 0">File Word (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
