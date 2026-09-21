@@ -619,15 +619,31 @@ def _nhan_muc_ai(so_nld):
 def soan_muc_tieu_ai(ten_bai, lop, mon, chon_ai):
     """Soạn các dòng cho mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)”.
 
-    Chỉ nêu tên mạch theo Khung, nội dung lớp, mục tiêu, minh chứng và căn cứ chọn mạch —
-    KHÔNG đưa khối “[QUY ĐỊNH]/[ĐỀ XUẤT]” vào tài liệu. Khung không có mã chỉ báo nên hệ
-    thống KHÔNG tự đặt mã; nguồn văn bản ghi một dòng ở cuối mục.
+    Ghi MÃ yêu cầu cần đạt AI của đúng lớp (mã do văn bản QĐ 2422/QĐ-BGDĐT quy định — hệ thống
+    KHÔNG tự đặt mã), kèm mạch/chủ đề, nội dung lớp, mục tiêu và minh chứng — song song với cách
+    mục “Tích hợp năng lực số” ghi mã tiêu chí. Không đưa khối “[QUY ĐỊNH]/[ĐỀ XUẤT]” vào tài liệu.
     """
     dong = []
     for i, x in enumerate(chon_ai, 1):
         dx = x.get("de_xuat") or {}
-        dong.append((f"{i}. Mạch “{x['ten_mach']}” — {x.get('ten_cap', '')}, lớp {lop or '…'}",
-                     "tieuchi"))
+        ds_ma = x.get("ma_goi_y") or []
+        if ds_ma:
+            # Ghi MÃ yêu cầu cần đạt AI của đúng lớp — giống cách mục năng lực số ghi mã
+            # tiêu chí (mã do văn bản của Bộ quy định, hệ thống không tự đặt).
+            _m0 = ds_ma[0]
+            dong.append((f"{i}. Mã {_m0['ma']} — {_m0.get('mach_ten', x['ten_mach'])} "
+                         f"({(x.get('ten_cap') or '').lower()}, lớp {lop or '…'}) — "
+                         f"“{_m0['yccd'].rstrip('.')}”"
+                         f"{' (nội dung mở rộng)' if _m0.get('mo_rong') else ''}", "tieuchi"))
+            for _m in ds_ma[1:]:
+                dong.append((f"   · Mã {_m['ma']} — {_m.get('chu_de_ten', '')} — "
+                             f"“{_m['yccd'].rstrip('.')}”"
+                             f"{' (nội dung mở rộng)' if _m.get('mo_rong') else ''}", "tieuchi"))
+        else:
+            # Không có mã nào sát bài: KHÔNG tự đặt mã — ghi rõ để giáo viên tự chọn.
+            dong.append((f"{i}. Mạch “{x['ten_mach']}” — {x.get('ten_cap', '')}, "
+                         f"lớp {lop or '…'} (chưa có mã nào trong kho sát bài này — "
+                         f"thầy/cô tự chọn mã của lớp {lop or '…'})", "tieuchi"))
         if x.get("can_duyet"):
             dong.append(("   · CẦN GIÁO VIÊN DUYỆT — bài học chưa nêu hoạt động nào liên quan "
                          "tới AI; chỉ giữ nếu thầy/cô thật sự tổ chức hoạt động này.", "can_duyet"))
@@ -1095,6 +1111,49 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
             loi.append("Nội dung giáo dục AI thiếu ghi nguồn văn bản — không được xuất.")
             cung.append(loi[-1])
 
+    # 2b2. mã yêu cầu cần đạt AI in trong mục phải CÓ THẬT, đúng lớp và đúng mạch đã chọn
+    if kq_ai.get("chon"):
+        _mau_ma_ai = re.compile(r"\b(\d{1,2})\.([A-D]\d)(?:\.(MR))?\.(\d+)\b")
+        _blk_ai = []
+        if i_ai is not None:
+            for p in doc.paragraphs[i_ai:]:
+                if p.text.strip() and not _het_toan_do(p):
+                    break
+                _blk_ai.append(p.text)
+        _ma_trong_muc = []
+        for _t in _blk_ai:
+            for _m in _mau_ma_ai.finditer(_t):
+                _m_full = _m.group(0)
+                if _m_full not in _ma_trong_muc:
+                    _ma_trong_muc.append(_m_full)
+        _ma_mong_doi = [z["ma"] for x in (kq_ai.get("chon") or [])
+                        for z in (x.get("ma_goi_y") or [])]
+        for _m in _ma_trong_muc:
+            _k = AIGD.tra_ma(_m)
+            if not _k:
+                loi.append(f"Mã giáo dục AI {_m} không có trong kho mã của văn bản — không được xuất.")
+                cung.append(loi[-1])
+                continue
+            if str(_k.get("ma", "")).split(".")[0] != str(pt.get("lop") or "").strip():
+                if str(pt.get("lop") or "").strip():
+                    loi.append(f"Mã giáo dục AI {_m} không thuộc lớp {pt.get('lop')} — sai lớp.")
+                    cung.append(loi[-1])
+                    continue
+            _mach_hop_le = {AIGD.MACH_SANG_MA.get(x.get("id")) for x in (kq_ai.get("chon") or [])}
+            if _k.get("mach") not in _mach_hop_le:
+                loi.append(f"Mã giáo dục AI {_m} không thuộc mạch nội dung nào đã chọn — sai mạch.")
+                cung.append(loi[-1])
+                continue
+            dat.append(f"Mã giáo dục AI {_m} hợp lệ: có trong kho, đúng lớp "
+                       f"{pt.get('lop')}, đúng mạch “{_k.get('mach_ten', '')}”.")
+        if _ma_mong_doi and not _ma_trong_muc:
+            loi.append("Mục giáo dục AI chưa ghi mã yêu cầu cần đạt nào dù kho có mã của lớp — "
+                       "mục AI phải ghi mã như mục năng lực số.")
+            cung.append(loi[-1])
+        if _ma_trong_muc:
+            dat.append(f"Mục giáo dục AI có ghi {len(_ma_trong_muc)} mã yêu cầu cần đạt của đúng lớp "
+                       f"(mã do Quyết định 2422/QĐ-BGDĐT quy định).")
+
     # 2c. thiết kế hoạt động chỉ ghi hoạt động, KHÔNG ghi mã chỉ báo trong dòng hoạt động
     _mau_ma = re.compile(r"\b\d\.\d\.(?:CB|TC|NC)\d[a-z]?\b")
     _dong_hd = [r for t in doc.tables for r in t.rows
@@ -1102,7 +1161,8 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
                         or "tích hợp giáo dục ai" in (c.text or "").lower()) for c in r.cells)]
     for dong in _dong_hd:
         for o in dong.cells:
-            if _mau_ma.search(o.text or ""):
+            if _mau_ma.search(o.text or "") or re.search(r"\b\d{1,2}\.[A-D]\d(?:\.MR)?\.\d+\b",
+                                                         o.text or "", re.I):
                 loi.append("Dòng hoạt động trong bảng còn ghi mã năng lực số — thiết kế hoạt động "
                            "chỉ ghi hoạt động, không ghi chi tiết năng lực.")
                 cung.append(loi[-1])

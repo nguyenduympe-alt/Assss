@@ -96,7 +96,44 @@ def _diem_tu_khoa(van_ban, ds_tu_khoa):
     return diem, khop
 
 
-def goi_y(lop, mon="", ten_bai="", van_ban="", toi_da=2, mach_chon=None):
+# Mạch nội dung trong Khung (M1–M4) ↔ mạch trong kho mã yêu cầu cần đạt (A–D).
+# Tên 4 mạch trùng nhau giữa hai phần của cùng văn bản QĐ 2422/QĐ-BGDĐT.
+MACH_SANG_MA = {"M1": "A", "M2": "B", "M3": "C", "M4": "D"}
+
+
+MA_SANG_MACH = {v: k for k, v in MACH_SANG_MA.items()}
+
+
+def gom_ma_theo_mach(ds_ma, toi_da_moi_mach=2):
+    """Gom mã yêu cầu cần đạt AI theo mạch nội dung, giữ thứ tự sát bài học nhất.
+
+    Mã đã xếp theo độ sát bài (`goi_y_ma`), nên mạch nào có mã đứng trước thì mạch đó
+    được chọn trước — mục “Tích hợp giáo dục AI” trong giáo án vì thế luôn có mã thật
+    của đúng lớp, song song với cách mục năng lực số ghi mã tiêu chí.
+    """
+    nhom = {}
+    for x in (ds_ma or []):
+        mid = MA_SANG_MACH.get(x.get("mach"))
+        if not mid:
+            continue
+        ds = nhom.setdefault(mid, [])
+        if len(ds) < max(1, toi_da_moi_mach):
+            ds.append(x)
+    return nhom
+
+
+def ma_cho_mach(ds_ma, mach_id, toi_da=2):
+    """Các mã yêu cầu cần đạt AI thuộc đúng mạch nội dung đang chọn (giữ thứ tự sát bài nhất).
+
+    Không tự đặt mã: chỉ trả về mã có thật trong kho của đúng lớp đó.
+    """
+    chu = MACH_SANG_MA.get(mach_id)
+    if not chu:
+        return []
+    return [x for x in (ds_ma or []) if x.get("mach") == chu][:max(1, toi_da)]
+
+
+def goi_y(lop, mon="", ten_bai="", van_ban="", toi_da=2, mach_chon=None, ds_ma=None):
     """Chọn mạch nội dung giáo dục AI phù hợp với bài (có căn cứ, không gán bừa).
 
     Trả về (danh sách, cảnh báo). Mỗi mục gồm: tên mạch, nội dung khung theo cấp,
@@ -111,6 +148,10 @@ def goi_y(lop, mon="", ten_bai="", van_ban="", toi_da=2, mach_chon=None):
     mach_theo_id = {m["id"]: m for m in kho_dl["mach"]}
     cap = kho_dl["theo_cap"][k]
     canh_bao = []
+    # Mã yêu cầu cần đạt AI của đúng lớp, xếp theo độ sát bài — dùng chung cho mọi mạch
+    # được chọn, để mục “Tích hợp giáo dục AI” trong giáo án ghi được mã như mục năng lực số.
+    ds_ma = list(ds_ma) if ds_ma is not None else goi_y_ma(lop, van_ban=van_ban, ten_bai=ten_bai,
+                                                           mon=mon, toi_da=8)[0]
 
     if mach_chon:
         ra = []
@@ -118,7 +159,8 @@ def goi_y(lop, mon="", ten_bai="", van_ban="", toi_da=2, mach_chon=None):
             if mid not in mach_theo_id:
                 canh_bao.append(f"Mạch “{mid}” không có trong Khung — đã bỏ qua.")
                 continue
-            ra.append(_mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so="giáo viên tự chọn"))
+            ra.append(_mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so="giáo viên tự chọn",
+                               ds_ma=ds_ma))
         return ra, canh_bao
 
     diem = {}
@@ -136,13 +178,29 @@ def goi_y(lop, mon="", ten_bai="", van_ban="", toi_da=2, mach_chon=None):
                 diem[mid] = diem.get(mid, 0) + (1.5 if i == 0 else 0.8)
                 khop.setdefault(mid, []).append(f"môn {mon}")
 
+    # Ưu tiên chọn mạch theo MÃ yêu cầu cần đạt của đúng lớp (căn cứ sát bài nhất, mã do văn bản
+    # quy định). Nhờ vậy mục “Tích hợp giáo dục AI” ghi được mã ngay trong giáo án.
+    nhom_ma = gom_ma_theo_mach([x for x in ds_ma if not x.get("mo_rong")] or ds_ma)
+    if nhom_ma:
+        ra = []
+        for mid in list(nhom_ma)[:max(1, toi_da)]:
+            ds_m = nhom_ma[mid]
+            khop_ma = list(dict.fromkeys([k for z in ds_m for k in (z.get("khop") or [])]))[:3]
+            co_so = ("khớp với nội dung bài qua: “" + "”, “".join(khop_ma) + "”") if khop_ma else \
+                    f"chọn theo mã yêu cầu cần đạt của lớp {lop}"
+            ra.append(_mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so=co_so, ds_ma=ds_m))
+        canh_bao.append(f"Chọn mạch theo mã yêu cầu cần đạt của đúng lớp {lop} (mã do văn bản quy "
+                        f"định — hệ thống không tự đặt mã); giáo viên quyết định giữ hay bỏ từng mã.")
+        canh_bao.append(f"Đã đối chiếu Khung giáo dục AI — {cap['ten_cap']} ({cap['huong'][:60]}…).")
+        return ra, canh_bao
+
     if not diem:
         # Không có căn cứ nào trong bài: KHÔNG gán bừa — đưa 1 mục “cần giáo viên duyệt”.
         mid = "M3"
         canh_bao.append("Bài học chưa nêu hoạt động nào liên quan tới AI. Hệ thống đưa một gợi ý "
                         "ở dạng “cần giáo viên duyệt”, mặc định KHÔNG tích — chỉ dùng nếu thầy/cô "
                         "thật sự tổ chức hoạt động này trong tiết học.")
-        x = _mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so="", can_duyet=True)
+        x = _mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so="", can_duyet=True, ds_ma=ds_ma)
         return [x], canh_bao
 
     xep = sorted(diem.items(), key=lambda kv: (-kv[1], kv[0]))[:max(1, toi_da)]
@@ -152,12 +210,15 @@ def goi_y(lop, mon="", ten_bai="", van_ban="", toi_da=2, mach_chon=None):
         if khop.get(mid):
             co_so = ("khớp với nội dung bài: “"
                  + "”, “".join(list(dict.fromkeys(khop[mid]))[:3]) + "”")
-        ra.append(_mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so=co_so))
+        ra.append(_mot_muc(kho_dl, mach_theo_id[mid], k, lop, co_so=co_so, ds_ma=ds_ma))
+    if any(x["ma_goi_y"] for x in ra):
+        canh_bao.append("Kèm mã yêu cầu cần đạt AI của đúng lớp (theo quy ước mã của văn bản) để "
+                        "thầy/cô đối chiếu — mã do giáo viên quyết định giữ hay bỏ.")
     canh_bao.append(f"Đã đối chiếu Khung giáo dục AI — {cap['ten_cap']} ({cap['huong'][:60]}…).")
     return ra, canh_bao
 
 
-def _mot_muc(kho_dl, m, k, lop, co_so="", can_duyet=False):
+def _mot_muc(kho_dl, m, k, lop, co_so="", can_duyet=False, ds_ma=None):
     dx = (kho_dl["goi_y_hoat_dong"].get(m["id"]) or {}).get(k) or {}
     theo_lop = ""
     if k == "1-5" and str(lop).strip() in kho_dl.get("theo_lop_tieu_hoc", {}):
@@ -181,6 +242,9 @@ def _mot_muc(kho_dl, m, k, lop, co_so="", can_duyet=False):
         "nguon": NGUON_NGAN,
         "co_so": co_so,
         "can_duyet": can_duyet,
+        # mã yêu cầu cần đạt AI của đúng lớp, thuộc đúng mạch này (có thật trong kho)
+        "ma_goi_y": ma_cho_mach(ds_ma, m["id"]),
+        "nguon_ma": NGUON_MA,
     }
 
 
