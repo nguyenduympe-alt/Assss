@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% block head %}Kết quả kiểm tra trùng lặp{% endblock %}
+{% block crumb %}{{ h.ten }} · {{ h.luc }}{% endblock %}
+{% block body %}
+
+{% if h.trang_thai != 'xong' %}
+<meta http-equiv="refresh" content="6">
+<div class="card" style="border:1px solid #bae6fd;background:linear-gradient(135deg,#f0f9ff,#fff)">
+  <div class="chead"><h3>⏳ Đang đối chiếu nguồn trên Internet…</h3>
+    <span class="chip" style="background:#e0f2fe;color:#0369a1">tự làm mới mỗi 6 giây</span></div>
+  <p class="sub" style="margin:0 0 10px">Hệ thống đang gửi vài câu nghi vấn ra máy tìm kiếm và tải nguồn về để so.
+    Trang này sẽ tự cập nhật. Thầy/cô có thể để nguyên tab và xem phần đối chiếu kho bên dưới.</p>
+  <ul class="sub" style="margin:0;padding-left:18px;line-height:1.7">
+    {% for n in h.nhat_ky %}
+    <li><span class="muted">{{n.luc}}</span>
+      {% if n.viec == 'truy_van' %}🔍 tra cứu: <b>{{n.du_lieu}}</b>
+      {% elif n.viec == 'tai' %}⬇️ tải nguồn: <span class="muted">{{n.du_lieu}}</span>
+      {% elif n.viec == 'kho' %}📚 kho hệ thống: {{n.du_lieu}} tài liệu
+      {% elif n.viec == 'loi' %}⚠️ lỗi: {{n.du_lieu}}
+      {% else %}{{n.viec}}: <span class="muted">{{n.du_lieu}}</span>{% endif %}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="card" style="border:1px solid {{kq.mau}}44">
+  <div class="chead">
+    <div><h3>{% if kq.kieu == 'mot_bai' %}Kết quả: {{kq.ten}}{% else %}So {{kq.so_bai}} bài nộp với nhau{% endif %}</h3>
+      <p class="sub" style="margin:2px 0 0">
+      {% if kq.kieu == 'mot_bai' %}{{kq.so_tu}} từ · {{kq.so_doan}} đoạn ·
+        đối chiếu {{kq.kho|length}} tài liệu trong kho
+        {% if kq.internet %}{% if kq.internet.lay_duoc_nguon %}· {{kq.internet.tai_duoc|length}} nguồn Internet ({{kq.internet.giay}} giây)
+        {% else %}· chưa đối chiếu được Internet{% endif %}{% endif %}
+      {% else %}{{kq.so_bai}} bài · so từng cặp · đối chiếu {{kq.kho|length}} lượt với kho{% endif %}</p></div>
+    <span class="chip" style="background:{{kq.mau}}1a;color:{{kq.mau}};font-size:14px;padding:7px 16px">{{kq.muc}}</span>
+  </div>
+
+  <div class="kpis" style="margin-bottom:6px">
+    {% if kq.kieu == 'mot_bai' %}
+    <div class="kpi" style="--c:{{kq.mau}}"><div class="ic">📊</div><b>{{kq.tk.ty_le_trung}}%</b>
+      <span>tỉ lệ chữ trùng (cao nhất trong các nguồn)</span></div>
+    <div class="kpi" style="--c:#0ea5e9"><div class="ic">📚</div><b>{{kq.tk.ty_le_trung_kho if kq.tk.ty_le_trung_kho is defined else kq.tk.ty_le_trung}}%</b>
+      <span>trùng với kho của thầy/cô</span></div>
+    <div class="kpi" style="--c:#8b5cf6"><div class="ic">🌐</div>
+      <b>{% if kq.internet and kq.internet.lay_duoc_nguon %}{{kq.tk.ty_le_trung_internet}}%{% else %}—{% endif %}</b>
+      <span>trùng với nguồn Internet</span></div>
+    <div class="kpi" style="--c:#f59e0b"><div class="ic">🔎</div><b>{{kq.tk.so_cau_khop}}</b>
+      <span>câu nghi trùng / {{kq.tk.so_cau_xet}} câu đã so</span></div>
+    {% else %}
+    <div class="kpi" style="--c:{{kq.mau}}"><div class="ic">👥</div><b>{{kq.ty_le_cao_nhat}}%</b>
+      <span>trùng cao nhất giữa 2 bài nộp</span></div>
+    <div class="kpi" style="--c:#0ea5e9"><div class="ic">📚</div><b>{{kq.ty_le_kho}}%</b>
+      <span>trùng với kho của thầy/cô</span></div>
+    <div class="kpi" style="--c:#f59e0b"><div class="ic">🧩</div><b>{{kq.cheo|length}}</b>
+      <span>cặp bài có điểm trùng đáng chú ý</span></div>
+    <div class="kpi" style="--c:#dc2626"><div class="ic">🚩</div><b>{{kq.canh_bao|length}}</b>
+      <span>cảnh báo chép nguyên đoạn</span></div>
+    {% endif %}
+  </div>
+  {% if kq.canh_bao_ngan %}<div class="flash err" style="margin-top:10px">⚠️ {{kq.canh_bao_ngan}}</div>{% endif %}
+  {% if h.loi_internet %}<div class="flash err" style="margin-top:10px">⚠️ {{h.loi_internet}}</div>{% endif %}
+</div>
+
+{% if kq.kieu == 'nhieu_bai' %}
+<div class="card">
+  <div class="chead"><h3>So từng cặp bài nộp</h3>
+    <span class="muted">% tính theo tỉ lệ chữ của mỗi bài nằm trong các câu bị coi là trùng</span></div>
+  {% if not kq.cheo %}
+  <p class="sub" style="margin:0">Chưa thấy cặp bài nào có đoạn trùng đáng kể. Đây là kết quả tốt.</p>
+  {% else %}
+  <table><thead><tr><th>Cặp bài</th><th>Trùng phía bài A</th><th>Trùng phía bài B</th>
+    <th>Số cặp câu</th><th>Chép nguyên văn</th><th>Dấu hiệu</th></tr></thead><tbody>
+    {% for k in kq.cheo %}
+    <tr><td><b>{{k.a}}</b> ↔ <b>{{k.b}}</b></td>
+      <td>{{k.ty_le_a}}%</td><td>{{k.ty_le_b}}%</td>
+      <td>{{k.so_cap_trung}}</td><td>{{k.nguyen_van}}</td>
+      <td>{% if k.day_dai_nhat >= 3 %}🚩 {{k.day_dai_nhat}} câu liên tiếp khớp và giữ nguyên thứ tự{% else %}—{% endif %}</td></tr>
+    {% endfor %}
+  </tbody></table>
+  {% endif %}
+  {% for c in kq.canh_bao %}<div class="flash err" style="margin-top:10px">🚩 {{c}}</div>{% endfor %}
+</div>
+
+{% for k in kq.cheo %}
+<div class="card">
+  <h3>{{k.a}} ↔ {{k.b}}</h3>
+  <p class="sub">Các câu khớp nhau (xếp theo độ giống giảm dần)</p>
+  <table><thead><tr><th>Mức</th><th>Độ giống</th><th>Bài A</th><th>Bài B</th><th>Đoạn chữ trùng</th></tr></thead><tbody>
+    {% for x in k.cap[:15] %}
+    <tr><td>{{x.nhan}}</td><td>{{'%.0f' % (x.diem*100)}}%</td>
+      <td>{{x.cau_a}}</td><td>{{x.cau_b}}</td>
+      <td style="background:#fff7ed">{{x.doan_chung}}</td></tr>
+    {% endfor %}
+  </tbody></table>
+</div>
+{% endfor %}
+
+<div class="card">
+  <h3>Đối chiếu từng bài với kho của thầy/cô</h3>
+  <table><thead><tr><th>Bài</th><th>Tỉ lệ trùng với kho</th><th>Số câu nghi trùng</th><th>Nguyên văn</th></tr></thead><tbody>
+    {% for k in kq.kho %}
+    <tr><td>{{k.ten}}</td><td>{{k.tk.ty_le_trung}}%</td><td>{{k.tk.so_cau_khop}}</td><td>{{k.tk.nguyen_van}}</td></tr>
+    {% endfor %}
+  </tbody></table>
+</div>
+
+{% else %}
+
+<div class="card">
+  <div class="chead"><h3>Những đoạn bị coi là trùng</h3>
+    <span class="muted">Đoạn chữ trùng là phần chữ giống nhau dài nhất giữa hai câu</span></div>
+  {% if not kq.bang %}
+  <p class="sub" style="margin:0">Không phát hiện đoạn nào đáng chú ý. Với văn bản dưới 120 từ hoặc
+    toàn mẫu câu hành chính, kết quả này thường là bình thường.</p>
+  {% else %}
+  <table><thead><tr><th>Mức</th><th>Độ giống</th><th>Nguồn</th><th>Câu trong bài cần kiểm tra</th><th>Đoạn chữ trùng</th></tr></thead><tbody>
+    {% for k in kq.bang[:40] %}
+    <tr>
+      <td>{% if k.nhan == 'trùng nguyên văn' %}<b style="color:#dc2626">{{k.nhan}}</b>
+        {% elif k.nhan == 'chép có đổi vài từ' %}<b style="color:#ea580c">{{k.nhan}}</b>
+        {% else %}<span class="muted">{{k.nhan}}</span>{% endif %}
+        {% if k.trich_dan %}<br><span class="muted">có ghi nguồn/trích dẫn</span>{% endif %}</td>
+      <td>{{'%.0f' % (k.diem*100)}}%</td>
+      <td>{{k.nguon}}{% if k.cau_nguon_url %}<br><a class="muted" style="font-size:11.5px" href="{{k.cau_nguon_url}}" rel="nofollow noopener" target="_blank">{{k.cau_nguon_url[:70]}}</a>{% endif %}</td>
+      <td>{{k.cau}}</td>
+      <td style="background:#fff7ed">{{k.doan_chung}}</td>
+    </tr>
+    {% endfor %}
+  </tbody></table>
+  {% endif %}
+</div>
+
+{% if kq.internet %}
+<div class="card">
+  <h3>Phần đối chiếu Internet</h3>
+  {% if kq.internet.lay_duoc_nguon %}
+  <p class="sub">Đã tra {{kq.internet.truy_van|length}} câu hỏi và tải được {{kq.internet.tai_duoc|length}} nguồn để so
+    ({{kq.internet.giay}} giây).</p>
+  <ul class="sub" style="padding-left:18px;line-height:1.7">
+    {% for t in kq.internet.truy_van %}<li>🔍 {{t}}</li>{% endfor %}
+  </ul>
+  <table><thead><tr><th>Nguồn đã tải</th><th>Máy tìm</th><th>Số từ</th></tr></thead><tbody>
+    {% for x in kq.internet.tai_duoc %}
+    <tr><td><a href="{{x.url}}" rel="nofollow noopener" target="_blank">{{x.tieu_de or x.url}}</a>
+      <br><span class="muted" style="font-size:11.5px">{{x.url[:90]}}</span></td>
+      <td>{{x.may_tim}}</td><td>{{x.so_tu}}</td></tr>
+    {% endfor %}
+  </tbody></table>
+  {% else %}
+  <p class="sub" style="margin:0">{{kq.internet.ghi_chu}}</p>
+  {% endif %}
+  {% if kq.internet.khong_tai_duoc %}
+  <details style="margin-top:12px"><summary class="muted">Có {{kq.internet.khong_tai_duoc|length}} trang không tải được (bấm để xem)</summary>
+  <ul class="sub" style="padding-left:18px">
+    {% for x in kq.internet.khong_tai_duoc %}<li>{{x.url[:90]}} — {{x.ly_do}}</li>{% endfor %}
+  </ul></details>
+  {% endif %}
+  <form method="post" action="{{url_for('trung_lap.chay_lai', token=token)}}" style="margin-top:12px">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <button class="btn sec" {% if h.trang_thai != 'xong' %}disabled{% endif %}>Tra lại Internet (không tính thêm lượt)</button>
+  </form>
+</div>
+{% elif h.internet_yeu_cau %}
+<div class="card">
+  <h3>Phần đối chiếu Internet</h3>
+  <p class="sub" style="margin:0">Chưa thu được kết quả (lần chạy trước bị gián đoạn). Bấm nút bên dưới để tra lại — không tính thêm lượt.</p>
+  <form method="post" action="{{url_for('trung_lap.chay_lai', token=token)}}">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <button class="btn sec">Tra Internet</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Đã đối chiếu với kho</h3>
+  <ul class="sub" style="margin:0;padding-left:18px;line-height:1.7">
+    {% for t in kq.kho %}<li>{{t}}</li>{% endfor %}
+    <li class="muted">Không tích chọn Internet thì phần đối chiếu mạng không chạy.</li>
+  </ul>
+</div>
+
+{% endif %}
+
+{% if kq.trich_dan_hop_le %}
+<div class="card">
+  <h3>Trích dẫn có ghi nguồn (không tính là đạo văn)</h3>
+  <p class="sub">Những câu này có dấu hiệu ghi nguồn hoặc để trong ngoặc kép, nên được ghi nhận riêng:
+    trùng chữ là bình thường nếu đã ghi rõ nguồn.</p>
+  <ul class="sub" style="margin:0;padding-left:18px;line-height:1.7">
+    {% for k in kq.trich_dan_hop_le[:10] %}<li>{{k.cau}} <span class="muted">(nguồn: {{k.nguon}})</span></li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if kq.goi_y %}
+<div class="card">
+  <h3>Gợi ý xử lý</h3>
+  <table><thead><tr><th>Câu trong bài</th><th>Cách xử lý</th></tr></thead><tbody>
+    {% for g in kq.goi_y[:15] %}
+    <tr><td>{{g.cau}}</td><td>{{g.cach}}</td></tr>
+    {% endfor %}
+  </tbody></table>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Xuất báo cáo</h3>
+  <p class="sub">Xem trực tuyến không tính lượt. Báo cáo Word (bảng đoạn trùng, nguồn, gợi ý sửa) tính 1 lượt khi tải.</p>
+  {% if la_pro %}
+  <a class="btn ok" href="{{url_for('trung_lap.xuat', token=token)}}">⬇️ Tải báo cáo Word (VIP — không giới hạn)</a>
+  {% elif da_tra %}
+  <a class="btn ok" href="{{url_for('trung_lap.xuat', token=token)}}">⬇️ Tải lại báo cáo Word (không tính thêm lượt)</a>
+  {% elif con_lai and con_lai > 0 %}
+  <a class="btn ok" href="{{url_for('trung_lap.xuat', token=token)}}">⬇️ Tải báo cáo Word (tính 1 lượt — còn {{con_lai}}/{{FREE_QUOTA}})</a>
+  {% else %}
+  <a class="btn" href="{{url_for('core.nang_cap', need='trunglap')}}"
+     style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Hết {{FREE_QUOTA}} lượt miễn phí — Nâng VIP để tải báo cáo Word</a>
+  <div class="muted" style="margin-top:6px">Kết quả vẫn xem trực tuyến đầy đủ, không mất. Số lượt dùng chung cho tất cả chức năng.</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Mô hình và giới hạn</h3>
+  <p class="sub" style="margin:0">
+    {{kq.thong_tin_mo_hinh.ten}} · {{kq.thong_tin_mo_hinh.so_dac_trung}} đặc trưng ·
+    P {{kq.thong_tin_mo_hinh.chi_so.precision}} · R {{kq.thong_tin_mo_hinh.chi_so.recall}} ·
+    F1 {{kq.thong_tin_mo_hinh.chi_so.f1}} (trên tập kiểm tra giữ riêng).<br>
+    <b>Giới hạn:</b> mô hình chỉ so cặp câu theo chữ, không đọc hiểu nội dung; bài đã được viết lại
+    hoàn toàn bằng lời khác thì rất khó phát hiện; nguồn trong nhóm kín, tệp scan hoặc sách giấy thì
+    không thấy được. Kết quả là <b>chỉ báo kỹ thuật</b>, không phải kết luận đạo văn.
+  </p>
+</div>
+
+{% endblock %}

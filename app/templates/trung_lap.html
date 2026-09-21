@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block head %}Kiểm tra trùng lặp / đạo văn{% endblock %}
+{% block crumb %}Đối chiếu kho của thầy/cô, đối chiếu Internet và so các bài nộp với nhau{% endblock %}
+{% block body %}
+
+<div class="card" style="border:1px solid #fde68a;background:linear-gradient(135deg,#fffbeb,#fff)">
+  <div style="display:flex;gap:12px;align-items:flex-start">
+    <span style="font-size:24px">⚖️</span>
+    <div>
+      <b style="font-size:15px">Kết quả là CHỈ BÁO KỸ THUẬT, không phải kết luận đạo văn.</b>
+      <p class="sub" style="margin:6px 0 0">
+        Hệ thống đo <b>độ giống nhau của chữ</b> (trùng từ, trùng cụm, đoạn chung dài nhất) và dùng
+        một mô hình nhỏ đã huấn luyện trên máy chủ để phân biệt “chép” với “chỉ cùng chủ đề”.
+        Trùng lặp có thể do <b>đề bài, mẫu câu, dẫn chứng, thuật ngữ</b> dùng chung.
+        <b>Không dùng để buộc tội, trừ điểm hay kết luận về học sinh</b> — hãy hỏi lại và xem quá trình học.</p>
+    </div>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+
+  <div class="card">
+    <h3>1. Chọn việc cần làm</h3>
+    <p class="sub">Có thể chạy ngay, tạo và xem kết quả <b>miễn phí</b>; chỉ khi <b>tải báo cáo Word</b> mới tính 1 lượt.</p>
+    <div class="row" style="gap:22px">
+      <label style="display:flex;gap:8px;align-items:flex-start;flex:1;min-width:260px">
+        <input type="radio" name="kieu" value="mot_bai" {% if kieu != 'nhieu_bai' %}checked{% endif %}>
+        <span><b>Kiểm tra một bài</b><br>
+          <span class="muted">Đối chiếu với kho của thầy/cô (KHDH đã lưu + khung, văn bản của Bộ)
+          và — nếu muốn — với nguồn trên Internet.</span></span>
+      </label>
+      <label style="display:flex;gap:8px;align-items:flex-start;flex:1;min-width:260px">
+        <input type="radio" name="kieu" value="nhieu_bai" {% if kieu == 'nhieu_bai' %}checked{% endif %}>
+        <span><b>So nhiều bài nộp với nhau</b><br>
+          <span class="muted">Từ 2 bài trở lên — để phát hiện học sinh chép bài của nhau
+          (kể cả khi đổi vài từ), và cùng lúc đối chiếu kho.</span></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2. Gửi bài cần kiểm tra</h3>
+    <p class="sub">Nhận tệp <b>.docx</b>, <b>.pdf</b>, <b>.txt</b> (tối đa 8 MB mỗi tệp) hoặc dán văn bản trực tiếp.</p>
+    <div class="row" style="align-items:flex-start">
+      <label class="f" style="flex:1;min-width:240px">Kiểm tra một bài — tệp
+        <input type="file" name="file" accept=".docx,.pdf,.txt"></label>
+      <div class="muted" style="align-self:center">hoặc</div>
+      <label class="f" style="flex:2;min-width:300px">Kiểm tra một bài — dán văn bản
+        <textarea name="text" rows="6" placeholder="Dán bài làm, đoạn văn, báo cáo cần kiểm tra…"
+          style="font-family:inherit;padding:9px 11px;border:1px solid #d8e6e1;border-radius:10px"></textarea></label>
+    </div>
+    <hr style="border:0;border-top:1px dashed #e2ece9;margin:16px 0">
+    <div class="row" style="align-items:flex-start">
+      <label class="f" style="flex:1;min-width:240px">So nhiều bài — tải nhiều tệp cùng lúc
+        <input type="file" name="files" accept=".docx,.pdf,.txt" multiple></label>
+      <div class="muted" style="align-self:center">hoặc</div>
+      <label class="f" style="flex:2;min-width:300px">So nhiều bài — dán từng bài vào đây
+        <textarea name="text_nhieu" rows="6" placeholder="Mỗi bài cách nhau bằng một dòng có ba dấu gạch:&#10;Bài 1…&#10;---&#10;Bài 2…"
+          style="font-family:inherit;padding:9px 11px;border:1px solid #d8e6e1;border-radius:10px"></textarea></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. Đối chiếu nguồn trên Internet (không bắt buộc)</h3>
+    <label style="display:flex;gap:9px;align-items:flex-start">
+      <input type="checkbox" name="internet" value="1" {% if internet %}checked{% endif %}>
+      <span>
+        <b>Gửi trích đoạn câu nghi vấn ra máy tìm kiếm rồi tải nguồn về để so khớp.</b><br>
+        <span class="muted">Chỉ gửi <b>vài câu ngắn</b> (10–12 từ nội dung ở giữa mỗi câu, giữ nguyên chữ và dấu) — không gửi cả bài.
+        Việc này chạy ở luồng riêng nên trang kết quả sẽ tự làm mới để hiện tiến độ.
+        Nếu không tích, hệ thống chỉ đối chiếu với kho của thầy/cô và các bài nộp.</span>
+      </span>
+    </label>
+  </div>
+
+  {% if is_pro %}
+  <button class="ok">Bắt đầu kiểm tra</button>
+  <span class="muted" style="margin-left:10px">👑 Gói VIP — tải không giới hạn</span>
+  {% elif remaining and remaining > 0 %}
+  <button class="ok">Bắt đầu kiểm tra</button>
+  <span class="muted" style="margin-left:10px">Còn <b>{{remaining}}/{{FREE_QUOTA}}</b> lượt (dùng chung mọi chức năng) —
+   xem kết quả trực tuyến miễn phí, chỉ tính 1 lượt khi <b>tải báo cáo Word</b></span>
+  {% else %}
+  <button class="ok">Bắt đầu kiểm tra</button>
+  <span class="muted" style="margin-left:10px">Đã hết lượt tải — vẫn chạy và xem kết quả được,
+   chỉ khi tải báo cáo Word mới cần
+   <a href="{{url_for('core.nang_cap', need='trunglap')}}">nâng VIP</a></span>
+  {% endif %}
+</form>
+
+<div class="card" style="margin-top:18px">
+  <h3>Hệ thống đối chiếu với những gì?</h3>
+  <ul class="sub" style="margin:6px 0 0;padding-left:18px;line-height:1.75">
+    <li><b>Kho của thầy/cô:</b> các KHDH đã lưu trong hệ thống, cùng khung nội dung giáo dục AI
+      (QĐ 2422/QĐ-BGDĐT), khung năng lực AI (CV 5588/BGDĐT-GDPT) và khung năng lực số (TT 02/2025).</li>
+    <li><b>Nguồn trên Internet:</b> bài viết, giáo trình, trang web mà máy tìm kiếm trả về cho các câu
+      nghi vấn. Bài trong nhóm kín, tệp scan, sách giấy thì hệ thống không thấy được.</li>
+    <li><b>Các bài nộp với nhau:</b> từng cặp bài được so câu-với-câu để thấy ai chép của ai,
+      và cảnh báo khi có nhiều câu khớp nhau theo đúng thứ tự (chép nguyên đoạn).</li>
+  </ul>
+</div>
+
+{% if thong_tin %}
+<div class="card">
+  <h3>Mô hình đang dùng</h3>
+  <p class="sub" style="margin:0">
+    {{thong_tin.ten}}{% if thong_tin.phien_ban %} · phiên bản {{thong_tin.phien_ban}}{% endif %}
+    {% if thong_tin.co_mo_hinh %} · {{thong_tin.so_dac_trung}} đặc trưng · huấn luyện {{thong_tin.huan_luyen_luc}}
+    · P {{thong_tin.chi_so.precision}} · R {{thong_tin.chi_so.recall}} · F1 {{thong_tin.chi_so.f1}}
+    (tập kiểm tra riêng, {{thong_tin.so_cap_huan_luyen}} cặp câu huấn luyện){% endif %}.
+    {{thong_tin.ghi_chu}}
+  </p>
+</div>
+{% endif %}
+
+{% endblock %}

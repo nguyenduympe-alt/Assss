@@ -79,7 +79,8 @@ def can_use(user):
 # ---------------- (M10) hạn mức dùng chung cho TẤT CẢ chức năng ----------------
 # Một tài khoản dùng thử có FREE_QUOTA lượt (mặc định 3) tính CHUNG cho mọi chức năng:
 # lịch báo giảng, xuất Excel nhận xét, sửa chính tả, tạo giáo án tích hợp, KHGD/phân phối
-# chương trình, dò dấu hiệu văn bản AI, tạo nhận xét học sinh. Hết lượt thì phải nâng VIP.
+# chương trình, dò dấu hiệu văn bản AI, tạo nhận xét học sinh, kiểm tra trùng lặp/đạo văn.
+# Hết lượt thì phải nâng VIP.
 CAC_CHUC_NANG = {
     "baogiang": "Lịch báo giảng",
     "excel": "Xuất Excel nhận xét",
@@ -87,6 +88,7 @@ CAC_CHUC_NANG = {
     "giaoan": "Giáo án tích hợp năng lực số & AI",
     "khgd": "Kế hoạch giáo dục / phân phối chương trình",
     "checkai": "Dò dấu hiệu văn bản AI",
+    "trunglap": "Kiểm tra trùng lặp / đạo văn",
     "nhanxet": "Tạo nhận xét học sinh",
 }
 

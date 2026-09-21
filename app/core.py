@@ -52,7 +52,9 @@ def _cong_cu():
          "the": [], "moi": False},
     ]
     # Công cụ do plugin đăng ký: chỉ kèm đúng một câu hướng dẫn dùng.
-    HUONG_DAN = {"check_ai.index": "Tải .docx/.pdf hoặc dán văn bản → xem điểm dấu hiệu và lý do"}
+    HUONG_DAN = {"check_ai.index": "Tải .docx/.pdf hoặc dán văn bản → xem điểm dấu hiệu và lý do",
+                 "trung_lap.index": ("Dán/tải bài → đối chiếu kho của thầy/cô, đối chiếu nguồn "
+                                     "Internet và so nhiều bài nộp với nhau")}
     from flask import current_app
     co = set(current_app.view_functions)
     for m in (current_app.jinja_env.globals.get("PLUGIN_MENUS") or []):
