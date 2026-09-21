@@ -334,40 +334,96 @@ def ppct():
 
 
 # ---------------- TKB ----------------
+def _tkb_mon_khoi():
+    """(M30) Đọc môn + khối từ ô chọn — dùng chung cho thêm mới và SỬA tiết dạy."""
+    db, uid = get_db(), session["uid"]
+    mon = (request.form.get("mon") or "").strip()
+    khoi = (request.form.get("khoi") or "").strip()
+    if mon == "__khac":
+        mon = (request.form.get("mon_moi") or "").strip()
+        khoi = (request.form.get("khoi_moi") or "").strip()
+        if mon and khoi in KHO.KHOI:
+            KHO.tao_mon(db, uid, mon, khoi)      # ghi nhận môn mới (chưa có KHDH)
+            MD.them(db, uid, mon)                # (M30) vào luôn danh sách MÔN DẠY
+        else:
+            return "", "", "Vui lòng chọn môn đã tạo, hoặc nhập tên môn mới kèm khối (1–12)."
+    elif "|" in mon:
+        mon, _, khoi = mon.partition("|")
+        mon, khoi = mon.strip(), khoi.strip()
+    if not mon:
+        return "", "", "Vui lòng chọn môn đã tạo trong kho KHDH, hoặc nhập môn mới kèm khối."
+    return mon, khoi, ""
+
+
+def _tkb_doc_form():
+    """(M30) Đọc + kiểm tra các ô của một tiết dạy. Trả về (dt, loi)."""
+    dt = {"thu": (request.form.get("thu") or "").strip(),
+          "buoi": (request.form.get("buoi") or "").strip(),
+          "tiet": (request.form.get("tiet") or "").strip(),
+          "lop": (request.form.get("lop") or "").strip()[:60],
+          "phong": (request.form.get("phong") or "").strip()[:120]}
+    if not (dt["thu"].isdigit() and 2 <= int(dt["thu"]) <= 8):
+        return dt, "Thứ phải từ Thứ Hai đến Chủ nhật."
+    if dt["buoi"] not in ("Sáng", "Chiều"):
+        return dt, "Buổi phải là Sáng hoặc Chiều."
+    if not (dt["tiet"].isdigit() and 1 <= int(dt["tiet"]) <= 10):
+        return dt, "Tiết phải là số từ 1 đến 10."
+    if not dt["lop"]:
+        return dt, "Vui lòng nhập lớp dạy (ví dụ 5A)."
+    return dt, ""
+
+
+def _tkb_nho_tkb(dt):
+    """(M30) Nhớ THỨ + BUỔI vừa dùng để lần thêm sau không phải chọn lại."""
+    session["tkb_thu"], session["tkb_buoi"] = dt["thu"], dt["buoi"]
+
+
 @bp.route("/tkb", methods=["GET", "POST"])
 @login_required
 def tkb():
     db, uid = get_db(), session["uid"]
     if request.method == "POST":
         act = request.form.get("act")
-        if act == "add":
-            # (M12) Môn lấy từ KHO KHDH đã tạo: giá trị "Tên môn|Khối"; chọn “__khac” thì nhập môn mới.
-            mon = (request.form.get("mon") or "").strip()
-            khoi = (request.form.get("khoi") or "").strip()
-            if mon == "__khac":
-                mon = (request.form.get("mon_moi") or "").strip()
-                khoi = (request.form.get("khoi_moi") or "").strip()
-                if mon and khoi in KHO.KHOI:
-                    KHO.tao_mon(db, uid, mon, khoi)      # ghi nhận môn mới (chưa có KHDH)
+        if act in ("add", "edit"):
+            dt, loi = _tkb_doc_form()
+            mon, khoi, loi_mon = _tkb_mon_khoi()
+            loi = loi_mon or loi
+            if loi:
+                flash(loi, "err")
+            elif act == "edit":
+                r = db.execute("SELECT * FROM tkb WHERE id=? AND teacher_id=?",
+                               (request.form.get("id"), uid)).fetchone()
+                if not r:
+                    flash("Không tìm thấy tiết cần sửa (có thể đã bị xoá).", "err")
                 else:
-                    flash("Vui lòng chọn môn đã tạo, hoặc nhập tên môn mới kèm khối (1–12).", "err")
-                    return redirect(url_for("core.tkb"))
-            elif "|" in mon:
-                mon, _, khoi = mon.partition("|")
-                mon, khoi = mon.strip(), khoi.strip()
-            if not mon:
-                flash("Vui lòng chọn môn đã tạo trong kho KHDH, hoặc nhập môn mới kèm khối.", "err")
+                    db.execute("UPDATE tkb SET thu=?,buoi=?,tiet=?,lop=?,mon=?,khoi=?,phong=?"
+                               " WHERE id=? AND teacher_id=?",
+                               (dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"],
+                                r["id"], uid))
+                    _tkb_nho_tkb(dt)          # (M30) nhớ thứ + buổi vừa dùng cho lần thêm sau
+                    flash("Đã sửa tiết dạy: %s · %s tiết %s · lớp %s · %s."
+                          % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
             else:
                 db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong)"
                            " VALUES(?,?,?,?,?,?,?,?)",
-                           (uid, request.form["thu"], request.form["buoi"], request.form["tiet"],
-                            request.form["lop"], mon, khoi, request.form.get("phong")))
+                           (uid, dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"]))
+                _tkb_nho_tkb(dt)              # (M30) nhớ thứ + buổi vừa dùng cho lần thêm sau
+                flash("Đã thêm tiết dạy: %s · %s tiết %s · lớp %s · %s."
+                      % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
         elif act == "del":
-            db.execute("DELETE FROM tkb WHERE id=? AND teacher_id=?", (request.form["id"], uid))
+            r = db.execute("SELECT * FROM tkb WHERE id=? AND teacher_id=?",
+                           (request.form.get("id"), uid)).fetchone()
+            db.execute("DELETE FROM tkb WHERE id=? AND teacher_id=?", (request.form.get("id"), uid))
+            if r:
+                flash("Đã xoá tiết dạy: %s · %s tiết %s · lớp %s."
+                      % (THU_NAME[int(r["thu"])] if str(r["thu"]).isdigit() else r["thu"],
+                         r["buoi"], r["tiet"], r["lop"]), "ok")
         elif act == "clear":
+            n = db.execute("SELECT COUNT(*) FROM tkb WHERE teacher_id=?", (uid,)).fetchone()[0]
             db.execute("DELETE FROM tkb WHERE teacher_id=?", (uid,))
+            flash("Đã xoá toàn bộ thời khoá biểu (%d tiết)." % n, "ok")
         db.commit()
-        return redirect(url_for("core.tkb"))
+        return redirect(url_for("core.tkb", tuan=request.args.get("tuan", "")))
     rows = db.execute("SELECT * FROM tkb WHERE teacher_id=? ORDER BY thu, buoi DESC, tiet", (uid,)).fetchall()
     grid = {}
     for r in rows:
@@ -379,10 +435,16 @@ def tkb():
     dem = {"du": 0, "thieu": 0, "thua": 0, "chua_co_khdh": 0, "chua_ro": 0}
     for d in doi_chieu:
         dem[d["ket_luan"]] = dem.get(d["ket_luan"], 0) + 1
+    ds_kho_khoi = KHO.danh_sach(db, uid)
+    # (M30) giữ lại THỨ + BUỔI đã chọn ở lần thêm trước
+    thu_chon = session.get("tkb_thu") or "2"
+    buoi_chon = session.get("tkb_buoi") or "Sáng"
     return render_template("tkb.html", rows=rows, grid=grid, tiets=tiets, kho=kho,
                            doi_chieu=doi_chieu, dem=dem,
-                           kho_khoi=[k for k in KHO.danh_sach(db, uid)],
-                           KHOI=KHO.KHOI)
+                           kho_khoi=ds_kho_khoi,
+                           KHOI=KHO.KHOI, mon_kho={("%s|%s" % (k["mon"], k["khoi"])): True
+                                                  for k in ds_kho_khoi},
+                           thu_chon=str(thu_chon), buoi_chon=buoi_chon)
 
 
 # ---------------- Lịch báo giảng ----------------
@@ -425,14 +487,17 @@ def bao_giang():
     db, u = get_db(), current_user()
     tuan = max(1, int(request.values.get("tuan") or 1))
 
-    # Ngày khai giảng (thứ Hai tuần 1) - lưu 1 lần, các tuần sau tự tính
+    # (M30) Ngày bắt đầu năm học = thứ Hai của TUẦN HỌC ĐẦU TIÊN; các tuần sau tự tính từ đó
     if request.values.get("tuan_1"):
         try:
-            d0 = datetime.date.fromisoformat(request.values["tuan_1"])
+            d0 = datetime.date.fromisoformat(request.values["tuan_1"].strip())
             d0 -= datetime.timedelta(days=d0.weekday())      # ép về thứ Hai
             set_setting(f"tuan1_{u['id']}", d0.isoformat())
+            flash("Đã lưu ngày bắt đầu năm học: %s là thứ Hai của tuần học đầu tiên — tuần 1 từ %s đến %s."
+                  % (d0.strftime("%d/%m/%Y"), d0.strftime("%d/%m/%Y"),
+                     (d0 + datetime.timedelta(days=6)).strftime("%d/%m/%Y")), "ok")
         except Exception:
-            pass
+            flash("Ngày bắt đầu năm học chưa hợp lệ — thầy/cô chọn lại theo dạng ngày/tháng/năm.", "err")
     s_t1 = setting(f"tuan1_{u['id']}", "")
     if s_t1:
         tuan1 = datetime.date.fromisoformat(s_t1)
@@ -478,7 +543,10 @@ def bao_giang():
         "SELECT DISTINCT tuan FROM ppct WHERE teacher_id=? ORDER BY tuan", (u["id"],))]
     max_tuan = max(tuans_pp or [1])
     tuan_now = LN.current_week(tuan1, breaks)
-    _, cal = LN.build_calendar(tuan1, breaks, max_hoc=max_tuan)
+    mp_tuan, cal = LN.build_calendar(tuan1, breaks, max_hoc=max(max_tuan, tuan, 1))
+    lich_tuan = [{"tuan": t, "tu": mp_tuan[t].strftime("%d/%m/%Y"),
+                  "den": (mp_tuan[t] + datetime.timedelta(days=6)).strftime("%d/%m/%Y"),
+                  "co_ppct": t in tuans_pp} for t in sorted(mp_tuan) if t <= max(max_tuan, tuan)]
     da_xuat = {int(m.group(1)) for m in (re.match(r"Lịch báo giảng tuần (\d+)", r["detail"] or "")
                for r in db.execute("SELECT detail FROM usage_log WHERE teacher_id=? AND kind IN ('pdf','word')",
                                    (u["id"],))) if m}
@@ -487,7 +555,9 @@ def bao_giang():
     return render_template("baogiang.html", rows=rows, meta=meta, monday=monday, tuan=tuan,
                            tuans_pp=tuans_pp, max_tuan=max_tuan, tuan_now=tuan_now,
                            tuan1=tuan1, da_xuat=da_xuat, cal=cal, breaks=breaks,
-                           nghi_tuan_nay=nghi_tuan_nay)
+                           nghi_tuan_nay=nghi_tuan_nay, lich_tuan=lich_tuan,
+                           da_chon_ngay=bool(s_t1),
+                           tuan1_txt=tuan1.strftime("%d/%m/%Y"))
 
 
 # ---------------- Nhận xét AI ----------------
