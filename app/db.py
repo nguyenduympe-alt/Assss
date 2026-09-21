@@ -52,6 +52,21 @@ CREATE TABLE IF NOT EXISTS tkb(
   tiet INTEGER,
   lop TEXT, mon TEXT, phong TEXT
 );
+CREATE TABLE IF NOT EXISTS khdh(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  teacher_id INTEGER,
+  mon TEXT, mon_chuan TEXT,        -- ten mon + ten da chuan hoa (bo dau) de so trung
+  khoi TEXT,                       -- khoi/lop (1..12)
+  ten_file TEXT, luu TEXT,         -- ten tep goc + ten tep luu trong DB_DIR/khdh/<teacher_id>/
+  loai TEXT DEFAULT 'ppct',        -- 'ppct' = KHDH/phan phoi chuong trinh | 'lesson' = giao an
+  so_dong INTEGER DEFAULT 0,       -- so dong bai hoc doc duoc tu KHDH
+  so_tiet_tuan INTEGER,            -- so tiet moi tuan (he thong suy ra hoac giao vien nhap)
+  tiet_tuan_tay INTEGER DEFAULT 0, -- 1 = giao vien tu nhap, khong ghi de
+  phien_ban INTEGER DEFAULT 1,
+  dang_dung INTEGER DEFAULT 1,     -- 1 = ban dang dung (moi mon + khoi chi 1 ban)
+  created TEXT, updated TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_khdh_gv ON khdh(teacher_id, mon_chuan, khoi, dang_dung);
 CREATE TABLE IF NOT EXISTS lop(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   teacher_id INTEGER, ten TEXT, khoi TEXT
@@ -159,6 +174,19 @@ def init_db():
         if name not in lcols:
             try:
                 con.execute(f"ALTER TABLE license ADD COLUMN {name} {ddl}")
+            except sqlite3.OperationalError:
+                pass
+    kcols = {r[1] for r in con.execute("PRAGMA table_info(khdh)")}
+    if kcols and "mon_chuan" not in kcols:          # DB tao truoc M12
+        try:
+            con.execute("ALTER TABLE khdh ADD COLUMN mon_chuan TEXT")
+        except sqlite3.OperationalError:
+            pass
+    tcols = {r[1] for r in con.execute("PRAGMA table_info(tkb)")}
+    for name, ddl in (("khoi", "TEXT"),):
+        if name not in tcols:
+            try:
+                con.execute(f"ALTER TABLE tkb ADD COLUMN {name} {ddl}")
             except sqlite3.OperationalError:
                 pass
     con.execute("UPDATE teacher SET role='admin' WHERE username='gv' AND (role IS NULL OR role='teacher')")

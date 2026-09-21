@@ -6,6 +6,7 @@ from .auth import (login_required, current_user, admin_required, google_bat,
                     google_callback_url, google_tinh_trang, kiem_tra_google)
 from .modules import ai_nhanxet as AI
 from .modules import excel_io as XL
+from .modules import khdh_kho as KHO
 from .modules.pdf_bao_giang import build_pdf, THU_NAME
 from .modules.word_bao_giang import build_docx
 from .modules import billing as BL
@@ -271,9 +272,27 @@ def tkb():
     if request.method == "POST":
         act = request.form.get("act")
         if act == "add":
-            db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,phong) VALUES(?,?,?,?,?,?,?)",
-                       (uid, request.form["thu"], request.form["buoi"], request.form["tiet"],
-                        request.form["lop"], request.form["mon"], request.form.get("phong")))
+            # (M12) Môn lấy từ KHO KHDH đã tạo: giá trị "Tên môn|Khối"; chọn “__khac” thì nhập môn mới.
+            mon = (request.form.get("mon") or "").strip()
+            khoi = (request.form.get("khoi") or "").strip()
+            if mon == "__khac":
+                mon = (request.form.get("mon_moi") or "").strip()
+                khoi = (request.form.get("khoi_moi") or "").strip()
+                if mon and khoi in KHO.KHOI:
+                    KHO.tao_mon(db, uid, mon, khoi)      # ghi nhận môn mới (chưa có KHDH)
+                else:
+                    flash("Vui lòng chọn môn đã tạo, hoặc nhập tên môn mới kèm khối (1–12).", "err")
+                    return redirect(url_for("core.tkb"))
+            elif "|" in mon:
+                mon, _, khoi = mon.partition("|")
+                mon, khoi = mon.strip(), khoi.strip()
+            if not mon:
+                flash("Vui lòng chọn môn đã tạo trong kho KHDH, hoặc nhập môn mới kèm khối.", "err")
+            else:
+                db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong)"
+                           " VALUES(?,?,?,?,?,?,?,?)",
+                           (uid, request.form["thu"], request.form["buoi"], request.form["tiet"],
+                            request.form["lop"], mon, khoi, request.form.get("phong")))
         elif act == "del":
             db.execute("DELETE FROM tkb WHERE id=? AND teacher_id=?", (request.form["id"], uid))
         elif act == "clear":
@@ -285,7 +304,16 @@ def tkb():
     for r in rows:
         grid.setdefault((r["buoi"], r["tiet"]), {})[r["thu"]] = r
     tiets = sorted({r["tiet"] for r in rows}) or [1, 2, 3, 4, 5]
-    return render_template("tkb.html", rows=rows, grid=grid, tiets=tiets)
+    # (M12) chọn môn đã tạo + đối chiếu số tiết/tuần theo KHDH
+    kho = [k for k in KHO.danh_sach(db, uid) if k["luu"]]
+    doi_chieu = KHO.doi_chieu(db, uid, rows)
+    dem = {"du": 0, "thieu": 0, "thua": 0, "chua_co_khdh": 0, "chua_ro": 0}
+    for d in doi_chieu:
+        dem[d["ket_luan"]] = dem.get(d["ket_luan"], 0) + 1
+    return render_template("tkb.html", rows=rows, grid=grid, tiets=tiets, kho=kho,
+                           doi_chieu=doi_chieu, dem=dem,
+                           kho_khoi=[k for k in KHO.danh_sach(db, uid)],
+                           KHOI=KHO.KHOI)
 
 
 # ---------------- Lịch báo giảng ----------------

@@ -3,18 +3,59 @@
 {% block crumb %}Thời khoá biểu cố định 1 tuần của giáo viên{% endblock %}
 {% block body %}
 <div class="card">
- <h3>➕ Thêm tiết dạy</h3><p class="sub">Khai báo các tiết cố định trong tuần</p>
- <form method="post" class="row">
+ <h3>➕ Thêm tiết dạy</h3><p class="sub">Chọn <b>môn đã tạo trong kho KHDH</b>, nhập <b>lớp dạy</b> — hệ thống đối chiếu
+ số tiết mỗi tuần với KHDH của môn đó. Môn chưa có trong danh sách thì chọn “＋ Môn khác” rồi nhập tên môn + khối.</p>
+ <form method="post">
   <input type="hidden" name="act" value="add">
-  <label class="f">Thứ<select name="thu">{% for i in range(2,9) %}<option value="{{i}}">{{THU_NAME[i]}}</option>{% endfor %}</select></label>
-  <label class="f">Buổi<select name="buoi"><option>Sáng</option><option>Chiều</option></select></label>
-  <label class="f">Tiết<input name="tiet" type="number" min="1" max="10" value="1" style="width:74px"></label>
-  <label class="f">Lớp<input name="lop" required style="width:92px" placeholder="5A"></label>
-  <label class="f">Môn<input name="mon" required style="width:140px" placeholder="Toán"></label>
-  <label class="f">Phòng / Ghi chú<input name="phong" style="width:150px"></label>
-  <button>+ Thêm tiết</button>
+  <div class="row">
+   <label class="f">Thứ<select name="thu">{% for i in range(2,9) %}<option value="{{i}}">{{THU_NAME[i]}}</option>{% endfor %}</select></label>
+   <label class="f">Buổi<select name="buoi"><option>Sáng</option><option>Chiều</option></select></label>
+   <label class="f">Tiết<input name="tiet" type="number" min="1" max="10" value="1" style="width:74px"></label>
+   <label class="f">Lớp dạy<input name="lop" required style="width:110px" placeholder="5A"></label>
+   <label class="f">Môn đã tạo<select name="mon" required style="min-width:210px">
+     {% for k in kho %}<option value="{{k['mon']}}|{{k['khoi']}}">{{k['mon']}} — khối {{k['khoi']}}</option>{% endfor %}
+     {% for k in kho_khoi if not k['luu'] %}<option value="{{k['mon']}}|{{k['khoi']}}">{{k['mon']}} — khối {{k['khoi']}} (chưa có KHDH)</option>{% endfor %}
+     <option value="__khac">＋ Môn khác (nhập tay)</option>
+    </select></label>
+   <label class="f">Phòng / Ghi chú<input name="phong" style="width:150px"></label>
+  </div>
+  <div class="row" style="margin-top:6px">
+   <label class="f">Chỉ điền khi chọn “＋ Môn khác” — Tên môn<input name="mon_moi" maxlength="100" style="width:160px" placeholder="Ví dụ: Âm nhạc"></label>
+   <label class="f">Khối của môn mới<select name="khoi_moi"><option value="">Chọn khối</option>{% for k in KHOI %}<option>{{k}}</option>{% endfor %}</select></label>
+   <button>+ Thêm tiết</button>
+  </div>
  </form>
+ {% if not kho %}
+ <p class="sub">Kho KHDH đang trống — vào <a href="{{url_for('digital.index')}}">KHDH + NLS + AI + STEM</a>
+ tạo môn và tải KHDH lên để đối chiếu số tiết mỗi tuần.</p>
+ {% endif %}
 </div>
+
+{% if doi_chieu %}
+<div class="card">
+ <div class="chead"><h3>🎯 Đối chiếu số tiết mỗi tuần với KHDH</h3>
+  <span class="chip">{{doi_chieu|length}} môn · lớp</span></div>
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>Môn</th><th>Khối</th><th>Lớp dạy</th><th>KHDH yêu cầu</th><th>Đã xếp trong tuần</th><th>Kết luận</th></tr></thead>
+  <tbody>{% for d in doi_chieu %}<tr>
+   <td><b>{{d['mon']}}</b>{% if d['khdh'] and d['khdh']['ten_file'] %}<br><span class="muted" style="font-size:11.5px">{{d['khdh']['ten_file']}}</span>{% endif %}</td>
+   <td>{{d['khoi'] or '—'}}</td>
+   <td><span class="chip">{{d['lop']}}</span></td>
+   <td>{% if d['can'] %}<b>{{d['can']}}</b> tiết/tuần{% else %}—{% endif %}</td>
+   <td><b>{{d['so_tiet'] }}</b> tiết</td>
+   <td>{% if d['ket_luan'] == 'du' %}<span class="chip" style="background:#ecfdf5;color:#0d9488">✅ Đủ</span>
+     {% elif d['ket_luan'] == 'thieu' %}<span class="chip" style="background:#fff7ed;color:#c2410c">⚠️ Thiếu {{d['can'] - d['so_tiet']}} tiết</span>
+     {% elif d['ket_luan'] == 'thua' %}<span class="chip" style="background:#fef2f2;color:#b91c1c">⚠️ Thừa {{d['so_tiet'] - d['can']}} tiết</span>
+     {% elif d['ket_luan'] == 'chua_ro' %}<span class="chip" style="background:#f8fafc;color:#475569">Chưa rõ số tiết</span>
+     {% else %}<span class="chip" style="background:#fef9c3;color:#a16207">Chưa có KHDH</span>{% endif %}
+    <div class="muted" style="font-size:11.5px">{{d['ghi_chu']}}</div></td>
+  </tr>{% endfor %}</tbody>
+ </table></div>
+ <p class="sub">Tổng: <b>{{dem['du']}}</b> đủ tiết · <b>{{dem['thieu']}}</b> thiếu · <b>{{dem['thua']}}</b> thừa ·
+ <b>{{dem['chua_co_khdh']}}</b> chưa có KHDH · <b>{{dem['chua_ro']}}</b> chưa rõ số tiết/tuần.
+ Số tiết/tuần lấy từ KHDH trong kho — sửa được ở trang <a href="{{url_for('digital.index')}}">KHDH + NLS + AI + STEM</a>.</p>
+</div>
+{% endif %}
 
 <div class="card">
  <div class="chead"><h3>Lưới thời khoá biểu</h3><span class="chip">{{rows|length}} tiết / tuần</span></div>
@@ -30,7 +71,7 @@
    <td style="text-align:center;min-width:104px">{% if c %}
      <div style="background:linear-gradient(135deg,#ecfdf5,#f0fdfa);border:1px solid #c7f0e4;border-radius:10px;padding:7px 6px">
       <b style="color:#0f766e;font-size:13px">{{c['mon']}}</b>
-      <div class="muted" style="font-size:11.5px">Lớp {{c['lop']}}{% if c['phong'] %}<br>{{c['phong']}}{% endif %}</div></div>
+      <div class="muted" style="font-size:11.5px">{% if c['khoi'] is defined and c['khoi'] %}Khối {{c['khoi'] }} · {% endif %}Lớp {{c['lop']}}{% if c['phong'] %}<br>{{c['phong']}}{% endif %}</div></div>
    {% else %}<span style="color:#e2e8f0">·</span>{% endif %}</td>{% endfor %}</tr>
   {% endif %}{% endfor %}{% endfor %}
   </tbody></table></div>
@@ -43,9 +84,9 @@
   <form method="post" onsubmit="return confirm('Xoá toàn bộ thời khoá biểu?')">
    <input type="hidden" name="act" value="clear"><button class="dan">🗑 Xoá toàn bộ</button></form></div>
  <div class="tbl-wrap"><table>
-  <thead><tr><th>Thứ</th><th>Buổi</th><th>Tiết</th><th>Lớp</th><th>Môn</th><th>Phòng</th><th></th></tr></thead>
+  <thead><tr><th>Thứ</th><th>Buổi</th><th>Tiết</th><th>Lớp dạy</th><th>Môn</th><th>Khối</th><th>Phòng</th><th></th></tr></thead>
   <tbody>{% for r in rows %}<tr><td><b>{{THU_NAME[r['thu']]}}</b></td><td>{{r['buoi']}}</td><td>{{r['tiet']}}</td>
-  <td><span class="chip">{{r['lop']}}</span></td><td>{{r['mon']}}</td><td class="muted">{{r['phong'] or '—'}}</td>
+  <td><span class="chip">{{r['lop']}}</span></td><td>{{r['mon']}}</td><td class="muted">{{r['khoi'] or '—'}}</td><td class="muted">{{r['phong'] or '—'}}</td>
   <td style="text-align:right"><form method="post"><input type="hidden" name="act" value="del">
    <input type="hidden" name="id" value="{{r['id']}}"><button class="dan">Xoá</button></form></td></tr>{% endfor %}</tbody>
  </table></div>

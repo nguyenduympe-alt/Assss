@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block head %}Kho KHDH — môn đã có KHDH{% endblock %}
+{% block crumb %}Chọn cách xử lý khi môn đã có KHDH{% endblock %}
+{% block body %}
+<div class="card">
+ <h3>⚠️ Môn này đã có KHDH trong kho</h3>
+ <p class="sub">Mỗi <b>môn + khối</b> giữ một KHDH đang dùng. Thầy/cô vừa tải lên KHDH cho
+ <b>{{ctx['mon']}} — khối {{ctx['khoi']}}</b>, mà môn này đã có KHDH từ trước.
+ Hãy chọn cách xử lý:</p>
+ <div class="tbl-wrap"><table>
+  <thead><tr><th></th><th>Tệp KHDH</th><th>Cập nhật</th><th>Số bài</th><th>Số tiết / tuần</th></tr></thead>
+  <tbody>
+   {% if cu %}
+   <tr><td><b>Bản đang dùng</b></td><td>{{cu['ten_file'] or 'KHDH.docx'}}</td>
+    <td class="muted">{{cu['updated'] or cu['created'] or '—'}}</td>
+    <td>{{cu['so_dong'] or '—'}}</td>
+    <td>{{cu['so_tiet_tuan'] or 'chưa xác định'}}{% if cu['tiet_tuan_tay'] %} <span class="muted">(nhập tay)</span>{% endif %}</td></tr>
+   {% endif %}
+   <tr style="background:#f0fdfa"><td><b>Bản vừa tải lên</b></td><td>{{ctx['name']}}</td>
+    <td class="muted">vừa xong</td><td>{{so_dong or ctx['so_dong'] or '—'}}</td>
+    <td>{{ctx['tiet_tuan'] or 'chưa xác định'}}{% if ctx['tiet_tay'] %} <span class="muted">(thầy/cô nhập)</span>{% endif %}</td></tr>
+  </tbody>
+ </table></div>
+ {% if tom_tat %}
+ <p class="sub">Vài bài đầu đọc được ở bản vừa tải lên: {{tom_tat|join(' · ')}}</p>
+ {% endif %}
+ <form method="post" action="{{url_for('digital.kho_xac_nhan', kid=cu['id'] if cu else 0)}}" style="margin-top:6px">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  <input type="hidden" name="token" value="{{token}}">
+  <div class="row">
+   <button class="ok" name="quyet_dinh" value="thay">🔁 Thay thế bản cũ bằng bản vừa tải lên</button>
+   <button class="btn sec" name="quyet_dinh" value="giu">🗂 Giữ cả hai bản (bản cũ thành phiên bản trước)</button>
+   <a class="btn sec" href="{{url_for('digital.index')}}">Huỷ, không thay đổi gì</a>
+  </div>
+ </form>
+ <p class="sub">Chọn <b>giữ cả hai bản</b> thì bản cũ vẫn nằm trong kho ở mục “phiên bản trước”, thầy/cô có thể
+ chuyển qua lại giữa các bản bất cứ lúc nào. Thao tác này không tính lượt.</p>
+</div>
+{% endblock %}

@@ -2,6 +2,91 @@
 {% block head %}KHDH + NLS + AI + STEM{% endblock %}
 {% block crumb %}Tải Word → rà soát gợi ý theo bài → tải bản đã tích hợp{% endblock %}
 {% block body %}
+<div class="card" id="kho">
+ <div class="chead"><h3>📚 Kho KHDH theo môn</h3><span class="chip">{{kho|length}} môn</span></div>
+ <p class="sub">Mỗi <b>môn + khối</b> giữ <b>một</b> KHDH đang dùng (ví dụ: Toán · khối 4; Toán · khối 5 là hai môn riêng).
+ Thầy/cô tạo bao nhiêu môn cũng được, mỗi môn tải <b>một</b> KHDH lên. Sang trang
+ <a href="{{url_for('core.tkb')}}"><b>Thời khoá biểu</b></a> chỉ cần chọn môn đã tạo và nhập lớp dạy — hệ thống đối chiếu
+ <b>số tiết mỗi tuần</b> ghi trong KHDH với số tiết đã xếp.</p>
+ <form method="post" action="{{url_for('digital.kho_them')}}" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  <div class="row">
+   <label class="f">Môn<input name="mon" maxlength="100" placeholder="Ví dụ: Toán" required style="width:150px"></label>
+   <label class="f">Khối<select name="khoi" required>{% for k in khoi %}<option>{{k}}</option>{% endfor %}</select></label>
+   <label class="f">Loại tài liệu (KHDH)<select name="loai"><option value="ppct">KHDH — Kế hoạch giáo dục / Phân phối chương trình</option><option value="lesson">KHDH — Giáo án / Kế hoạch bài dạy</option></select></label>
+   <label class="f">Số tiết mỗi tuần<input name="tiet_tuan" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="để trống: tự suy ra" style="width:150px"></label>
+  </div>
+  <label class="f" style="margin-top:6px;flex:1;min-width:260px">File KHDH (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
+  <p class="sub">Để trống ô <b>số tiết mỗi tuần</b> thì hệ thống tự suy ra từ KHDH (cột tuần / cột số tiết), rồi thầy/cô sửa lại được.
+  Lưu vào kho <b>không tính lượt</b> — lượt chỉ tính khi tạo bản tích hợp NLS/AI/STEM.</p>
+  <button class="ok">＋ Thêm môn + KHDH</button>
+  {% if kho_moi %}<span class="muted" style="margin-left:10px">Môn vừa lưu được đánh dấu màu vàng trong bảng dưới.</span>{% endif %}
+ </form>
+ {% if kho %}
+ <div class="tbl-wrap" style="margin-top:12px"><table>
+  <thead><tr><th>Môn</th><th>Khối</th><th>KHDH đang dùng</th><th>Số bài</th><th>Số tiết / tuần</th><th>Cập nhật</th><th>Thao tác</th></tr></thead>
+  <tbody>{% for k in kho %}{% set r = k.r %}
+   <tr {% if kho_moi == r['id'] %}style="background:#fef9c3"{% endif %}>
+    <td><b>{{r['mon']}}</b>{% if k.ban > 1 %}<br><span class="muted" style="font-size:11.5px">{{k.ban}} phiên bản — đang dùng bản {{r['phien_ban']}}</span>{% endif %}</td>
+    <td><span class="chip">Khối {{r['khoi']}}</span></td>
+    <td>{% if r['luu'] %}{{r['ten_file'] or 'KHDH.docx'}}{% if r['loai'] == 'lesson' %}<br><span class="muted" style="font-size:11.5px">giáo án</span>{% endif %}
+        {% else %}<span style="color:#b45309">chưa có KHDH</span>{% endif %}</td>
+    <td>{{r['so_dong'] or '—'}}</td>
+    <td>
+     <form method="post" action="{{url_for('digital.kho_tiet_tuan', kid=r['id'])}}" style="display:flex;gap:6px;align-items:center">
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+      <input name="so_tiet_tuan" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{r['so_tiet_tuan'] or ''}}" style="width:64px">
+      <button class="btn sec sm">Lưu</button>
+      <span class="muted" style="font-size:11.5px">{% if r['tiet_tuan_tay'] %}thầy/cô nhập{% else %}tự suy ra từ KHDH{% endif %}</span>
+     </form>
+    </td>
+    <td class="muted">{{r['updated'] or r['created'] or '—'}}</td>
+    <td style="text-align:right;white-space:nowrap">
+     {% if r['luu'] %}
+     <details style="display:inline-block;text-align:left">
+      <summary class="btn sec sm" style="cursor:pointer">Tích hợp NLS/AI/STEM</summary>
+      <form method="post" action="{{url_for('digital.kho_tich_hop', kid=r['id'])}}" style="margin-top:8px;min-width:260px">
+       <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_nls" value="1" checked style="width:18px"><b>NLS</b> — năng lực số</label>
+       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_ai" value="1" checked style="width:18px"><b>AI</b> — giáo dục trí tuệ nhân tạo</label>
+       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_stem" value="1" checked style="width:18px"><b>STEM</b> / STEAM</label>
+       <div class="row" style="margin-top:4px">
+        <label class="f">Số bài NLS<input name="so_bai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="trống: tự chọn" style="width:110px"></label>
+        <label class="f">Số bài AI<input name="so_bai_ai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="trống: tự chọn" style="width:110px"></label>
+       </div>
+       <label style="display:flex;gap:8px;align-items:flex-start"><input type="hidden" name="cung_bai" value="0">
+        <input type="checkbox" name="cung_bai" value="1" checked style="width:18px;margin-top:3px"><span>Tích hợp năng lực số và AI <b>cùng bài</b></span></label>
+       <button class="ok sm">Tạo bản tích hợp (1 lượt)</button>
+      </form>
+     </details>
+     {% endif %}
+     {% if k.khac %}
+     <details style="display:inline-block;text-align:left">
+      <summary class="btn sec sm" style="cursor:pointer">{{k.khac|length}} phiên bản trước</summary>
+      <table style="margin-top:6px;font-size:12.5px"><tbody>
+      {% for v in k.khac %}<tr><td>{{v['ten_file'] or 'không tên'}}<br><span class="muted">bản {{v['phien_ban']}} · {{v['updated'] or v['created']}}</span></td>
+       <td style="white-space:nowrap">
+        <form method="post" action="{{url_for('digital.kho_doi_ban', kid=v['id'])}}" style="display:inline">
+         <input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="btn sec sm">Dùng bản này</button></form>
+        <form method="post" action="{{url_for('digital.kho_xoa_ban', kid=v['id'])}}" style="display:inline;margin-left:4px">
+         <input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="dan sm">Xoá</button></form>
+       </td></tr>{% endfor %}
+      </tbody></table>
+     </details>
+     {% endif %}
+     <form method="post" action="{{url_for('digital.kho_xoa', kid=r['id'])}}" style="display:inline;margin-left:4px"
+           onsubmit="return confirm('Xoá môn này khỏi kho KHDH (kèm mọi phiên bản và tệp)?')">
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="dan sm">Xoá môn</button></form>
+    </td>
+   </tr>
+  {% endfor %}</tbody>
+ </table></div>
+ <p class="sub">Ở trang <a href="{{url_for('core.tkb')}}">Thời khoá biểu</a>, ô <b>Môn</b> hiện đúng danh sách môn này để chọn,
+ kèm khối; thầy/cô chỉ cần nhập <b>lớp dạy</b> cho từng tiết.</p>
+ {% else %}
+ <div class="empty" style="margin-top:12px"><span class="e">📚</span>Chưa có môn nào trong kho. Hãy tạo môn đầu tiên ở ô phía trên.</div>
+ {% endif %}
+</div>
 <div class="card">
  <h3>KHDH + NLS + AI + STEM</h3>
  <p class="sub"><b>KHDH</b> = kế hoạch dạy học (kế hoạch giáo dục / phân phối chương trình, hoặc giáo án —
