@@ -33,8 +33,9 @@ def _cong_cu():
         {"icon": "🔤", "ten": "Kiểm tra chính tả", "endpoint": "chinh_ta.index", "mau": "#06b6d4",
          "mo_ta": "Tải .docx hoặc dán văn bản → duyệt từng chỗ sửa → tải bản .docx",
          "the": [], "moi": False},
-        {"icon": "🧩", "ten": "Năng lực số & STEM", "endpoint": "digital.index", "mau": "#8b5cf6",
-         "mo_ta": "Tải KHGD/PPCT Word → chọn cột cần tích hợp → tải bản .docx",
+        {"icon": "🧩", "ten": "KHDH + NLS + AI + STEM", "endpoint": "digital.index", "mau": "#8b5cf6",
+         "mo_ta": "Tải KHDH (kế hoạch dạy học) / giáo án Word → đọc tựa bài → chọn bài cần tích hợp "
+                  "năng lực số, AI, STEM → tải bản .docx",
          "the": [], "moi": False},
         {"icon": "🖨️", "ten": "Lịch báo giảng", "endpoint": "core.bao_giang", "mau": "#f59e0b",
          "mo_ta": "Xuất lịch báo giảng ra PDF hoặc Word",

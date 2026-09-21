@@ -11,7 +11,8 @@ from ..modules import billing as BL
 from ..modules import digital_plan as DP
 
 bp = Blueprint('digital', __name__, url_prefix='/nang-luc-so')
-MENU = {'label': 'Năng lực số & STEM', 'endpoint': 'digital.index', 'icon': '🧩'}
+# (M11) Tên chức năng nói đủ phạm vi: KHDH (kế hoạch dạy học) + NLS + AI + STEM
+MENU = {'label': 'KHDH + NLS + AI + STEM', 'endpoint': 'digital.index', 'icon': '🧩'}
 FIELDS = ('week','topic','title','periods','digital','ai','stem','notes')
 
 
@@ -153,7 +154,7 @@ def review(token):
                 _phan.append('AI')
             if any(r.get('stem') for r in rows):
                 _phan.append('STEM')
-            _ten = ('KHGD' if ctx['mode'] == 'ppct' else 'Giao-an') + '-tich-hop-' + \
+            _ten = ('KHDH' if ctx['mode'] == 'ppct' else 'Giao-an') + '-tich-hop-' + \
                    ('-'.join(_phan) if _phan else 'trong') + '.docx'
             return send_file(output, as_attachment=True, download_name=_ten,
                              mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')

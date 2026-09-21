@@ -1,23 +1,26 @@
 {% extends 'base.html' %}
-{% block head %}Tích hợp năng lực số &amp; giáo dục AI{% endblock %}
+{% block head %}KHDH + NLS + AI + STEM{% endblock %}
 {% block crumb %}Tải Word → rà soát gợi ý theo bài → tải bản đã tích hợp{% endblock %}
 {% block body %}
 <div class="card">
- <h3>Kế hoạch bài dạy / phân phối chương trình — tích hợp năng lực số &amp; giáo dục AI</h3>
+ <h3>KHDH + NLS + AI + STEM</h3>
+ <p class="sub"><b>KHDH</b> = kế hoạch dạy học (kế hoạch giáo dục / phân phối chương trình, hoặc giáo án —
+ kế hoạch bài dạy) · <b>NLS</b> = năng lực số · <b>AI</b> = giáo dục trí tuệ nhân tạo · <b>STEM</b> = STEM/STEAM.
+ Một tài liệu có thể tích hợp <b>một, hai hoặc cả ba</b> nội dung NLS – AI – STEM.</p>
  <p class="sub">Cách dùng: chọn loại tài liệu, lớp, môn → tích chọn nội dung cần tích hợp → tải file Word
  lên → rà soát từng dòng → tải bản .docx. Bảng xuất ra giữ đúng <b>8 cột</b> của mẫu KHGD (tuần, chủ đề,
  bài học, thời lượng, năng lực số, AI, STEM, ghi chú).</p>
  <form method="post" enctype="multipart/form-data">
   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
   <div class="row">
-   <label class="f">Loại tài liệu<select name="mode" required><option value="ppct">Kế hoạch giáo dục / Phân phối chương trình</option><option value="lesson">Giáo án / Kế hoạch bài dạy</option></select></label>
+   <label class="f">Loại tài liệu (KHDH)<select name="mode" required><option value="ppct">KHDH — Kế hoạch giáo dục / Phân phối chương trình</option><option value="lesson">KHDH — Giáo án / Kế hoạch bài dạy</option></select></label>
    <label class="f">Lớp<select name="grade" required><option value="">Chọn lớp</option>{% for i in range(1,13) %}<option>{{i}}</option>{% endfor %}</select></label>
    <label class="f">Môn học<input name="subject" value="{{user['subject'] or ''}}" maxlength="100" placeholder="Ví dụ: Tin học" required></label>
   </div>
   <div class="row" style="margin-top:6px">
-   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_nls" value="1" checked style="width:18px">Năng lực số</label>
-   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_ai" value="1" checked style="width:18px">Trí tuệ nhân tạo (AI)</label>
-   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_stem" value="1" checked style="width:18px">STEM / STEAM</label>
+   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_nls" value="1" checked style="width:18px"><b>NLS</b> — năng lực số</label>
+   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_ai" value="1" checked style="width:18px"><b>AI</b> — giáo dục trí tuệ nhân tạo</label>
+   <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="chon_stem" value="1" checked style="width:18px"><b>STEM</b> / STEAM</label>
   </div>
   <div class="row" style="margin-top:6px">
    <label class="f" style="flex:1;min-width:260px">Số bài cần tích hợp <b>năng lực số</b> (phân phối chương trình)
@@ -33,7 +36,7 @@
    <input type="checkbox" name="cung_bai" value="1" checked style="width:18px;margin-top:3px">
    <span><b>Tích hợp năng lực số và AI cùng bài</b> — mỗi bài được chọn sẽ ghi <b>cả</b> mã năng lực số <b>và</b> mã AI.
    Bỏ tích nếu muốn hai cột chọn bài riêng (năng lực số và AI có thể khác bài).</span></label>
-  <p class="sub">Chọn <b>riêng từng cái</b> hoặc <b>cả hai</b>: bỏ tích ô nào thì cột đó không được đề xuất cho
+  <p class="sub">Chọn <b>riêng từng cái</b> hoặc <b>cả ba</b>: bỏ tích ô nào thì cột đó không được đề xuất cho
   cả file. Ở bước rà soát, mỗi dòng bài học còn có ô tích riêng để giữ/bỏ từng cột.</p>
   <label class="f" style="margin:18px 0">File Word (.docx, tối đa 8 MB)<input type="file" name="file" accept=".docx" required></label>
   {% if is_pro %}
@@ -54,8 +57,8 @@
  <p class="sub">Cột năng lực số và cột AI được đề xuất theo đúng lớp của tài liệu. Bài nào chưa đủ căn cứ thì
  để trống để thầy/cô tự chọn; nội dung đã có sẵn trong file được giữ nguyên. Mã AI là mã do văn bản của Bộ
  quy định (ví dụ <b>3.A3.2</b>, phần mở rộng có thêm <b>MR</b>) — hệ thống <b>không tự đặt mã</b>.</p>
- <p class="sub">Trong file Word tải về: ô năng lực số <b style="color:#c00">tô đỏ</b>, ô AI
- <b style="color:#00f">tô xanh dương</b>. Với phân phối chương trình, nhớ kiểm lại tuần, tiết và các ô gộp
- ở bước rà soát; với giáo án, phần tích hợp được thêm ở cuối tài liệu.</p>
+ <p class="sub">Trong file Word tải về: ô <b>NLS</b> (năng lực số) <b style="color:#c00">tô đỏ</b>, ô <b>AI</b>
+ <b style="color:#00f">tô xanh dương</b>; cột STEM giữ gợi ý hoạt động. Với <b>KHDH</b> (phân phối chương trình),
+ nhớ kiểm lại tuần, tiết và các ô gộp ở bước rà soát; với giáo án, phần tích hợp được thêm ở cuối tài liệu.</p>
 </div>
 {% endblock %}
