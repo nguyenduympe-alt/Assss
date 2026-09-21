@@ -73,8 +73,8 @@ def _nhat_ky_them(ho_so, viec, du_lieu=''):
 
 
 # ------------------------------------------------------------------ tra Internet ở luồng riêng
-def _chay_internet(token, uid, doan):
-    """Tra Internet rồi gộp kết quả vào hồ sơ (chạy ở luồng riêng)."""
+def _chay_internet(token, uid, doan, che_do="tieu_chuan"):
+    """Tra Internet (nhiều nguồn, nhiều trang) rồi gộp kết quả vào hồ sơ — chạy ở luồng riêng."""
     def gio(viec, du_lieu=''):
         try:
             h = json.loads(_duong(token).read_text(encoding='utf-8'))
@@ -84,11 +84,12 @@ def _chay_internet(token, uid, doan):
             pass
 
     try:
-        it = TL.doi_chieu_internet(doan, gio=gio, so_truy_van=3, so_trang=TL.TOI_DA_TRANG,
-                                   han_giay=70)
+        it = TL.doi_chieu_internet(doan, gio=gio, che_do=che_do)
         h = json.loads(_duong(token).read_text(encoding='utf-8'))
         TL.gop_internet(h['kq'], it)
-        _nhat_ky_them(h, 'xong', 'tải được %d trang' % len(it.get('tai_duoc') or []))
+        _nhat_ky_them(h, 'xong', 'tra %d câu hỏi · %d kết quả · tải %d trang · %d giây'
+                      % (it.get('so_cau_hoi', 0), it.get('so_ket_qua', 0),
+                         it.get('so_trang_tai', 0), it.get('giay', 0)))
         h['trang_thai'] = 'xong'
         h['xong_luc'] = time.strftime('%H:%M:%S')
         _ghi(token, h)
@@ -110,10 +111,14 @@ def _chay_internet(token, uid, doan):
 def index():
     if request.method != 'POST':
         return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(),
-                               thong_tin=TL.thong_tin())
+                               thong_tin=TL.thong_tin(), che_do=TL.CHE_DO,
+                               che_do_chon='tieu_chuan')
     u = current_user()
     kieu = (request.form.get('kieu') or 'mot_bai').strip()
     internet = (request.form.get('internet') or '') not in ('', '0', 'off')
+    che_do = (request.form.get('che_do') or 'tieu_chuan').strip()
+    if che_do not in TL.CHE_DO:
+        che_do = 'tieu_chuan'
     nguon = TL.kho_he_thong(u['id'])
     if kieu == 'nhieu_bai':
         return _xu_ly_nhieu(u, nguon)
@@ -123,18 +128,22 @@ def index():
         doan, ten, loi = [], '', 'Không đọc được nội dung thầy/cô gửi lên.'
     if loi:
         flash(loi, 'err')
-        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(),
-                               thong_tin=TL.thong_tin(), kieu=kieu, internet=internet)
+        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
+                               che_do_chon=che_do, thong_tin=TL.thong_tin(), kieu=kieu,
+                               internet=internet)
     kq = TL.phan_tich_mot_bai(doan, ten, nguon=nguon)
     token = uuid.uuid4().hex
     ho_so = {'token': token, 'uid': u['id'], 'luc': time.strftime('%H:%M %d/%m/%Y'),
              'kieu': 'mot_bai', 'ten': ten, 'internet_yeu_cau': bool(internet),
              'trang_thai': 'dang_chay' if internet else 'xong', 'kq': kq, 'nhat_ky': []}
+    ho_so['che_do'] = che_do
     if internet:
-        _nhat_ky_them(ho_so, 'bat_dau', 'chuẩn bị tra %d câu' % min(3, len(doan)))
+        _ts = TL.thong_so_che_do(che_do)
+        _nhat_ky_them(ho_so, 'bat_dau', 'chế độ %s — %s' % (_ts['ten'], _ts['mo_ta']))
     _ghi(token, ho_so)
     if internet:
-        threading.Thread(target=_chay_internet, args=(token, u['id'], doan), daemon=True).start()
+        threading.Thread(target=_chay_internet, args=(token, u['id'], doan, che_do),
+                         daemon=True).start()
     return redirect(url_for('trung_lap.ket_qua', token=token))
 
 
@@ -151,12 +160,12 @@ def _xu_ly_nhieu(u, nguon):
     if len(cac) < 2:
         flash('Cần ít nhất 2 bài để so với nhau. Thầy/cô gửi 2 tệp .docx/.pdf, hoặc dán các bài '
               'cách nhau bằng một dòng có ba dấu gạch (---).', 'err')
-        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(),
-                               thong_tin=TL.thong_tin(), kieu='nhieu_bai')
+        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
+                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai')
     if len(cac) > TOI_DA_BAI:
         flash('Mỗi lượt so tối đa %d bài. Thầy/cô chia thành các lượt nhỏ hơn.' % TOI_DA_BAI, 'err')
-        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(),
-                               thong_tin=TL.thong_tin(), kieu='nhieu_bai')
+        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
+                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai')
     bai, loi_ds = [], []
     for f in cac:
         try:
@@ -171,8 +180,8 @@ def _xu_ly_nhieu(u, nguon):
         flash(' '.join(loi_ds[:4]), 'err')
     if len(bai) < 2:
         flash('Cần ít nhất 2 bài đọc được nội dung để so với nhau.', 'err')
-        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(),
-                               thong_tin=TL.thong_tin(), kieu='nhieu_bai')
+        return render_template('trung_lap.html', kq=None, nguoi=_ten_nguoi(), che_do=TL.CHE_DO,
+                               che_do_chon='tieu_chuan', thong_tin=TL.thong_tin(), kieu='nhieu_bai')
     kq = TL.phan_tich_nhieu_bai(bai, nguon=nguon)
     token = uuid.uuid4().hex
     ho_so = {'token': token, 'uid': u['id'], 'luc': time.strftime('%H:%M %d/%m/%Y'),
@@ -210,7 +219,8 @@ def ket_qua(token):
     db = get_db()
     return render_template('trung_lap_kq.html', h=h, kq=h['kq'], token=token,
                            nguoi=_ten_nguoi(), da_tra=BL.da_tra_luot(db, u['id'], token),
-                           con_lai=BL.remaining(u), la_pro=BL.is_pro(u))
+                           con_lai=BL.remaining(u), la_pro=BL.is_pro(u),
+                           che_do=TL.CHE_DO)
 
 
 # ------------------------------------------------------------------ tải báo cáo Word (1 lượt)
@@ -245,10 +255,16 @@ def chay_lai(token):
     if h['kq'].get('kieu') != 'mot_bai':
         flash('Chỉ đối chiếu Internet cho trường hợp kiểm tra một bài.', 'err')
         return redirect(url_for('trung_lap.ket_qua', token=token))
+    che_do = (request.form.get('che_do') or h.get('che_do') or 'tieu_chuan').strip()
+    if che_do not in TL.CHE_DO:
+        che_do = 'tieu_chuan'
+    h['che_do'] = che_do
     h['trang_thai'] = 'dang_chay'
     h['nhat_ky'] = []
-    _nhat_ky_them(h, 'bat_dau', 'chạy lại phần đối chiếu Internet')
+    h['kq']['internet'] = None
+    _nhat_ky_them(h, 'bat_dau', 'chạy lại phần đối chiếu Internet — chế độ %s'
+                  % TL.thong_so_che_do(che_do)['ten'])
     _ghi(token, h)
-    threading.Thread(target=_chay_internet, args=(token, u['id'], h['kq']['doan']),
+    threading.Thread(target=_chay_internet, args=(token, u['id'], h['kq']['doan'], che_do),
                      daemon=True).start()
     return redirect(url_for('trung_lap.ket_qua', token=token))

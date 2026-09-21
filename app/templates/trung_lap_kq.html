@@ -29,7 +29,8 @@
       <p class="sub" style="margin:2px 0 0">
       {% if kq.kieu == 'mot_bai' %}{{kq.so_tu}} từ · {{kq.so_doan}} đoạn ·
         đối chiếu {{kq.kho|length}} tài liệu trong kho
-        {% if kq.internet %}{% if kq.internet.lay_duoc_nguon %}· {{kq.internet.tai_duoc|length}} nguồn Internet ({{kq.internet.giay}} giây)
+        {% if kq.internet %}{% if kq.internet.lay_duoc_nguon %}· {{kq.internet.tai_duoc|length}} trang Internet
+        (mức {{kq.internet.ten_che_do}}, {{kq.internet.giay}} giây)
         {% else %}· chưa đối chiếu được Internet{% endif %}{% endif %}
       {% else %}{{kq.so_bai}} bài · so từng cặp · đối chiếu {{kq.kho|length}} lượt với kho{% endif %}</p></div>
     <span class="chip" style="background:{{kq.mau}}1a;color:{{kq.mau}};font-size:14px;padding:7px 16px">{{kq.muc}}</span>
@@ -43,7 +44,7 @@
       <span>trùng với kho của thầy/cô</span></div>
     <div class="kpi" style="--c:#8b5cf6"><div class="ic">🌐</div>
       <b>{% if kq.internet and kq.internet.lay_duoc_nguon %}{{kq.tk.ty_le_trung_internet}}%{% else %}—{% endif %}</b>
-      <span>trùng với nguồn Internet</span></div>
+      <span>trùng với nguồn Internet ({{kq.tk.so_trang_tai or 0}} trang đã tải)</span></div>
     <div class="kpi" style="--c:#f59e0b"><div class="ic">🔎</div><b>{{kq.tk.so_cau_khop}}</b>
       <span>câu nghi trùng / {{kq.tk.so_cau_xet}} câu đã so</span></div>
     {% else %}
@@ -133,30 +134,70 @@
 {% if kq.internet %}
 <div class="card">
   <h3>Phần đối chiếu Internet</h3>
+  <p class="sub">Mức tra: <b>{{kq.internet.ten_che_do}}</b> · tra <b>{{kq.internet.so_cau_hoi}}</b> câu hỏi
+    (phủ đều cả bài) · tìm được <b>{{kq.internet.so_ket_qua}}</b> kết quả · tải về <b>{{kq.internet.so_trang_tai}}</b> trang
+    {% if kq.internet.so_trang_dem %} ({{kq.internet.so_trang_dem}} trang lấy lại từ bộ nhớ đệm){% endif %}
+    · {{kq.internet.giay}} giây
+    {% if kq.internet.so_may_tim %}· nguồn đã trả kết quả: {{kq.internet.so_may_tim|join(', ')}}{% endif %}
+    {% if kq.internet.so_trang_theo_lien_ket %}· trong đó {{kq.internet.so_trang_theo_lien_ket}} trang mở rộng theo liên kết{% endif %}</p>
+  {% if kq.internet.nguon_kq %}
+  <p class="sub" style="margin:0 0 8px">Kết quả theo từng nguồn:
+    {% for ten, n in kq.internet.nguon_kq.items() %}<span class="chip" style="font-size:11px">{{ten}}: {{n}}</span> {% endfor %}</p>
+  {% endif %}
+
   {% if kq.internet.lay_duoc_nguon %}
-  <p class="sub">Đã tra {{kq.internet.truy_van|length}} câu hỏi và tải được {{kq.internet.tai_duoc|length}} nguồn để so
-    ({{kq.internet.giay}} giây).</p>
-  <ul class="sub" style="padding-left:18px;line-height:1.7">
-    {% for t in kq.internet.truy_van %}<li>🔍 {{t}}</li>{% endfor %}
-  </ul>
-  <table><thead><tr><th>Nguồn đã tải</th><th>Máy tìm</th><th>Số từ</th></tr></thead><tbody>
+  <table><thead><tr><th>Trang đã đối chiếu</th><th>Nguồn tìm</th><th>Số từ</th></tr></thead><tbody>
     {% for x in kq.internet.tai_duoc %}
     <tr><td><a href="{{x.url}}" rel="nofollow noopener" target="_blank">{{x.tieu_de or x.url}}</a>
-      <br><span class="muted" style="font-size:11.5px">{{x.url[:90]}}</span></td>
+      <br><span class="muted" style="font-size:11.5px">{{x.url[:100]}}</span>{% if x.tu_dem %} <span class="chip" style="font-size:10.5px">bộ nhớ đệm</span>{% endif %}{% if x.toan_van_wiki %} <span class="chip" style="font-size:10.5px">toàn văn Wikipedia</span>{% endif %}</td>
       <td>{{x.may_tim}}</td><td>{{x.so_tu}}</td></tr>
     {% endfor %}
   </tbody></table>
+  {% if kq.internet.nguon_ngan %}
+  <p class="sub" style="margin-top:12px">Đoạn trích sách/báo tìm thấy (chỉ so trong phạm vi đoạn trích):</p>
+  <ul class="sub" style="padding-left:18px;line-height:1.7">
+    {% for x in kq.internet.nguon_ngan[:10] %}
+    <li><a href="{{x.url}}" rel="nofollow noopener" target="_blank">{{x.tieu_de[:90] or x.may_tim}}</a>
+      — <span class="muted">{{x.trich[:140]}}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   {% else %}
   <p class="sub" style="margin:0">{{kq.internet.ghi_chu}}</p>
   {% endif %}
+
+  {% if kq.internet.tin_lien_quan %}
+  <p class="sub" style="margin-top:12px">Bài báo cùng chủ đề tìm thấy (chỉ có tiêu đề — mở xem tay, không đo được chữ trùng):</p>
+  <ul class="sub" style="padding-left:18px;line-height:1.7">
+    {% for x in kq.internet.tin_lien_quan[:10] %}
+    <li><a href="{{x.url}}" rel="nofollow noopener" target="_blank">{{x.tieu_de[:110]}}</a>
+      <span class="muted">{% if x.ten_bao %}— {{x.ten_bao}}{% endif %}{% if x.ngay %} ({{x.ngay}}){% endif %}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if kq.internet.truy_van %}
+  <details style="margin-top:12px"><summary class="muted">Đã gửi {{kq.internet.truy_van|length}} câu hỏi ra ngoài (bấm để xem)</summary>
+    <ul class="sub" style="padding-left:18px;line-height:1.7">
+      {% for t in kq.internet.truy_van %}<li>🔍 {{t}}</li>{% endfor %}
+    </ul>
+  </details>
+  {% endif %}
   {% if kq.internet.khong_tai_duoc %}
-  <details style="margin-top:12px"><summary class="muted">Có {{kq.internet.khong_tai_duoc|length}} trang không tải được (bấm để xem)</summary>
+  <details style="margin-top:8px"><summary class="muted">Có {{kq.internet.khong_tai_duoc|length}} trang không tải được (bấm để xem)</summary>
   <ul class="sub" style="padding-left:18px">
     {% for x in kq.internet.khong_tai_duoc %}<li>{{x.url[:90]}} — {{x.ly_do}}</li>{% endfor %}
   </ul></details>
   {% endif %}
-  <form method="post" action="{{url_for('trung_lap.chay_lai', token=token)}}" style="margin-top:12px">
+
+  <form method="post" action="{{url_for('trung_lap.chay_lai', token=token)}}"
+        style="margin-top:14px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap">
     <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <label class="f" style="min-width:220px">Tra lại ở mức
+      <select name="che_do" {% if h.trang_thai != 'xong' %}disabled{% endif %}>
+        {% for ma, cd in che_do.items() %}
+        <option value="{{ma}}" {% if ma == (h.che_do or 'tieu_chuan') %}selected{% endif %}>{{cd.ten}} — {{cd.mo_ta}}</option>
+        {% endfor %}
+      </select></label>
     <button class="btn sec" {% if h.trang_thai != 'xong' %}disabled{% endif %}>Tra lại Internet (không tính thêm lượt)</button>
   </form>
 </div>

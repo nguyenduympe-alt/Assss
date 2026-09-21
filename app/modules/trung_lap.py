@@ -12,8 +12,10 @@ NÓI THẲNG VỀ GIỚI HẠN (bắt buộc đọc trước khi dùng kết qu�
   · Đây KHÔNG phải mô hình ngôn ngữ lớn, không "hiểu" nội dung, không phán quyết đạo văn.
   · Số % trong báo cáo là TỈ LỆ CHỮ TRÙNG KHỚP với nguồn tìm thấy (bằng chữ), không phải
     kết luận. Trùng lặp có thể do: đề bài, mẫu câu, dẫn chứng, khung chương trình, thuật ngữ.
-  · Đối chiếu Internet chỉ thấy những gì công cụ tìm kiếm trả về: bài trong nhóm kín,
-    file scan, sách giấy, hoặc bài đã xoá thì KHÔNG thấy được.
+  · Đối chiếu Internet hỏi nhiều nguồn (Wikipedia tiếng Việt + toàn văn bài, DuckDuckGo,
+    Google Books, Google Tin tức, OpenAlex) rồi TẢI VỀ hàng chục → hàng trăm trang để so
+    từng câu; nhưng không công cụ nào quét hết được toàn bộ Internet: bài trong nhóm kín,
+    tệp scan (ảnh), sách giấy, bài đã xoá thì KHÔNG thấy được.
   · Không dùng để buộc tội, trừ điểm hay kết luận về một học sinh. Hãy hỏi lại, xem bản nháp,
     xem quá trình học.
 """
@@ -419,6 +421,22 @@ def _chi_so_nhan(nhan):
     return 0.0
 
 
+def _dung_chi_muc(kho_cau):
+    """Chỉ mục ngược: cụm 3 ký tự → các câu nguồn chứa cụm đó.
+
+    Nhờ chỉ mục này mà so được với HÀNG NGHÌN trang đã tải về (mỗi trang có thể vài trăm câu)
+    mà vẫn nhanh: chỉ những câu nguồn trùng cụm mới được đem ra chấm bằng mô hình.
+    """
+    idx = {}
+    for i, c in enumerate(kho_cau):
+        g = c.get("gram")
+        if g is None:
+            g = c["gram"] = _gram3(c["chu"])
+        for x in g:
+            idx.setdefault(x, []).append(i)
+    return idx
+
+
 def _ung_vien(cau, kho_cau, so=25):
     """Chọn nhanh các câu nguồn đáng so (lọc bằng shingle ký tự) để đỡ phải so tất cả."""
     g = _gram3(cau)
@@ -436,19 +454,39 @@ def _ung_vien(cau, kho_cau, so=25):
     return [i for _, i in ra[:so]]
 
 
-def so_khop_voi_nguon(doan, nguon, soi_toi_da=400):
-    """So từng câu của `doan` với kho câu `nguon` (đã dựng sẵn chỉ số).
+def _ung_vien_nhanh(cau, chi_muc, so=40):
+    """Lấy ứng viên qua chỉ mục ngược (dùng khi kho câu rất lớn: hàng nghìn trang)."""
+    g = _gram3(cau)
+    if not g or not chi_muc:
+        return [], {}
+    dem = {}
+    for x in g:
+        for i in chi_muc.get(x, ()):
+            dem[i] = dem.get(i, 0) + 1
+    if not dem:
+        return [], {}
+    nguong = max(3, int(0.10 * len(g)))
+    ra = [(v, i) for i, v in dem.items() if v >= nguong]
+    if not ra:
+        ra = list(dem.items())
+    ra.sort(reverse=True)
+    return [i for _, i in ra[:so]], dem
 
-    `nguon`: [{'ten':…, 'loai':…, 'cau': [{'chu':…}, …]}]
-    Trả về (danh sách câu khớp, thống kê).
+
+def so_khop_voi_nguon(doan, nguon, soi_toi_da=400):
+    """So từng câu của `doan` với kho câu `nguon`.
+
+    `nguon`: [{'ten':…, 'loai':…, 'url':…, 'cau': [{'chu':…}, …]}]
+    Trả về (danh sách câu khớp, thống kê). Dùng chỉ mục cụm ký tự nên chịu được kho rất lớn
+    (kho Internet có thể là hàng nghìn câu từ hàng trăm trang).
     """
     tat_ca = []
     for n in nguon:
-        n["_idx"] = n.get("_idx") or []
         for c in n["cau"]:
             c.setdefault("nd", tach_tu_noi_dung(c["chu"]))
             tat_ca.append((n, c))
     kho_cau = [{"chu": c["chu"], "gram": None} for _, c in tat_ca]
+    chi_muc = _dung_chi_muc(kho_cau) if len(kho_cau) > 120 else {}
     cau_doan = []
     for d in doan:
         for x in danh_dau_trich_dan([d]):
@@ -461,8 +499,12 @@ def so_khop_voi_nguon(doan, nguon, soi_toi_da=400):
     tu_trung = 0.0
     for x in cau_doan:
         c = x["chu"]
+        if chi_muc:
+            ung_vien, _ = _ung_vien_nhanh(c, chi_muc)
+        else:
+            ung_vien = _ung_vien(c, kho_cau)
         tot, giu = None, 0.0
-        for i in _ung_vien(c, kho_cau):
+        for i in ung_vien:
             n, cn = tat_ca[i]
             nhan, diem, nv = loai_cap(c, cn["chu"])
             if diem > giu:
@@ -477,7 +519,7 @@ def so_khop_voi_nguon(doan, nguon, soi_toi_da=400):
                     "doan_chung": doan_chung(c, cn["chu"]),
                     "ty_le_nguyen_van": round(nv, 3), "so_tu": do_dai,
                     "trich_dan": bool(x.get("trich_dan")),
-                    "cau_nguon_url": cn.get("url", "")})
+                    "cau_nguon_url": cn.get("url", "") or n.get("url", "")})
     ket.sort(key=lambda x: -x["diem"])
     ty_le = (tu_trung / float(max(1, tong_tu))) * 100.0
     tk = {"so_cau_xet": len(cau_doan), "so_cau_khop": len([k for k in ket if k["diem"] >= NGUONG_TRUNG]),
@@ -488,9 +530,12 @@ def so_khop_voi_nguon(doan, nguon, soi_toi_da=400):
 
 
 def dung_kho_cau(ten, van_ban, loai="kho", url=""):
-    """Dựng cấu trúc kho câu từ một văn bản nguồn."""
+    """Dựng cấu trúc kho câu từ một văn bản nguồn (giới hạn số câu để chạy nhanh)."""
+    cau = tach_cau_text(van_ban)
+    if len(cau) > 400:
+        cau = sorted(cau, key=lambda x: -len(tach_tu(x)))[:400]
     return {"ten": ten, "loai": loai, "url": url,
-            "cau": [{"chu": c, "url": url} for c in tach_cau_text(van_ban)]}
+            "cau": [{"chu": c, "url": url} for c in cau]}
 
 
 # ------------------------------------------------------------------ so nhiều bài nộp với nhau
@@ -565,12 +610,40 @@ def so_khop_cheo(cac_bai, soi_toi_da=500):
 
 
 # ------------------------------------------------------------------ tìm nguồn trên Internet
+# Mục tiêu: đối chiếu với CÀNG NHIỀU TRANG càng tốt. Toàn bộ Internet thì không công cụ nào
+# quét hết được, nên cách làm ở đây là:
+#   1) Sinh câu hỏi phủ ĐỀU CẢ BÀI (không chỉ 3 câu), mỗi câu hỏi là một cụm nguyên văn
+#      (bọc ngoặc kép) để máy tìm kiếm khớp chính xác.
+#   2) Hỏi NHIỀU nguồn: máy tìm kiếm DuckDuckGo (bản html + bản lite), Wikipedia tiếng Việt,
+#      Google Books (nội dung trong sách) và Google Tin tức — nguồn nào trả lời được thì lấy.
+#   3) Tải về HÀNG TRĂM trang (chạy song song nhiều luồng), có bộ nhớ đệm trên máy chủ để
+#      những lần kiểm tra sau đối chiếu lại được cả những trang đã tải trước đó.
+#   4) So từng câu của bài với TOÀN BỘ số câu của tất cả các trang tải được (dùng chỉ mục
+#      cụm ký tự nên vẫn nhanh với hàng nghìn câu).
+# Chế độ "Sâu" hỏi nhiều câu hơn, tải nhiều trang hơn và chạy lâu hơn (xem CHE_DO).
+CHE_DO = {
+    "tieu_chuan": {"ten": "Tiêu chuẩn", "so_truy_van": 12, "so_ket_qua": 20, "so_trang": 60,
+                   "han_giay": 180, "so_song_song": 8, "trang_moi_mien": 2,
+                   "theo_trang": 1, "so_wiki": 20,
+                   "mo_ta": "khoảng 1–3 phút: 12 câu hỏi phủ cả bài, tối đa 60 trang"},
+    "sau": {"ten": "Sâu", "so_truy_van": 40, "so_ket_qua": 40, "so_trang": 200,
+            "han_giay": 480, "so_song_song": 12, "trang_moi_mien": 4,
+            "theo_trang": 2, "so_wiki": 60,
+            "mo_ta": "khoảng 3–8 phút: 40 câu hỏi, tối đa 200 trang, lần theo liên kết trong trang"},
+}
+
+
+def thong_so_che_do(che_do=None):
+    return dict(CHE_DO.get(che_do or "tieu_chuan") or CHE_DO["tieu_chuan"])
+
+
 UA = {"User-Agent": ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
                      "Chrome/122 Safari/537.36"),
-      "Accept-Language": "vi,en;q=0.8", "Accept": "text/html,application/xhtml+xml"}
+      "Accept-Language": "vi-VN,vi;q=0.9,en;q=0.8", "Accept": "text/html,application/xhtml+xml"}
 DDG = ("https://html.duckduckgo.com/html/", "https://lite.duckduckgo.com/lite/")
 BO_QUA_TEN_MIEN = ("facebook.com", "tiktok.com", "youtube.com", "instagram.com", "pinterest.",
-                   "zalo.me", "shopee.", "lazada.", "google.com/url", "bing.com/ck")
+                   "zalo.me", "shopee.", "lazada.", "google.com/url", "bing.com/ck",
+                   "news.google.com/rss")
 
 
 def _requests():
@@ -591,18 +664,135 @@ def _url_that(u):
     return u
 
 
+# ------------------------------------------------------------------ từ khoá / câu hỏi
+def cau_nghi_van(doan, so=4, it_nhat=8):
+    """Chọn những câu đáng đem đi tra Internet: câu dài, nhiều từ hiếm, chưa nằm trong ngoặc kép."""
+    cau = []
+    for c in doan:
+        for x in tach_cau_text(c):
+            if len(tach_tu(x)) >= it_nhat and not x.strip().startswith(">"):
+                cau.append(x)
+    if not cau:
+        return []
+    idf = _idf_cau(cau)
+
+    def _diem(x):
+        t = tach_tu_noi_dung(x)
+        if not t:
+            return 0.0
+        return sum(idf.get(w, 1.0) for w in t) * math.log1p(len(t))
+
+    cau.sort(key=lambda x: -_diem(x))
+    ra = []
+    for c in cau:
+        if any(_ty_le(tach_tu(c), tach_tu(x)) > 0.6 for x in ra):
+            continue
+        ra.append(c)
+        if len(ra) >= so:
+            break
+    return ra
+
+
+def truy_van_tu_cau(cau, so_tu=12):
+    """Câu truy vấn rộng theo TỪ KHOÁ (giữ dấu) — dùng khi tra cụm nguyên văn không ra kết quả."""
+    giu = [w for w in TOKEN.findall(cau or "") if len(bo_dau(w)) > 1 and bo_dau(w) not in STOP]
+    if not giu:
+        return ""
+    if len(giu) <= so_tu:
+        return " ".join(giu)
+    giua = len(giu) // 2
+    nua = so_tu // 2
+    doan = giu[max(0, giua - nua):giua + nua]
+    if len(doan) < 3:
+        doan = giu[:so_tu]
+    return " ".join(doan)
+
+
+def truy_van_nguyen_van(cau, so_tu=8):
+    """Lấy một CỤM LIỀN NHAU không có dấu câu ở giữa câu để tra cụm nguyên văn (bọc ngoặc kép)."""
+    doan = [x.strip() for x in re.split(r"[,;:.!?…()\[\]\"“”]", chuan_hoa(cau or ""))]
+    doan = [x for x in doan if len(tach_tu(x)) >= 2]
+    if not doan:
+        return ""
+    dai_nhat = max(doan, key=lambda x: len(tach_tu(x)))
+    w = dai_nhat.split()
+    if len(w) <= so_tu:
+        return dai_nhat.strip()
+    giua = max(0, len(w) // 2 - so_tu // 2)
+    return " ".join(w[giua:giua + so_tu]).strip()
+
+
+def sinh_truy_van(doan, toi_da=12, it_nhat=7, toi_thieu=6):
+    """Sinh danh sách câu hỏi PHỦ ĐỀU CẢ BÀI (không chỉ vài câu đầu).
+
+    Cách làm: cắt bài thành `toi_da` khúc theo số từ, mỗi khúc chọn câu "đáng tra" nhất
+    (nhiều từ hiếm, câu dài) rồi lấy cụm nguyên văn ở giữa câu đó. Nhờ vậy phần nào của bài
+    cũng có cơ hội được mang đi đối chiếu.
+    """
+    tat_ca = []
+    for d in doan:
+        for x in danh_dau_trich_dan([d]):
+            if x.get("trich_dan"):        # câu đã ghi nguồn thì không cần tra
+                continue
+            if len(tach_tu(x["chu"])) >= it_nhat:
+                tat_ca.append(x["chu"])
+    if not tat_ca:
+        return []
+    toi_da = max(1, int(toi_da))
+    if len(tat_ca) <= toi_da:
+        return [q for q in (truy_van_nguyen_van(c) for c in tat_ca) if q]
+    idf = _idf_cau(tat_ca)
+
+    def _diem(x):
+        t = tach_tu_noi_dung(x)
+        return (sum(idf.get(w, 1.0) for w in t) * math.log1p(len(t))) if t else 0.0
+
+    tong = sum(len(tach_tu(c)) for c in tat_ca)
+    khuc = [[] for _ in range(toi_da)]
+    da = 0
+    for c in tat_ca:
+        vt = int((da + len(tach_tu(c)) / 2.0) / max(1, tong) * toi_da)
+        khuc[min(toi_da - 1, max(0, vt))].append(c)
+        da += len(tach_tu(c))
+    ra, da_dung = [], set()
+    for k in khuc:
+        if not k:
+            continue
+        chon = max(k, key=_diem)
+        q = truy_van_nguyen_van(chon)
+        if q and q not in da_dung:
+            da_dung.add(q)
+            ra.append(q)
+    # bài ngắn: lấy thêm một cụm KHÁC (lệch về nửa sau câu) để vẫn có nhiều câu hỏi đi tra
+    if len(ra) < min(toi_thieu, len(tat_ca)) and len(tat_ca) <= toi_da:
+        for c in sorted(tat_ca, key=lambda x: -len(tach_tu(x))):
+            w = c.split()
+            if len(w) >= 10:
+                nua = max(1, len(w) // 2)
+                q = " ".join(w[nua:nua + 8]).strip()
+            else:
+                q = truy_van_nguyen_van(c)
+            if q and q not in da_dung and all(_ty_le(tach_tu(q), tach_tu(x)) < 0.7 for x in ra):
+                da_dung.add(q)
+                ra.append(q)
+            if len(ra) >= min(toi_thieu, len(tat_ca) * 2):
+                break
+    return ra
+
+
+# ------------------------------------------------------------------ từng nguồn tìm kiếm
 def _ddg_post(url, truy_van, timeout=15):
-    """Gọi một máy tìm kiếm DuckDuckGo (bản không cần JavaScript) và bóc kết quả."""
+    """Một máy tìm kiếm DuckDuckGo (bản không cần JavaScript). Tự thử lại 1 lần khi bị chặn tạm."""
     import html as _html
     requests = _requests()
     ra = []
     try:
         r = requests.post(url, data={"q": truy_van}, headers=UA, timeout=timeout)
         if r.status_code != 200 or "result__a" not in r.text:
-            time.sleep(2)                  # bị máy tìm kiếm chặn tạm thời → chờ rồi thử lại 1 lần
+            time.sleep(2)
             r = requests.post(url, data={"q": truy_van}, headers=UA, timeout=timeout)
         if r.status_code != 200 or "result__a" not in r.text:
-            return ra, "DuckDuckGo trả về mã %s" % r.status_code
+            return ra, "DuckDuckGo mã %s" % r.status_code
         for b in re.split(r'<div class="result', r.text)[1:]:
             a = re.search(r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', b, re.S)
             if not a:
@@ -619,31 +809,211 @@ def _ddg_post(url, truy_van, timeout=15):
     return ra, ""
 
 
-def _wiki_api(truy_van, so=3, timeout=15):
-    """Tra thẳng Wikipedia tiếng Việt.
+WIKI_API = "https://vi.wikipedia.org/w/api.php"
 
-    Thử CỤM NGUYÊN VĂN trước (khớp chính xác, tỉ lệ tìm đúng trang nguồn rất cao); nếu không ra
-    kết quả nào mới tra theo từ khoá. Wikipedia ổn định hơn máy tìm kiếm với câu tiếng Việt.
+
+def _wiki_search(truy_van, so=20, timeout=15):
+    """Wikipedia tiếng Việt: tìm BÀI chứa cụm nguyên văn (thử cả tìm trong mã nguồn bài).
+
+    Trả về danh sách BÀI THẬT (kèm `wiki` = tên bài) để bước sau tải TOÀN VĂN bằng API —
+    nhanh hơn tải từng trang HTML rất nhiều, nên so được với số lượng bài lớn.
+    """
+    requests = _requests()
+    so = max(1, min(int(so), 50))
+    ds, ghi_chu = [], ""
+    for truy in ('"%s"' % truy_van.strip('"'), 'insource:"%s"' % truy_van.strip('"')[:60],
+                 " ".join(tach_tu_noi_dung(truy_van)[:10])):
+        if not truy.strip():
+            continue
+        try:
+            r = requests.get(WIKI_API, params={"action": "query", "list": "search", "srsearch": truy,
+                                               "format": "json", "srlimit": so, "srnamespace": 0,
+                                               "srprop": "snippet"}, headers=UA, timeout=timeout)
+            if r.status_code != 200:
+                ghi_chu = "Wikipedia mã %s" % r.status_code
+                break
+            ds = ((r.json().get("query") or {}).get("search") or [])
+        except Exception as e:
+            return [], "Wikipedia lỗi %s" % type(e).__name__
+        if ds:
+            break
+    ra = []
+    for x in ds[:so]:
+        ten = x.get("title") or ""
+        if not ten:
+            continue
+        ra.append({"url": "https://vi.wikipedia.org/wiki/" + _lien_wiki(ten), "tieu_de": ten,
+                   "trich": re.sub(r"<[^>]+>", "", x.get("snippet") or "")[:240],
+                   "may_tim": "Wikipedia", "ten_mien": "vi.wikipedia.org", "wiki": ten})
+    return ra, ghi_chu
+
+
+# tên cũ: giữ lại để mã/test cũ vẫn chạy
+def _wiki_api(truy_van, so=3, timeout=15):
+    ra, _ = _wiki_search(truy_van, so=so, timeout=timeout)
+    return [{k: v for k, v in x.items() if k != "wiki"} for x in ra]
+
+
+def _lien_wiki(ten):
+    from urllib.parse import quote
+    return quote((ten or "").replace(" ", "_"), safe="/()!,:._-")
+
+
+def _wiki_noi_dung(ds, timeout=25):
+    """Tải TOÀN VĂN nhiều bài Wikipedia trong MỘT request (API cho 20 bài mỗi lần)."""
+    ten = [x.get("wiki") for x in ds if x.get("wiki")][:20]
+    if not ten:
+        return {}
+    try:
+        r = _requests().get(WIKI_API, params={"action": "query", "prop": "extracts", "explaintext": 1,
+                                              "exlimit": 20, "titles": "|".join(ten), "format": "json",
+                                              "redirects": 1}, headers=UA, timeout=timeout)
+        if r.status_code != 200:
+            return {}
+        ra = {}
+        for v in (((r.json().get("query") or {}).get("pages")) or {}).values():
+            if v.get("extract"):
+                ra[v.get("title")] = v["extract"]
+        return ra
+    except Exception:
+        return {}
+
+
+def _loc_lien_ket(trang, toi_da=3):
+    """Chọn liên kết đáng tải tiếp trong một trang: ưu tiên CÙNG NHÁNH đường dẫn,
+    bỏ trang mục lục / trang đặc biệt / trang chủ."""
+    from urllib.parse import urlparse
+    goc = urlparse(trang.get("url_cuoi") or trang.get("url") or "")
+    nhanh = (goc.path.strip("/").split("/") or [""])[0]
+    ung = []
+    for u in (trang.get("lien_ket") or []):
+        pu = urlparse(u)
+        if pu.netloc.lower() != goc.netloc.lower():
+            continue
+        if not pu.path or pu.path in ("/", "/index.html", "/index.php"):
+            continue
+        if any(x in u for x in ("Trang_Chính", "Đặc_biệt:", "Special:", "Thể_loại:", "Category:")):
+            continue
+        cung = 0 if (nhanh and (pu.path.strip("/").split("/") or [""])[0] == nhanh) else 1
+        ung.append((cung, u))
+    ung.sort(key=lambda x: x[0])
+    return [u for _, u in ung[:max(1, int(toi_da))]]
+
+
+def tai_wiki_nhieu(ds, gio=None, timeout=25):
+    """Tải toàn văn các bài Wikipedia tìm được → coi như những TRANG đã đối chiếu."""
+    gio = gio or (lambda *a, **k: None)
+    ra = []
+    for i in range(0, len(ds), 20):
+        lo = ds[i:i + 20]
+        noi_dung = _wiki_noi_dung(lo, timeout=timeout)
+        for k in lo:
+            chu = noi_dung.get(k.get("wiki")) or ""
+            if len(tach_tu(chu)) < 40:
+                continue
+            ra.append({"url": k["url"], "url_cuoi": k["url"], "chu": chu, "lien_ket": [],
+                       "tieu_de": k.get("tieu_de", ""), "may_tim": "Wikipedia",
+                       "ten_mien": "vi.wikipedia.org", "tu_dem": False, "tu_wiki": True,
+                       "so_tu": len(tach_tu(chu))})
+        gio("tai", "Wikipedia: đã lấy toàn văn %d/%d bài" % (min(i + 20, len(ds)), len(ds)))
+    return ra
+
+
+def _openalex(truy_van, so=10, timeout=20):
+    """OpenAlex: bài báo / công trình khoa học (miễn phí, không cần khoá) — lấy TIÊU ĐỀ + TÓM TẮT."""
+    try:
+        r = _requests().get("https://api.openalex.org/works",
+                            params={"search": truy_van.strip('"'), "per-page": max(1, min(so, 25)),
+                                    "mailto": "eduassist@example.com"}, headers=UA, timeout=timeout)
+        if r.status_code != 200:
+            return [], "OpenAlex mã %d" % r.status_code
+        ra = []
+        for w in (((r.json() or {}).get("results")) or [])[:so]:
+            tom = w.get("abstract_inverted_index")
+            chu_tom = ""
+            if tom:
+                vt = {}
+                for tu, ds_vt in tom.items():
+                    for i in (ds_vt or [])[:12]:
+                        vt[i] = tu
+                chu_tom = " ".join(vt[k] for k in sorted(vt)[:150])
+            doi = w.get("doi") or ((w.get("primary_location") or {}).get("landing_page_url")) or \
+                "https://openalex.org/" + str(w.get("id") or "").rsplit("/", 1)[-1]
+            ra.append({"url": doi, "tieu_de": w.get("title") or "(không có tiêu đề)",
+                       "trich": chu_tom, "may_tim": "OpenAlex", "ten_mien": "openalex.org",
+                       "chi_trich": True})
+        return ra, ""
+    except Exception as e:
+        return [], "OpenAlex lỗi %s" % type(e).__name__
+
+
+def _gbooks(truy_van, so=10, timeout=15):
+    """Tra Google Books — tìm cụm chữ trong SÁCH (nhiều giáo trình, sách tham khảo tiếng Việt).
+
+    Sách không tải về đọc được nên chỉ lấy ĐOẠN TRÍCH mà Google trả về, đủ để thấy cụm chữ
+    có trong sách nào.
     """
     requests = _requests()
     ra = []
-    for truy in (truy_van, truy_van.strip('"')):
+    try:
+        r = requests.get("https://www.googleapis.com/books/v1/volumes", params={
+            "q": truy_van, "maxResults": so, "country": "VN", "hl": "vi"},
+            headers=UA, timeout=timeout)
+        if r.status_code == 429:
+            return ra, "Google Books: hết hạn mức truy vấn trong ngày"
+        if r.status_code != 200:
+            return ra, "Google Books mã %d" % r.status_code
+        for x in (r.json().get("items") or []):
+            v = x.get("volumeInfo") or {}
+            tr = ((x.get("searchInfo") or {}).get("textSnippet") or "")
+            u = (v.get("infoLink") or v.get("canonicalVolumeLink") or "") \
+                or ("https://books.google.com/books?id=" + (x.get("id") or ""))
+            ra.append({"url": u, "tieu_de": (v.get("title") or "Sách") +
+                       ((" — " + ", ".join(v.get("authors") or [])) if v.get("authors") else ""),
+                       "trich": re.sub(r"<[^>]+>", "", tr)[:400], "may_tim": "Google Books",
+                       "chi_trich": True, "ten_mien": "books.google.com"})
+    except Exception as e:
+        return ra, "Google Books lỗi %s" % type(e).__name__
+    return ra, ""
+
+
+def _gnews(truy_van, so=10, timeout=15):
+    """Google Tin tức (RSS): bài báo tiếng Việt cùng chủ đề.
+
+    RSS chỉ trả về TIÊU ĐỀ + tên báo (đường dẫn là trang trung gian của Google), nên kết quả
+    ở đây được dùng làm DANH SÁCH BÀI BÁO CẦN MỞ XEM TAY — không đo được chữ trùng.
+    """
+    requests = _requests()
+    ra = []
+    import html as _html
+    # tra bằng TỪ KHOÁ (Google Tin tức không trả kết quả cho cụm bọc ngoặc kép)
+    for truy in (" ".join(tach_tu_noi_dung(truy_van)[:12]), truy_van.strip('"')):
+        if not truy.strip():
+            continue
         try:
-            r = requests.get("https://vi.wikipedia.org/w/api.php", params={
-                "action": "query", "list": "search", "srsearch": truy, "format": "json",
-                "srlimit": so, "srprop": "snippet"}, headers=UA, timeout=timeout)
-            for x in (r.json().get("query", {}) or {}).get("search", [])[:so]:
-                u = "https://vi.wikipedia.org/wiki/" + x["title"].replace(" ", "_")
-                if any(k["url"] == u for k in ra):
+            r = requests.get("https://news.google.com/rss/search", params={
+                "q": truy, "hl": "vi", "gl": "VN", "ceid": "VN:vi"}, headers=UA, timeout=timeout)
+            if r.status_code != 200:
+                return ra, "Google Tin tức mã %s" % r.status_code
+            for b in re.findall(r"<item>(.*?)</item>", r.text, re.S)[:so]:
+                t = re.search(r"<title>(.*?)</title>", b, re.S)
+                l = re.search(r"<link>(.*?)</link>", b, re.S)
+                nguon = re.search(r'<source url="([^"]+)"', b)
+                ngay = re.search(r"<pubDate>(.*?)</pubDate>", b, re.S)
+                if not l:
                     continue
-                ra.append({"url": u, "tieu_de": x["title"],
-                           "trich": re.sub(r"<[^>]+>", "", x.get("snippet", ""))[:240],
-                           "may_tim": "Wikipedia"})
-        except Exception:
-            pass
-        if len(ra) >= so:
+                ten_bao = re.sub(r"^https?://(www\.)?", "", (nguon.group(1) if nguon else "")).strip("/")
+                ra.append({"url": _html.unescape(l.group(1)).strip(),
+                           "tieu_de": _html.unescape(re.sub(r"<[^>]+>", "",
+                                                            t.group(1)))[:160] if t else "",
+                           "trich": "", "may_tim": "Google Tin tức", "chi_trich": True,
+                           "tin": True, "ten_bao": ten_bao, "ten_mien": "news.google.com",
+                           "ngay": (ngay.group(1).strip()[:16] if ngay else "")})
+        except Exception as e:
+            return ra, "Google Tin tức lỗi %s" % type(e).__name__
+        if ra:
             break
-    return ra
+    return ra, ""
 
 
 def diem_lien_quan(truy_van, ket_qua, so_tu=6):
@@ -655,27 +1025,78 @@ def diem_lien_quan(truy_van, ket_qua, so_tu=6):
     return len(tu & chung) / float(min(len(tu), so_tu * 2))
 
 
-def tim_nguon(truy_van, so=8, timeout=15):
-    """Tìm nguồn trên Internet cho MỘT câu truy vấn.
+NGUON_TIM = {"ddg": "DuckDuckGo", "ddg_lite": "DuckDuckGo (bản nhẹ)", "wiki": "Wikipedia",
+             "gbooks": "Google Books", "gnews": "Google Tin tức", "openalex": "OpenAlex"}
+_SUC_KHOE = {}          # mã nguồn → (số lỗi liên tiếp, lúc lỗi cuối) để tạm bỏ nguồn đang chặn
 
-    Gọi DuckDuckGo (bản html, nếu ít kết quả thì gọi thêm bản lite) + tra thẳng Wikipedia
-    tiếng Việt, rồi xếp theo mức liên quan với câu truy vấn. Trả về (danh sách, ghi chú).
+
+def _nguon_ok(ma, cho_giay=300):
+    dem, luc = _SUC_KHOE.get(ma, (0, 0))
+    if dem < 2:
+        return True
+    return (time.time() - luc) > cho_giay       # thử lại sau một lúc
+
+
+def _nguon_xong(ma, duoc):
+    if duoc:
+        _SUC_KHOE.pop(ma, None)
+    else:
+        dem, _ = _SUC_KHOE.get(ma, (0, 0))
+        _SUC_KHOE[ma] = (dem + 1, time.time())
+
+
+def tim_nhieu_nguon(truy_van, so=20, timeout=15, nguon=None):
+    """Hỏi NHIỀU nguồn tìm kiếm rồi gộp kết quả (bỏ trùng theo đường dẫn).
+
+    Nguồn nào đang bị chặn/hết hạn mức thì tạm bỏ qua trong 5 phút để không làm chậm lượt chạy.
+    Trả về (danh sách kết quả, ghi chú) — ghi chú nói rõ nguồn nào không trả lời được.
     """
+    nguon = nguon or ("ddg", "wiki", "ddg_lite", "gnews", "gbooks", "openalex")
     ra, ghi_chu = [], []
-    kq1, gc = _ddg_post(DDG[0], truy_van, timeout)
-    ra += kq1
-    if len(kq1) < 4:                       # máy tìm kiếm trả ít → thử tiếp bản lite
-        kq2, gc2 = _ddg_post(DDG[1], truy_van, timeout)
-        ra += kq2
-        gc = gc or gc2
-    if gc:
-        ghi_chu.append(gc)
-    ra += _wiki_api(truy_van, so=3, timeout=timeout)
-    for k in ra:
-        k["lien_quan"] = diem_lien_quan(truy_van, k)
+    for ma in nguon:
+        ten = NGUON_TIM.get(ma, ma)
+        if not _nguon_ok(ma):
+            ghi_chu.append("%s: tạm bỏ qua (vừa bị chặn)" % ten)
+            continue
+        try:
+            if ma in ("ddg", "ddg_lite"):
+                kq, gc = _ddg_post(DDG[0 if ma == "ddg" else 1], truy_van, timeout)
+            elif ma == "wiki":
+                kq, gc = _wiki_search(truy_van, so=min(20, max(5, so)), timeout=timeout)
+            elif ma == "gbooks":
+                kq, gc = _gbooks(truy_van, so=8, timeout=timeout)
+            elif ma == "gnews":
+                kq, gc = _gnews(truy_van, so=10, timeout=timeout)
+            elif ma == "openalex":
+                kq, gc = _openalex(truy_van, so=10, timeout=timeout)
+            else:
+                kq, gc = [], ""
+        except Exception as e:
+            kq, gc = [], "%s lỗi %s" % (ten, type(e).__name__)
+        if gc:
+            ghi_chu.append(gc)
+        _nguon_xong(ma, bool(kq))
+        ra += kq
     du, ra2 = set(), []
-    for k in sorted(ra, key=lambda x: -x["lien_quan"]):
-        ten_mien = re.sub(r"^www\.", "", re.sub(r"^https?://([^/]+).*$", r"\1", k["url"]))
+    for k in ra:
+        u = (k.get("url") or "").split("#")[0]
+        if not u or u in du:
+            continue
+        du.add(u)
+        k["lien_quan"] = diem_lien_quan(truy_van, k)
+        ra2.append(k)
+    ra2.sort(key=lambda x: -x["lien_quan"])
+    return ra2[:max(10, int(so))], "; ".join(dict.fromkeys(ghi_chu))
+
+
+# tên cũ: giữ lại để mã/test cũ vẫn chạy
+def tim_nguon(truy_van, so=8, timeout=15):
+    """(Giữ tên cũ) Tìm nguồn cho một câu truy vấn, bỏ trùng theo tên miền."""
+    ra, gc = tim_nhieu_nguon(truy_van, so=so, timeout=timeout)
+    du, ra2 = set(), []
+    for k in ra:
+        ten_mien = k.get("ten_mien") or re.sub(r"^www\.", "",
+                                               re.sub(r"^https?://([^/]+).*$", r"\1", k["url"]))
         if any(x in k["url"] for x in BO_QUA_TEN_MIEN):
             continue
         if ten_mien in du:
@@ -683,9 +1104,10 @@ def tim_nguon(truy_van, so=8, timeout=15):
         du.add(ten_mien)
         k["ten_mien"] = ten_mien
         ra2.append(k)
-    return ra2[:so], "; ".join(ghi_chu)
+    return ra2[:so], gc
 
 
+# ------------------------------------------------------------------ tải trang + bộ nhớ đệm
 def lam_sach_html(du_lieu):
     """Lấy chữ đọc được từ HTML (bỏ script/style/menu/chân trang)."""
     try:
@@ -698,21 +1120,55 @@ def lam_sach_html(du_lieu):
     for xau in ("script", "style", "noscript", "svg", "nav", "header", "footer", "form",
                 "iframe", "aside", "button"):
         for e in cay.xpath("//" + xau):
-            e.getparent().remove(e)
+            try:
+                e.getparent().remove(e)
+            except Exception:
+                pass
     chu = " ".join(cay.itertext())
     return chuan_hoa(chu)
 
 
-def tai_trang(url, timeout=12, toi_da=TOI_DA_BYTE_TRANG):
-    """Tải một trang và trả về (chữ, lỗi). Bỏ qua tệp nhị phân; giới hạn dung lượng."""
+_LIEN_KET = {}          # url → các liên kết nội bộ trong trang đó (để mở rộng phạm vi tải)
+
+
+def _lien_ket_noi_bo(du_lieu, goc, toi_da=30):
+    """Lấy các liên kết CÙNG TÊN MIỀN trong một trang HTML (để lần theo, mở rộng phạm vi)."""
+    from urllib.parse import urljoin, urlparse
+    try:
+        from lxml import html as LH
+        cay = LH.fromstring(du_lieu if isinstance(du_lieu, bytes) else du_lieu.encode("utf-8"))
+    except Exception:
+        return []
+    host = urlparse(goc).netloc.lower()
+    ra, du = [], set()
+    for a in cay.xpath("//a[@href]"):
+        u = urljoin(goc, (a.get("href") or "").strip())
+        if not u.lower().startswith("http") or urlparse(u).netloc.lower() != host:
+            continue
+        u = u.split("#")[0]
+        if u == goc.split("#")[0] or u in du:
+            continue
+        if any(u.lower().endswith(x) for x in (".jpg", ".png", ".gif", ".pdf", ".zip", ".mp4", ".doc",
+                                              ".docx", ".xls", ".xlsx", ".ppt", ".pptx")):
+            continue
+        du.add(u)
+        ra.append(u)
+        if len(ra) >= toi_da:
+            break
+    return ra
+
+
+def tai_trang(url, timeout=12, toi_da=TOI_DA_BYTE_TRANG, tra_ve_url=False):
+    """Tải một trang → (chữ, lỗi) hoặc (chữ, lỗi, địa_chỉ_cuối). Bỏ tệp nhị phân, giới hạn dung lượng."""
     requests = _requests()
     try:
         r = requests.get(url, headers=UA, timeout=timeout, stream=True, allow_redirects=True)
         if r.status_code != 200:
-            return "", "mã %s" % r.status_code
+            return ("", "mã %s" % r.status_code, r.url) if tra_ve_url else ("", "mã %s" % r.status_code)
         ct = (r.headers.get("Content-Type") or "").lower()
         if ct and not any(x in ct for x in ("text/html", "text/plain", "application/xhtml")):
-            return "", "không phải trang chữ (%s)" % ct.split(";")[0]
+            loi = "không phải trang chữ (%s)" % ct.split(";")[0]
+            return ("", loi, r.url) if tra_ve_url else ("", loi)
         du, da = b"", 0
         for phan in r.iter_content(32 * 1024):
             du += phan
@@ -720,141 +1176,312 @@ def tai_trang(url, timeout=12, toi_da=TOI_DA_BYTE_TRANG):
             if da >= toi_da:
                 break
         if not du:
-            return "", "trang rỗng"
-        return lam_sach_html(du), ""
+            return ("", "trang rỗng", r.url) if tra_ve_url else ("", "trang rỗng")
+        chu = lam_sach_html(du)
+        _LIEN_KET[url] = _lien_ket_noi_bo(du, r.url or url)
+        return (chu, "", r.url) if tra_ve_url else (chu, "")
     except Exception as e:
-        return "", "lỗi %s" % type(e).__name__
+        loi = "lỗi %s" % type(e).__name__
+        return ("", loi, url) if tra_ve_url else ("", loi)
 
 
-def cau_nghi_van(doan, so=4, it_nhat=8):
-    """Chọn những câu đáng đem đi tra Internet: câu dài, nhiều từ hiếm, chưa nằm trong ngoặc kép."""
-    cau = []
-    for c in doan:
-        for x in tach_cau_text(c):
-            if len(tach_tu(x)) >= it_nhat and not x.strip().startswith(">"):
-                cau.append(x)
-    if not cau:
-        return []
-    idf = _idf_cau(cau)
-    def _diem(x):
-        t = tach_tu_noi_dung(x)
-        if not t:
-            return 0.0
-        return sum(idf.get(w, 1.0) for w in t) * math.log1p(len(t))
-    cau.sort(key=lambda x: -_diem(x))
-    ra = []
-    for c in cau:
-        if any(_ty_le(tach_tu(c), tach_tu(x)) > 0.6 for x in ra):
-            continue
-        ra.append(c)
-        if len(ra) >= so:
-            break
-    return ra
+def _thu_muc_dem():
+    p = Path(os.environ.get("DB_DIR", "data")) / "trunglap-cache"
+    try:
+        p.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+    return p
 
 
-def truy_van_tu_cau(cau, so_tu=12):
-    """Biến một câu thành câu truy vấn đưa ra Internet: 10–12 từ NỘI DUNG liền nhau, GIỮ NGUYÊN DẤU.
+def _dem_khoa(url):
+    import hashlib
+    return hashlib.sha1((url or "").encode("utf-8")).hexdigest()
 
-    Giữ dấu là bắt buộc: máy tìm kiếm với tiếng Việt không dấu trả về kết quả gần như ngẫu nhiên.
-    Lấy đoạn ở giữa câu vì đó thường là chỗ ít bị sửa nhất khi chép.
+
+def doc_dem(url, toi_da_ngay=45):
+    """Đọc lại trang đã tải trước đây (bộ nhớ đệm trên máy chủ) — giúp lần sau đối chiếu được
+    cả những trang đã từng tải mà không cần tải lại."""
+    p = _thu_muc_dem() / (_dem_khoa(url) + ".txt")
+    if not p.exists():
+        return None
+    try:
+        if (time.time() - p.stat().st_mtime) > toi_da_ngay * 86400:
+            return None
+        chu = p.read_text(encoding="utf-8")
+        return chu if len(tach_tu(chu)) >= 40 else None
+    except Exception:
+        return None
+
+
+def ghi_dem(url, chu):
+    try:
+        p = _thu_muc_dem() / (_dem_khoa(url) + ".txt")
+        p.write_text(chu[:400_000], encoding="utf-8")
+        _don_dem()
+    except Exception:
+        pass
+
+
+def _don_dem(toi_da_tep=800):
+    try:
+        p = _thu_muc_dem()
+        tep = sorted(p.glob("*.txt"), key=lambda x: x.stat().st_mtime)
+        for f in tep[:-toi_da_tep] if len(tep) > toi_da_tep else []:
+            f.unlink()
+    except Exception:
+        pass
+
+
+def tai_nhieu_trang(ds, so_song_song=8, gio=None, timeout=12):
+    """Tải nhiều trang CÙNG LÚC (nhiều luồng) — trả về (tải_được, không_tải_được).
+
+    Mỗi trang tải về được lưu vào bộ nhớ đệm để lần kiểm tra sau dùng lại.
     """
-    giu = [w for w in TOKEN.findall(cau or "") if len(bo_dau(w)) > 1 and bo_dau(w) not in STOP]
-    if not giu:
-        return ""
-    if len(giu) <= so_tu:
-        return " ".join(giu)
-    giua = len(giu) // 2
-    nua = so_tu // 2
-    doan = giu[max(0, giua - nua):giua + nua]
-    if len(doan) < 3:                     # câu rất ngắn: lấy từ đầu
-        doan = giu[:so_tu]
-    return " ".join(doan)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    gio = gio or (lambda *a, **k: None)
+    ra, loi, hang_doi = [], [], []
+    for k in ds:
+        chu = doc_dem(k["url"])
+        if chu:
+            ra.append({"url": k["url"], "url_cuoi": k["url"], "chu": chu, "lien_ket": [],
+                       "tieu_de": k.get("tieu_de", ""), "may_tim": k.get("may_tim", ""),
+                       "ten_mien": k.get("ten_mien", ""), "tu_dem": True,
+                       "so_tu": len(tach_tu(chu))})
+        else:
+            hang_doi.append(k)
+    if not hang_doi:
+        return ra, loi
+    gio("tien_do", "dùng lại %d trang trong bộ nhớ đệm, tải %d trang mới" % (len(ra), len(hang_doi)))
+    with ThreadPoolExecutor(max_workers=max(2, int(so_song_song))) as pool:
+        viec = {pool.submit(tai_trang, k["url"], timeout, TOI_DA_BYTE_TRANG, True): k for k in hang_doi}
+        for f in as_completed(viec):
+            k = viec[f]
+            try:
+                chu, loi_t, url_cuoi = f.result()
+            except Exception as e:
+                chu, loi_t, url_cuoi = "", "lỗi %s" % type(e).__name__, k["url"]
+            if loi_t or len(tach_tu(chu)) < 40:
+                loi.append({"url": k["url"], "ly_do": loi_t or "trang quá ít chữ"})
+                continue
+            ghi_dem(k["url"], chu)
+            ra.append({"url": k["url"], "url_cuoi": url_cuoi or k["url"], "chu": chu,
+                       "lien_ket": _LIEN_KET.pop(k["url"], []),
+                       "tieu_de": k.get("tieu_de", ""), "may_tim": k.get("may_tim", ""),
+                       "ten_mien": k.get("ten_mien", ""), "tu_dem": False,
+                       "so_tu": len(tach_tu(chu))})
+            gio("tai", "%s (%d từ)" % (k["url"][:90], len(tach_tu(chu))))
+    ra.sort(key=lambda x: -x["so_tu"])
+    return ra, loi
 
 
-def truy_van_nguyen_van(cau, so_tu=8):
-    """Lấy một CỤM LIỀN NHAU không có dấu câu ở giữa câu để tra cụm nguyên văn (bọc ngoặc kép).
+# ------------------------------------------------------------------ pipeline đối chiếu Internet
+def doi_chieu_internet(doan, ghi_de=(), che_do="tieu_chuan", gio=None, so_truy_van=None,
+                       so_trang=None, han_giay=None, so_ket_qua=None, so_song_song=None,
+                       trang_moi_mien=None):
+    """Tra Internet rồi so văn bản với TẤT CẢ các trang tải được.
 
-    Tra cụm nguyên văn chính xác hơn hẳn tra cả câu: máy tìm kiếm và Wikipedia đều có chế độ
-    khớp đúng cụm, mà câu chép lại thường chỉ bị đổi vài chỗ nên cụm giữa câu hay còn nguyên.
-    """
-    doan = [x.strip() for x in re.split(r"[,;:.!?…()\[\]\"“”]", chuan_hoa(cau or ""))]
-    doan = [x for x in doan if len(tach_tu(x)) >= 2]
-    if not doan:
-        return ""
-    dai_nhat = max(doan, key=lambda x: len(tach_tu(x)))
-    w = dai_nhat.split()
-    if len(w) <= so_tu:
-        return dai_nhat.strip()
-    giua = max(0, len(w) // 2 - so_tu // 2)
-    return " ".join(w[giua:giua + so_tu]).strip()
-
-
-def doi_chieu_internet(doan, ghi_de=(), so_truy_van=3, so_trang=TOI_DA_TRANG,
-                       han_giay=75, gio=None, so_ket_qua=10):
-    """Tra Internet rồi so văn bản với những trang tải về được.
-
-    `ghi_de`: hàm nhận (sự_kiện, dữ_liệu) để ghi nhật ký hiển thị cho người dùng.
-    Trả về dict kết quả (đã gồm cả trường hợp không tải được nguồn nào).
+    Trả về dict kết quả (gồm cả trường hợp không tải được nguồn nào).
     """
     t0 = time.time()
     gio = gio or (lambda *a, **k: None)
-    nghi = cau_nghi_van(doan, so=max(2, so_truy_van))
-    kq = {"bat": True, "truy_van": [], "tim_thay": [], "tai_duoc": [], "khong_tai_duoc": [],
-          "lay_duoc_nguon": False, "ghi_chu": "", "giay": 0}
-    if not nghi:
-        kq["ghi_chu"] = ("Không có câu nào đủ dài để tra Internet (cần câu từ 8 từ trở lên). "
-                         "Thầy/cô có thể dán đoạn văn dài hơn.")
+    ts = thong_so_che_do(che_do)
+    if so_truy_van is not None:
+        ts["so_truy_van"] = so_truy_van
+    if so_trang is not None:
+        ts["so_trang"] = so_trang
+    if han_giay is not None:
+        ts["han_giay"] = han_giay
+    if so_ket_qua is not None:
+        ts["so_ket_qua"] = so_ket_qua
+    if so_song_song is not None:
+        ts["so_song_song"] = so_song_song
+    if trang_moi_mien is not None:
+        ts["trang_moi_mien"] = trang_moi_mien
+    kq = {"bat": True, "che_do": che_do if che_do in CHE_DO else "tieu_chuan",
+          "ten_che_do": ts["ten"], "truy_van": [], "tim_thay": [], "tai_duoc": [],
+          "khong_tai_duoc": [], "lay_duoc_nguon": False, "ghi_chu": "", "giay": 0,
+          "so_cau_hoi": 0, "so_ket_qua": 0, "so_trang_tai": 0, "so_trang_dem": 0,
+          "so_may_tim": [], "nguon_ngan": [], "tk": {}, "bang": [],
+          "nguon_kq": {}, "tin_lien_quan": [], "so_trang_theo_lien_ket": 0}
+    het_gio = lambda: (time.time() - t0) > ts["han_giay"]
+
+    cau_hoi = sinh_truy_van(doan, toi_da=ts["so_truy_van"])
+    if not cau_hoi:
+        kq["ghi_chu"] = ("Không có câu nào đủ dài để tra Internet (cần câu từ 7 từ trở lên, "
+                         "không nằm trong phần trích dẫn).")
         return kq
-    kho, da_tai = [], []
-    for c in nghi:
-        if time.time() - t0 > han_giay:
-            kq["ghi_chu"] = "Hết thời gian tra Internet, đã dừng ở phần tìm được."
+    kq["so_cau_hoi"] = len(cau_hoi)
+    gio("buoc", "sinh %d câu hỏi phủ đều cả bài → tra %d nguồn tìm kiếm (%s)"
+        % (len(cau_hoi), len(NGUON_TIM), ", ".join(NGUON_TIM.values())))
+
+    tat_ca, da_co, ghi_chu = [], set(), []
+    for i, c in enumerate(cau_hoi):
+        if het_gio():
+            ghi_chu.append("hết thời gian tra cứu ở câu %d/%d" % (i + 1, len(cau_hoi)))
             break
-        q = truy_van_nguyen_van(c)          # cụm nguyên văn → khớp chính xác
-        if not q:
-            continue
-        q = '"%s"' % q
+        q = '"%s"' % c
+        gio("truy_van", "%d/%d — %s" % (i + 1, len(cau_hoi), q))
         kq["truy_van"].append(q)
-        gio("truy_van", q)
-        thay, gc = tim_nguon(q, so=so_ket_qua)
-        if not thay:                        # không ra gì → tra rộng theo từ khoá
+        thay, gc = tim_nhieu_nguon(q, so=ts["so_ket_qua"])
+        if gc:
+            ghi_chu.append(gc)
+        if not thay:                        # cụm nguyên văn không ra gì → tra rộng theo từ khoá
             q2 = truy_van_tu_cau(c)
             if q2:
                 kq["truy_van"].append(q2)
-                gio("truy_van", q2)
-                thay, gc = tim_nguon(q2, so=so_ket_qua)
-        kq["tim_thay"] = thay
-        if gc:
-            kq["ghi_chu"] = (kq["ghi_chu"] + "; " + gc).strip("; ")
-        for k in kq["tim_thay"]:
-            if len(da_tai) >= so_trang or time.time() - t0 > han_giay:
-                break
-            if k["url"] in da_tai:
+                thay, _ = tim_nhieu_nguon(q2, so=ts["so_ket_qua"])
+        moi = 0
+        for k in thay:
+            u = k["url"].split("#")[0]
+            if u in da_co:
                 continue
-            da_tai.append(k["url"])
-            gio("tai", k["url"])
-            chu, loi = tai_trang(k["url"])
-            if loi or len(tach_tu(chu)) < 40:
-                kq["khong_tai_duoc"].append({"url": k["url"], "ly_do": loi or "trang quá ít chữ"})
-                continue
-            kq["tai_duoc"].append({"url": k["url"], "tieu_de": k["tieu_de"],
-                                   "so_tu": len(tach_tu(chu)), "may_tim": k["may_tim"]})
-            kho.append(dung_kho_cau(k["tieu_de"] or k["ten_mien"], chu, loai="Internet", url=k["url"]))
-    kq["lay_duoc_nguon"] = bool(kho)
-    if kho:
-        bang, tk = so_khop_voi_nguon(doan, kho)
-        kq["bang"] = bang
-        kq["tk"] = tk
+            da_co.add(u)
+            tat_ca.append(k)
+            kq["nguon_kq"][k.get("may_tim") or "khác"] = kq["nguon_kq"].get(k.get("may_tim") or "khác", 0) + 1
+            moi += 1
+        gio("ket_qua", "câu %d: thêm %d kết quả (tổng %d)" % (i + 1, moi, len(tat_ca)))
+
+    kq["tim_thay"] = tat_ca[:300]
+    kq["so_ket_qua"] = len(tat_ca)
+    # chọn trang để tải: ưu tiên liên quan + đa dạng tên miền, chừa chỗ cho nguồn trích sẵn
+    dem_mien, chon, tam_tin = {}, [], []
+    for k in tat_ca:
+        if k.get("tin"):
+            tam_tin.append(k)
+        if het_gio():
+            break
+        if k.get("chi_trich"):              # Google Books: chỉ có đoạn trích, không tải được
+            if k.get("trich") and len(tach_tu(k["trich"])) >= 8:
+                kq["nguon_ngan"].append(k)
+            continue
+        if len(chon) >= ts["so_trang"]:
+            break
+        tm = k.get("ten_mien") or re.sub(r"^www\.", "", re.sub(r"^https?://([^/]+).*$", r"\1", k["url"]))
+        k["ten_mien"] = tm
+        if any(x in k["url"] for x in BO_QUA_TEN_MIEN):
+            continue
+        if dem_mien.get(tm, 0) >= ts["trang_moi_mien"]:
+            continue
+        dem_mien[tm] = dem_mien.get(tm, 0) + 1
+        chon.append(k)
+    gio("buoc", "chọn %d trang để tải về (trong %d kết quả, tối đa %d trang)"
+        % (len(chon), len(tat_ca), ts["so_trang"]))
+
+    tai_duoc, khong_tai = [], []
+    # Wikipedia: tải TOÀN VĂN các bài tìm được (nhanh, mỗi request 20 bài) — đối chiếu được
+    # với hàng chục bài bách khoa chứ không phải chỉ vài trang HTML
+    _wiki_ds = [k for k in tat_ca if k.get("wiki")][:int(ts.get("so_wiki", 0) or 0)]
+    if _wiki_ds and not het_gio():
+        gio("buoc", "tải toàn văn %d bài Wikipedia tìm được" % len(_wiki_ds))
+        try:
+            tai_duoc += tai_wiki_nhieu(_wiki_ds, gio=gio)
+        except Exception as e:
+            ghi_chu.append("Wikipedia: không lấy được toàn văn bài (%s)" % type(e).__name__)
+    con = max(0, ts["so_trang"] - len(tai_duoc))
+    for i in range(0, len(chon), max(2, ts["so_song_song"])):
+        if het_gio() or con <= 0:
+            ghi_chu.append("hết thời gian tải trang — đã tải %d trang" % len(tai_duoc))
+            break
+        lo = chon[i:i + max(2, ts["so_song_song"])][:con]
+        d, l = tai_nhieu_trang(lo, so_song_song=ts["so_song_song"], gio=gio)
+        tai_duoc += d
+        khong_tai += l
+        con = ts["so_trang"] - len(tai_duoc)
+        kq["so_may_tim"] = sorted({x["may_tim"] for x in tai_duoc if x.get("may_tim")})
+        gio("tien_do", "đã tải %d/%d trang · %d lỗi · %.0f giây"
+            % (len(tai_duoc), ts["so_trang"], len(khong_tai), time.time() - t0))
+
+    # BƯỚC 1: so bài với những gì đã tải được (toàn văn Wikipedia + trang tải về + đoạn trích)
+    def _dung_kho(ds):
+        k = []
+        for x in ds:
+            k.append(dung_kho_cau(x["tieu_de"] or x["ten_mien"] or x["url"], x["chu"],
+                                  loai="Internet", url=x["url"]))
+        for z in kq["nguon_ngan"]:          # đoạn trích sách/báo/tóm tắt: so trong phạm vi đoạn trích
+            k.append(dung_kho_cau((z.get("tieu_de") or "")[:120] or z.get("may_tim", ""), z.get("trich") or "",
+                                  loai="Internet (%s)" % z.get("may_tim", ""), url=z.get("url", "")))
+        return k
+
+    kq["tin_lien_quan"] = [{"tieu_de": k.get("tieu_de", ""), "ten_bao": k.get("ten_bao", ""),
+                            "url": k.get("url", ""), "ngay": k.get("ngay", "")}
+                           for k in tam_tin if k.get("tin")][:20]
+    kq["lay_duoc_nguon"] = bool(tai_duoc or kq["nguon_ngan"])
+    if kq["lay_duoc_nguon"]:
+        gio("so", "bước 1: so bài với %d nguồn (%d trang + %d đoạn trích)…"
+            % (len(tai_duoc), len(tai_duoc), len(kq["nguon_ngan"])))
+        ban1, tk1 = so_khop_voi_nguon(doan, _dung_kho(tai_duoc))
+        kq["bang"], kq["tk"] = ban1, tk1
+
+        # BƯỚC 2 (mở rộng phạm vi): lần theo LIÊN KẾT trong những trang ĐÃ CÓ CÂU KHỚP —
+        # những trang cùng website với nguồn chép thường chứa bài gốc hoặc các bài cùng chuyên mục
+        theo = int(ts.get("theo_trang", 0) or 0)
+        if theo and ban1 and not het_gio() and len(tai_duoc) < ts["so_trang"]:
+            mien_khop = set()
+            for k in ban1:
+                m = re.sub(r"^https?://(www\.)?([^/]+).*$", r"\2", k.get("cau_nguon_url") or "")
+                if m:
+                    mien_khop.add(m)
+            da_co_url = set()
+            for x in tai_duoc:
+                da_co_url.add(x["url"])
+                da_co_url.add(x.get("url_cuoi") or "")
+            for k in chon:
+                da_co_url.add(k["url"])
+            them = []
+            for x in tai_duoc:
+                tm = x.get("ten_mien") or ""
+                if tm not in mien_khop or "wikipedia.org" in tm:
+                    continue
+                n = 0
+                for u in _loc_lien_ket(x, theo):
+                    if n >= theo or len(them) >= ts["so_trang"] - len(tai_duoc) or het_gio():
+                        break
+                    if u in da_co_url:
+                        continue
+                    da_co_url.add(u)
+                    them.append({"url": u, "tieu_de": (x.get("tieu_de") or "")[:60] + " — trang cùng website",
+                                 "may_tim": "Mở rộng theo liên kết", "ten_mien": tm})
+                    n += 1
+            if them:
+                gio("buoc", "bước 2: tải thêm %d trang CÙNG WEBSITE với nguồn đã khớp" % len(them))
+                for i in range(0, len(them), max(2, ts["so_song_song"])):
+                    if het_gio():
+                        break
+                    d, l = tai_nhieu_trang(them[i:i + max(2, ts["so_song_song"])],
+                                           so_song_song=ts["so_song_song"], gio=gio)
+                    tai_duoc += d
+                    khong_tai += l
+                kq["so_trang_theo_lien_ket"] = len([y for y in tai_duoc
+                                                    if y.get("may_tim") == "Mở rộng theo liên kết"])
+                if kq["so_trang_theo_lien_ket"]:
+                    gio("so", "bước 2: so lại với %d trang (thêm %d trang cùng website)…"
+                        % (len(tai_duoc), kq["so_trang_theo_lien_ket"]))
+                    kq["bang"], kq["tk"] = so_khop_voi_nguon(doan, _dung_kho(tai_duoc))
     else:
-        kq["bang"], kq["tk"] = [], {"so_cau_xet": 0, "so_cau_khop": 0, "so_tu": 0,
-                                    "ty_le_trung": 0.0, "nguyen_van": 0, "doi_tu": 0}
+        kq["tk"] = {"so_cau_xet": 0, "so_cau_khop": 0, "so_tu": 0, "ty_le_trung": 0.0,
+                    "nguyen_van": 0, "doi_tu": 0}
+
+    kq["tai_duoc"] = [{"url": x["url"], "url_cuoi": x.get("url_cuoi", ""), "tieu_de": x["tieu_de"],
+                       "so_tu": x["so_tu"], "may_tim": x["may_tim"], "ten_mien": x["ten_mien"],
+                       "tu_dem": x["tu_dem"], "toan_van_wiki": bool(x.get("tu_wiki"))} for x in tai_duoc]
+    kq["khong_tai_duoc"] = khong_tai
+    kq["so_trang_tai"] = len(tai_duoc)
+    kq["so_trang_dem"] = len([x for x in tai_duoc if x["tu_dem"]])
+    kq["so_may_tim"] = sorted({x["may_tim"] for x in tai_duoc if x.get("may_tim")})
     kq["giay"] = int(time.time() - t0)
     if not kq["lay_duoc_nguon"]:
-        kq["ghi_chu"] = ((kq["ghi_chu"] + "; ") if kq["ghi_chu"] else "") + \
-            ("Đã tra Internet nhưng chưa tải được trang nào để so (máy tìm kiếm không trả kết quả "
-             "hoặc các trang chặn truy cập tự động). Kết quả bên dưới chỉ là đối chiếu trong kho của thầy/cô.")
+        ghi_chu.append("Đã tra %d câu hỏi qua các nguồn tìm kiếm nhưng chưa tải được trang nào để so "
+                       "(nguồn chặn truy cập tự động hoặc không có kết quả). Kết quả bên dưới chỉ là "
+                       "đối chiếu trong kho của thầy/cô." % len(kq["truy_van"]))
+    if kq["nguon_kq"]:
+        gio("so", "kết quả theo từng nguồn: " + ", ".join(
+            "%s %d" % (t, n) for t, n in sorted(kq["nguon_kq"].items(), key=lambda x: -x[1])))
+    kq["ghi_chu"] = "; ".join(dict.fromkeys([x for x in ghi_chu if x]))[:600]
+    gio("xong", "tra %d câu hỏi · %d kết quả · tải %d trang · %d câu nghi trùng · %d giây"
+        % (len(kq["truy_van"]), kq["so_ket_qua"], kq["so_trang_tai"], kq["tk"]["so_cau_khop"],
+           kq["giay"]))
     return kq
-
 
 # ------------------------------------------------------------------ trích dẫn hợp lệ
 TRICH_DAN = ("nguồn:", "theo ", "trích", "dẫn theo", "tài liệu tham khảo", "trích dẫn",
@@ -981,6 +1608,9 @@ def gop_internet(kq, it):
     kq["bang"] = bang
     kq["tk"]["ty_le_trung_kho"] = kq["tk"].get("ty_le_trung_kho", kq["tk"]["ty_le_trung"])
     kq["tk"]["ty_le_trung_internet"] = (it.get("tk") or {}).get("ty_le_trung", 0.0)
+    kq["tk"]["so_cau_hoi"] = it.get("so_cau_hoi", 0)
+    kq["tk"]["so_ket_qua"] = it.get("so_ket_qua", 0)
+    kq["tk"]["so_trang_tai"] = it.get("so_trang_tai", 0)
     kq["tk"]["ty_le_trung"] = round(max(kq["tk"]["ty_le_trung_kho"],
                                          kq["tk"]["ty_le_trung_internet"]), 1)
     kq["muc"], kq["mau"] = muc_do(kq["tk"]["ty_le_trung"])
@@ -1055,6 +1685,16 @@ def _chuan_bi_du_lieu_docx(kq):
             d["bang"].append([k["nhan"], "%.0f%%" % (k["diem"] * 100),
                               k["nguon"] + (("\n" + k["cau_nguon_url"]) if k.get("cau_nguon_url") else ""),
                               k["cau"], k["doan_chung"]])
+        _it = kq.get("internet") or {}
+        if _it.get("so_cau_hoi"):
+            d["dong"].append(("Phần đối chiếu Internet",
+                              "%s: tra %d câu hỏi, tìm được %d kết quả, tải về %d trang để so khớp "
+                              "(nguồn: %s)" % (_it.get("ten_che_do", ""), _it.get("so_cau_hoi", 0),
+                                               _it.get("so_ket_qua", 0), _it.get("so_trang_tai", 0),
+                                               ", ".join(_it.get("so_may_tim") or []) or "—")))
+            for x in (_it.get("tai_duoc") or [])[:25]:
+                d["canh_bao"].append("Đã đối chiếu: %s — %s" % ((x.get("tieu_de") or "")[:80],
+                                                                 (x.get("url") or "")[:110]))
         if kq.get("canh_bao_ngan"):
             d["canh_bao"].append(kq["canh_bao_ngan"])
         if kq.get("internet") and not kq["internet"].get("lay_duoc_nguon"):

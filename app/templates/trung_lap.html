@@ -66,12 +66,25 @@
     <label style="display:flex;gap:9px;align-items:flex-start">
       <input type="checkbox" name="internet" value="1" {% if internet %}checked{% endif %}>
       <span>
-        <b>Gửi trích đoạn câu nghi vấn ra máy tìm kiếm rồi tải nguồn về để so khớp.</b><br>
-        <span class="muted">Chỉ gửi <b>vài câu ngắn</b> (10–12 từ nội dung ở giữa mỗi câu, giữ nguyên chữ và dấu) — không gửi cả bài.
-        Việc này chạy ở luồng riêng nên trang kết quả sẽ tự làm mới để hiện tiến độ.
-        Nếu không tích, hệ thống chỉ đối chiếu với kho của thầy/cô và các bài nộp.</span>
+        <b>Gửi trích đoạn ngắn ra các nguồn tìm kiếm rồi tải trang về để so khớp.</b><br>
+        <span class="muted">Hệ thống hỏi <b>5 nguồn</b> (Wikipedia tiếng Việt, DuckDuckGo, Google Books,
+        Google Tin tức, OpenAlex) và tự tải <b>toàn văn các bài tìm được</b> — chỉ gửi cụm ngắn, không gửi cả bài —
+        rồi <b>tải các trang tìm được về</b> để so từng câu. Chạy ở luồng riêng nên trang kết quả
+        tự làm mới và hiện tiến độ. Nếu không tích, hệ thống chỉ đối chiếu với kho của thầy/cô và các bài nộp.</span>
       </span>
     </label>
+    <div style="margin-top:14px">
+      <div class="muted" style="margin-bottom:6px"><b>Mức độ tra:</b> càng sâu càng nhiều câu hỏi và nhiều trang,
+        nhưng chờ lâu hơn. Hệ thống tra <b>phủ đều cả bài</b> (không chỉ vài câu đầu).</div>
+      <div class="row" style="gap:20px">
+        {% for ma, cd in che_do.items() %}
+        <label style="display:flex;gap:8px;align-items:flex-start;flex:1;min-width:240px">
+          <input type="radio" name="che_do" value="{{ma}}" {% if ma == (che_do_chon or 'tieu_chuan') %}checked{% endif %}>
+          <span><b>{{cd.ten}}</b><br><span class="muted">{{cd.mo_ta}}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 
   {% if is_pro %}
@@ -94,8 +107,10 @@
   <ul class="sub" style="margin:6px 0 0;padding-left:18px;line-height:1.75">
     <li><b>Kho của thầy/cô:</b> các KHDH đã lưu trong hệ thống, cùng khung nội dung giáo dục AI
       (QĐ 2422/QĐ-BGDĐT), khung năng lực AI (CV 5588/BGDĐT-GDPT) và khung năng lực số (TT 02/2025).</li>
-    <li><b>Nguồn trên Internet:</b> bài viết, giáo trình, trang web mà máy tìm kiếm trả về cho các câu
-      nghi vấn. Bài trong nhóm kín, tệp scan, sách giấy thì hệ thống không thấy được.</li>
+    <li><b>Nguồn trên Internet:</b> trang web, bài báo, sách mà các nguồn tìm kiếm trả về cho những cụm
+      nguyên văn của bài — hệ thống tải các trang đó về và so từng câu. <b>Không công cụ nào quét hết được
+      toàn bộ Internet</b>: bài trong nhóm kín, tệp scan (ảnh), sách giấy không đọc được thì hệ thống
+      không thấy; vì vậy chế độ <b>Sâu</b> hỏi nhiều câu hơn và tải nhiều trang hơn.</li>
     <li><b>Các bài nộp với nhau:</b> từng cặp bài được so câu-với-câu để thấy ai chép của ai,
       và cảnh báo khi có nhiều câu khớp nhau theo đúng thứ tự (chép nguyên đoạn).</li>
   </ul>
