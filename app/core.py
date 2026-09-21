@@ -14,6 +14,7 @@ from .modules import mon_day as MD
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
 from .modules import sms as SMS
+from .modules import hoa_don as HD
 from .modules import bank_webhook as BW
 from .modules import config as CFG
 
@@ -600,6 +601,28 @@ def nang_cap():
     return render_template("nangcap.html", qr_svg=qr, noi_dung=content, logs=logs,
                            need=request.args.get("need", ""), goi=goi, gia=gia,
                            tudong=bool(BW.WEBHOOK_TOKEN) and BW.AUTO_ACTIVATE)
+
+
+@bp.route("/nang-cap/hoa-don")
+@login_required
+def hoa_don():
+    """(M28) Danh sách hoá đơn / biên lai của giáo viên (giao dịch ngân hàng + mã kích hoạt)."""
+    db = get_db()
+    ds = HD.danh_sach(db, session["uid"])
+    return render_template("hoadon.html", ds=ds, tong=HD.tien_chu(ds))
+
+
+@bp.route("/nang-cap/hoa-don/<loai>/<int:iid>")
+@login_required
+def hoa_don_ct(loai, iid):
+    """(M28) Biên lai in được — có logo EduAssist, số tiền bằng chữ, mã giao dịch."""
+    if loai not in ("bank", "ma"):
+        return redirect(url_for("core.hoa_don"))
+    r = HD.tim(HD.danh_sach(get_db(), session["uid"]), loai, iid)
+    if not r:
+        flash("Không tìm thấy biên lai này trong tài khoản của thầy/cô.", "err")
+        return redirect(url_for("core.hoa_don"))
+    return render_template("hoadon_ct.html", r=r, tien_chu=HD.doc_tien(r.get("so_tien") or 0))
 
 
 @bp.route("/nang-cap/sdt", methods=["POST"])

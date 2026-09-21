@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block head %}Biên lai {{r.ma}}{% endblock %}
+{% block crumb %}Biên lai thanh toán in được (A4){% endblock %}
+{% block body %}
+<style>
+/* (M28) khi IN hoặc lưu PDF: bỏ thanh bên, thanh trên và nút bấm — chỉ còn tờ biên lai */
+@media print{
+ body{background:#fff}
+ aside,.topbar,.flash,.noprint,nav{display:none!important}
+ .shell{display:block}
+ main{padding:0!important}
+ .wrap{padding:0!important;max-width:none!important}
+ .card{border:0!important;box-shadow:none!important;padding:0!important;margin:0 0 10px!important}
+ .tbl-wrap{overflow:visible!important}
+ @page{size:A4;margin:14mm}
+}
+.tk{width:100%;border-collapse:collapse;font-size:13.5px}
+.tk td{padding:7px 4px;vertical-align:top;border-bottom:1px solid #eef4f2}
+.tk td:first-child{color:#64748b;width:34%}
+</style>
+
+<div class="noprint card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+ <button class="btn" onclick="window.print()">🖨️ In / Lưu thành PDF</button>
+ <a class="btn sec" href="{{url_for('core.hoa_don')}}">← Danh sách hoá đơn</a>
+ <span class="muted" style="font-size:12.5px">Mẹo: trong hộp thoại in, chọn “Lưu dưới dạng PDF” để gửi kèm hồ sơ.</span>
+</div>
+
+<div class="card" id="bienlai" style="max-width:780px">
+ <div style="display:flex;align-items:center;gap:14px;border-bottom:2px solid #0d9488;padding-bottom:12px">
+  <img src="{{url_for('static', filename='logo/ea-mark-b-256.png')}}?v=logo1" alt="{{SITE_NAME}}"
+   style="width:56px;height:56px;border-radius:15px">
+  <div style="flex:1">
+   <div style="font-size:19px;font-weight:800">{{SITE_NAME}}
+    <span style="font-weight:500;color:#64748b;font-size:13px">— {{SITE_TAGLINE}}</span></div>
+   <div class="muted" style="font-size:12.5px">edugiaovien.com · Hệ thống soạn tài liệu và kiểm tra cho giáo viên</div>
+  </div>
+  <div style="text-align:right">
+   <div class="muted" style="font-size:12px">Số biên lai</div>
+   <div style="font-weight:800;font-size:15px">{{r.ma}}</div>
+  </div>
+ </div>
+
+ <h2 style="text-align:center;margin:16px 0 4px;font-size:18px;letter-spacing:.5px">
+  BIÊN LAI THANH TOÁN / XÁC NHẬN NÂNG CẤP</h2>
+ <div class="muted" style="text-align:center;font-size:12.5px;margin-bottom:14px">
+  Ngày {{r.ngay}} · Trạng thái: <b>{{r.trang_thai}}</b></div>
+
+ <table class="tk">
+  <tr><td>Người sử dụng</td><td><b>{{user['fullname'] or ''}}</b>
+   {% if user['school'] %} — {{user['school']}}{% endif %}</td></tr>
+  <tr><td>Tài khoản đăng nhập</td><td>{{user['username']}}{% if user['email'] %} · {{user['email']}}{% endif %}</td></tr>
+  <tr><td>Nội dung nâng cấp</td><td><b>{{r.goi}}</b></td></tr>
+  {% if r.so_tien %}
+  <tr><td>Số tiền</td><td><b style="font-size:16px;color:#0d9488">{{'{:,}'.format(r.so_tien).replace(',','.')}}đ</b>
+   <div class="muted" style="font-size:12.5px">Bằng chữ: {{tien_chu}}</div></td></tr>
+  <tr><td>Hình thức thanh toán</td><td>{{r.hinh_thuc}}</td></tr>
+  <tr><td>Mã giao dịch</td><td style="font-family:ui-monospace,Menlo,monospace">{{r.ma_gd or '—'}}</td></tr>
+  <tr><td>Nội dung chuyển khoản</td><td>{{r.noi_dung or '—'}}</td></tr>
+  {% else %}
+  <tr><td>Hình thức</td><td>{{r.hinh_thuc}}</td></tr>
+  <tr><td>Mã kích hoạt</td><td style="font-family:ui-monospace,Menlo,monospace">{{r.ma_gd or '—'}}</td></tr>
+  {% endif %}
+  <tr><td>Hiệu lực tài khoản</td><td>{% if user['expires'] %}Gói không giới hạn đến hết ngày
+   <b>{{user['expires'][8:10]}}/{{user['expires'][5:7]}}/{{user['expires'][:4]}}</b>{% else %}—{% endif %}</td></tr>
+  <tr><td>Lượt dùng chung còn lại</td><td>{{remaining}} lượt</td></tr>
+ </table>
+
+ {% if r.so_tien %}
+ <p style="font-size:12.5px;color:#475569;margin-top:14px">
+  Số tiền trên đã được hệ thống <b>đối chiếu tự động</b> với giao dịch của ngân hàng theo nội dung chuyển khoản
+  ghi mã riêng của thầy/cô. Nếu có sai lệch, thầy/cô nhắn lại để được kiểm tra và cấp lại.</p>
+ {% endif %}
+
+ <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px;gap:16px;flex-wrap:wrap">
+  <div style="font-size:12.5px;color:#64748b;max-width:58%">
+   Biên lai điện tử do hệ thống <b>EduAssist</b> phát hành, dùng để thầy/cô đối chiếu khi cần
+   (không phải hoá đơn giá trị gia tăng). Cảm ơn thầy/cô đã ủng hộ hệ thống!
+  </div>
+  <div style="text-align:center;font-size:12.5px;color:#475569">
+   <div style="height:44px"></div>
+   <div style="border-top:1px solid #cbd5e1;padding-top:6px;min-width:190px">
+    <b>{{SITE_NAME}}</b><br>edugiaovien.com</div>
+  </div>
+ </div>
+</div>
+{% endblock %}

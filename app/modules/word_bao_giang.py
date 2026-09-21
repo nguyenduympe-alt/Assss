@@ -205,6 +205,12 @@ def build_docx(meta, rows):
     _para(c, "", 10, space_after=0)
     _para(c, meta.get("giao_vien", ""), 10, bold=True, align=C)
 
+    # (LOGO-B) dòng thương hiệu ở đầu/chân trang
+    try:
+        from . import thuong_hieu as T_HIEU
+        T_HIEU.gan(doc, tieu_de="Lịch báo giảng — %s" % (meta.get("mon", "") or ""))
+    except Exception:
+        pass
     bio = io.BytesIO()
     doc.save(bio)
     bio.seek(0)

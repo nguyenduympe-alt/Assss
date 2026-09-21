@@ -564,6 +564,13 @@ def export(data, mode, rows, grade, subject):
                     if mau is not None and item.get('_themmoi', {}).get(key):
                         run.font.color.rgb = mau
     doc.add_paragraph('Tham chiếu Thông tư 02/2025/TT-BGDĐT và hướng dẫn theo khối lớp tại Công văn 3456/BGDĐT-GDPT (mã năng lực số). Mã giáo dục AI lấy theo Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026 (Khung nội dung giáo dục AI cho học sinh phổ thông; quy ước mã [Lớp].[Mã chủ đề].[Số thứ tự], nội dung mở rộng thêm tiền tố “MR”) và hướng dẫn triển khai tại Công văn 5588/BGDĐT-GDPT ngày 19/8/2026. Các mã và hoạt động tích hợp cần được giáo viên rà soát theo thực tế lớp học.')
+    # (LOGO-B) in dòng thương hiệu EduAssist ở đầu/chân trang tệp Word xuất ra
+    try:
+        from . import thuong_hieu as T_HIEU
+        T_HIEU.gan(doc, tieu_de=('Kế hoạch giáo dục — %s lớp %s' % (subject, grade)) if mode == 'ppct'
+               else ('Giáo án tích hợp — %s lớp %s' % (subject, grade)))
+    except Exception:
+        pass
     output = io.BytesIO()
     doc.save(output)
     output.seek(0)

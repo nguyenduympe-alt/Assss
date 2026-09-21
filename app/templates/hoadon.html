@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block head %}Hoá đơn / biên lai{% endblock %}
+{% block crumb %}Lịch sử thanh toán và mã kích hoạt của thầy/cô{% endblock %}
+{% block body %}
+<div class="card">
+ <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+  <img src="{{url_for('static', filename='logo/ea-mark-b-256.png')}}?v=logo1" alt="{{SITE_NAME}}"
+   style="width:54px;height:54px;border-radius:15px;box-shadow:0 8px 20px -10px rgba(13,148,136,.8)">
+  <div style="flex:1;min-width:220px">
+   <h3 style="margin:0">🧾 Hoá đơn / biên lai của thầy/cô</h3>
+   <div class="muted" style="font-size:12.5px">Mỗi lần hệ thống nhận được chuyển khoản hoặc mã kích hoạt
+    của thầy/cô đều được ghi lại ở đây. Bấm vào một dòng để mở biên lai in được (A4).</div>
+  </div>
+  <a class="btn sec" href="{{url_for('core.nang_cap')}}">← Về trang nâng cấp</a>
+ </div>
+</div>
+
+<div class="card">
+ {% if ds %}
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>Mã</th><th>Ngày</th><th>Nội dung</th><th>Số tiền</th><th>Hình thức</th><th>Trạng thái</th><th></th></tr></thead>
+  <tbody>
+  {% for r in ds %}
+   <tr>
+    <td><b>{{r.ma}}</b></td>
+    <td>{{r.ngay}}</td>
+    <td>{{r.goi}}{% if r.noi_dung %}<div class="muted" style="font-size:11.5px">{{r.noi_dung}}</div>{% endif %}</td>
+    <td>{% if r.so_tien %}<b>{{'{:,}'.format(r.so_tien).replace(',','.')}}đ</b>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td style="font-size:12.5px">{{r.hinh_thuc}}</td>
+    <td>{% if r.da_kich_hoat %}<span class="chip" style="background:#d1fae5;color:#047857">{{r.trang_thai}}</span>
+        {% else %}<span class="chip" style="background:#fef3c7;color:#92400e">{{r.trang_thai}}</span>{% endif %}</td>
+    <td><a class="btn sec sm" href="{{url_for('core.hoa_don_ct', loai=r.loai, iid=r.id)}}">Mở biên lai</a></td>
+   </tr>
+  {% endfor %}
+  </tbody>
+ </table></div>
+ {% if tong %}<p class="sub" style="margin-top:12px">{{tong}}</p>{% endif %}
+ {% else %}
+ <p class="sub" style="margin:0">Chưa có giao dịch nào. Khi thầy/cô chuyển khoản theo mã QR ở trang
+  <a href="{{url_for('core.nang_cap')}}">Nâng cấp</a> (nội dung chuyển khoản có mã riêng của thầy/cô),
+  hệ thống tự đối soát và ghi biên lai vào đây.</p>
+ {% endif %}
+</div>
+
+<div class="card" style="background:#f8fbfa">
+ <div class="muted" style="font-size:12.5px">Biên lai do hệ thống EduAssist phát hành để thầy/cô đối chiếu
+  (không phải hoá đơn giá trị gia tăng). Cần biên lai cho nhà trường, thầy/cô nhắn lại để được hỗ trợ.</div>
+</div>
+{% endblock %}

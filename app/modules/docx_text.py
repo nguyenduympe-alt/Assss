@@ -86,6 +86,11 @@ def apply_to_docx(file_bytes, issues, chosen_ids):
             if _replace_in_paragraph(para, s, e, rep):
                 done += 1
 
+    try:
+        from . import thuong_hieu as T_HIEU
+        T_HIEU.gan(doc, tieu_de="Văn bản đã sửa lỗi chính tả")
+    except Exception:
+        pass
     bio = io.BytesIO()
     doc.save(bio)
     bio.seek(0)
@@ -100,6 +105,11 @@ def make_docx_from_text(paragraphs, title="Văn bản đã sửa lỗi chính t�
     d.styles["Normal"].font.size = Pt(13)
     for t in paragraphs:
         d.add_paragraph(t)
+    try:
+        from . import thuong_hieu as T_HIEU
+        T_HIEU.gan(d, tieu_de=title)
+    except Exception:
+        pass
     bio = io.BytesIO()
     d.save(bio)
     bio.seek(0)

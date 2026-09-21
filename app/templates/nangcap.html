@@ -17,13 +17,27 @@
  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
   <span style="font-size:42px">👑</span>
   <div style="flex:1;min-width:240px">
-   <div style="font-size:21px;font-weight:750">Tài khoản đang ở gói KHÔNG GIỚI HẠN</div>
+   <img src="{{url_for('static', filename='logo/ea-mark-b-256.png')}}?v=logo1" alt="{{SITE_NAME}}"
+    style="width:46px;height:46px;border-radius:13px;vertical-align:middle;margin-right:12px">
+   <div style="font-size:21px;font-weight:750;display:inline-block;vertical-align:middle">Tài khoản đang ở gói KHÔNG GIỚI HẠN</div>
    <div style="opacity:.92;margin-top:4px">Hạn sử dụng đến <b>{{ user['expires'][8:10] }}/{{ user['expires'][5:7] }}/{{ user['expires'][:4] }}</b>
-    — còn <b>{{days_left}}</b> ngày. Cảm ơn bạn đã ủng hộ EduAssist!</div>
+    — còn <b>{{days_left}}</b> ngày. Cảm ơn bạn đã ủng hộ EduAssist!
+    <a href="{{url_for('core.hoa_don')}}" style="color:#fff;text-decoration:underline">Xem biên lai thanh toán</a></div>
   </div>
  </div>
 </div>
 {% else %}
+
+<div class="card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+ <img src="{{url_for('static', filename='logo/ea-mark-b-256.png')}}?v=logo1" alt="{{SITE_NAME}}"
+  style="width:52px;height:52px;border-radius:14px;box-shadow:0 8px 20px -10px rgba(13,148,136,.8)">
+ <div style="flex:1;min-width:220px">
+  <b style="font-size:15.5px">Nâng cấp {{SITE_NAME}} — thanh toán và kích hoạt tự động</b>
+  <div class="muted" style="font-size:12.5px">Chuyển khoản đúng nội dung có mã riêng của thầy/cô: hệ thống tự
+   đối soát, ghi <b>biên lai</b> và nhắn tin xác nhận.</div>
+ </div>
+ <a class="btn sec" href="{{url_for('core.hoa_don')}}">🧾 Hoá đơn / biên lai</a>
+</div>
 
 <div class="g2" style="margin-bottom:18px">
  <div class="card" style="border:2px solid {{'#0d9488' if goi=='luot' else 'var(--line)'}};margin:0">

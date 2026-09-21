@@ -172,6 +172,12 @@ def xuat(token):
         flash(BL.thong_bao_het(), 'err')
         return redirect(url_for('core.nang_cap', need='giaoan'))
 
+    # (LOGO-B) dòng thương hiệu ở đầu/chân trang giáo án xuất ra
+    try:
+        from ..modules import thuong_hieu as T_HIEU
+        T_HIEU.gan(doc_out, tieu_de='Giáo án tích hợp — lớp %s' % (c.get('lop') or ''))
+    except Exception:
+        pass
     out = io.BytesIO()
     doc_out.save(out)
     out.seek(0)

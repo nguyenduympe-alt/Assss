@@ -2070,6 +2070,11 @@ def xuat_docx(kq):
               "Trùng lặp có thể do đề bài, mẫu câu, dẫn chứng hoặc thuật ngữ dùng chung. "
               "Đối chiếu Internet chỉ thấy nội dung mà máy tìm kiếm trả về được. "
               "Hãy hỏi lại học sinh và xem quá trình học trước khi kết luận.")
+    try:
+        from . import thuong_hieu as T_HIEU
+        T_HIEU.gan(d, tieu_de="Báo cáo kiểm tra trùng lặp / đạo văn")
+    except Exception:
+        pass
     bio = io.BytesIO()
     d.save(bio)
     bio.seek(0)
