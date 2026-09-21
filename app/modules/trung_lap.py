@@ -1284,6 +1284,11 @@ def _dem_api(ma):
 
 
 def _tang_dem_api(ma):
+    """Tăng số lượt đã gọi API của tháng này (để tự giữ trong hạn mức miễn phí).
+
+    Ghi ra tệp tạm rồi THAY THẾ tệp cũ (`os.replace`) — nhờ vậy tiến trình web chạy dưới
+    quyền www-data vẫn cập nhật được, kể cả khi tệp cũ do root tạo và không cho ghi.
+    """
     try:
         p = _tep_dem_api()
         try:
@@ -1293,7 +1298,13 @@ def _tang_dem_api(ma):
         thang = time.strftime("%Y-%m")
         d = {thang: (d.get(thang) or {})}          # chỉ giữ tháng hiện tại
         d[thang][ma] = int(d[thang].get(ma, 0)) + 1
-        p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+        tam = p.with_name(p.name + ".tam")
+        tam.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+        try:
+            os.chmod(tam, 0o666)                   # cả root và www-data đọc/ghi được
+        except Exception:
+            pass
+        os.replace(tam, p)
     except Exception:
         pass
 
