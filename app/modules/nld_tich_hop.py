@@ -16,6 +16,7 @@ from docx.oxml.ns import qn
 
 from . import ai_giao_duc as AIGD
 from . import nld
+from . import thiet_ke_hoat_dong as TKD
 from .giao_an import (DO, MAU_MOI, NHAN_AI, RE_DONG_DO_HE_THONG, RE_HOAT_DONG_HE_THONG, RE_TIEU_DE_AI,
                        XANH,
                        doan_mau, gon, khong_dau, la_tieu_de_ai,
@@ -430,26 +431,61 @@ def _rut_gon(nguyen_van):
     return t.rstrip(".") + ","
 
 
-def soan_hoat_dong(ten_bai, lop, mon, chon, thoi_luong=6, thiet_bi="co"):
-    """Soạn hoạt động tích hợp để chèn vào tiến trình bài dạy."""
+def soan_hoat_dong(ten_bai, lop, mon, chon, thoi_luong=6, thiet_bi="co",
+                   doc=None, pt=None, boi_canh=None):
+    """Soạn hoạt động tích hợp để chèn vào tiến trình bài dạy.
+
+    Hoạt động được THIẾT KẾ THEO NỘI DUNG THẬT của giáo án: hệ thống đọc bài (tên bài, yêu cầu cần
+    đạt, tiến trình, đồ dùng) rồi chọn một kiểu tổ chức lớp học phù hợp lứa tuổi và khác nhau giữa
+    các bài — xem `thiet_ke_hoat_dong`. Toàn bộ chạy cục bộ, không gửi giáo án ra ngoài.
+
+    Thiết kế chỉ ghi HOẠT ĐỘNG (việc học sinh làm), không ghi mã chỉ báo như “1.1.CB1a” —
+    mã tiêu chí đã nêu ở mục “Tích hợp năng lực số”.
+    """
     if not chon:
         return None
     ma = ", ".join(x["chi_bao"]["code"] for x in chon)
-    # Thiết kế hoạt động chỉ ghi HOẠT ĐỘNG (việc học sinh làm), không ghi chi tiết năng lực
-    # như “1.1.CB1a”, “3.1.CB1a” — mã tiêu chí đã nêu ở mục “Tích hợp năng lực số”.
     ten = "Hoạt động tích hợp năng lực số"
-    muc_tieu = "; ".join(dict.fromkeys(x["ten_hoat_dong"] for x in chon))
+    cap = cap_hoc(lop)
+    bc = boi_canh or TKD.doc_bai(doc=doc, pt=pt, ten_bai=ten_bai,
+                                 muc_tieu=[x.get("ten_hoat_dong") or "" for x in chon],
+                                 thiet_bi=thiet_bi)
+    phan, so_ct = TKD.chia_thoi_luong(thoi_luong, len(chon))
+    ds_tk, da_dung = [], set()
+    for i, x in enumerate(chon):
+        khoa = "%s|%s|%s" % (ten_bai or bc.get("bai") or "", x["chi_bao"]["code"], lop)
+        tk = TKD.thiet_ke(bc, muc_tieu_chuan=x["chi_bao"].get("name") or "", khoa=khoa,
+                          thoi_luong=phan[min(i, len(phan) - 1)], da_dung=da_dung, cap_ngan=cap)
+        da_dung.add(tk["kieu_i"])
+        ds_tk.append(tk)
+    _tong_phut = sum(phan)
+    nd = bc.get("nd") or "nội dung bài"
+    # dòng “Mục tiêu:” trong bảng = hoạt động thật (lấy từ bảng ngữ cảnh) + hình thức tổ chức
+    # riêng cho đúng bài này, nên mỗi giáo án có một thiết kế khác nhau.
+    _theo_hd = {}
+    for x, tk in zip(chon, ds_tk):
+        _theo_hd.setdefault(x["ten_hoat_dong"], [])
+        if tk["kieu_ten"].lower() not in _theo_hd[x["ten_hoat_dong"]]:
+            _theo_hd[x["ten_hoat_dong"]].append(tk["kieu_ten"].lower())
+    muc_tieu = "; ".join(
+        "%s — hình thức %s, bám nội dung “%s”"
+        % (hd_ten, "/".join("“%s”" % k for k in ds_k), nd)
+        for hd_ten, ds_k in _theo_hd.items())
     return {
         "ten": ten,
         "muc_tieu": muc_tieu,
         "ma": ma,
-        "thoi_luong": thoi_luong,
-        "gv": _gv(chon, thiet_bi, lop),
-        "hs": _hs(chon, thiet_bi, lop),
+        "thoi_luong": _tong_phut,
+        "thiet_bi": thiet_bi,
+        "gv": " ".join([tk["gv"] for tk in ds_tk[:so_ct]] + [_gv(chon, thiet_bi, lop)]),
+        "hs": " ".join([tk["hs"] for tk in ds_tk[:so_ct]] + [_hs(chon, thiet_bi, lop)]),
         "cong_cu": _cong_cu(chon, thiet_bi, lop),
-        "cac_buoc": _cac_buoc(chon, thiet_bi, lop),
+        "cac_buoc": " ".join(tk["cac_buoc"] for tk in ds_tk[:so_ct]),
         "san_pham": "; ".join(dict.fromkeys(x["san_pham"] for x in chon)),
         "danh_gia": "; ".join(dict.fromkeys(x["minh_chung"] for x in chon)),
+        "gan_vao": "; ".join(dict.fromkeys(tk["gan_vao"] for tk in ds_tk if tk.get("gan_vao"))),
+        "kieu": [tk["kieu"] for tk in ds_tk],
+        "nd": nd,
         "cap_hoc": _ten_cap(lop),
     }
 
@@ -741,6 +777,7 @@ def _chen_doan_sau(doc, neo, hd, ghi_chu="", mau_chu=DO):
     dong = [
         (hd["ten"], "tieude"),
         (f"Mục tiêu: {hd['muc_tieu']}", "n"),
+    ] + ([f"Gắn vào: {hd['gan_vao']}"] if hd.get("gan_vao") else []) + [
         (f"Thời lượng: {hd['thoi_luong']} phút", "n"),
         (f"Công cụ: {hd['cong_cu']}", "n"),
         (f"Các bước: {hd['cac_buoc']}", "n"),
@@ -773,10 +810,37 @@ def chen_hoat_dong_ai(doc, pt, hd):
     return _chen_duoi_muc_tieu(doc, pt, hd, mau_chu=XANH)
 
 
-def chon_muc_ai(doc, pt, mach_chon=None, toi_da=2):
-    """Chọn mạch nội dung giáo dục AI cho bài (dữ liệu có nguồn, xem ai_giao_duc)."""
-    return AIGD.goi_y(pt.get("lop"), mon=pt.get("mon"), ten_bai=lay_ten_bai(doc),
-                      van_ban=noi_dung_bai(doc), toi_da=toi_da, mach_chon=mach_chon)
+def chon_muc_ai(doc, pt, mach_chon=None, toi_da=2, thoi_luong=5, thiet_bi="co"):
+    """Chọn mạch nội dung giáo dục AI cho bài (dữ liệu có nguồn, xem ai_giao_duc).
+
+    Kèm luôn PHẦN THIẾT KẾ HOẠT ĐỘNG đọc từ chính giáo án (xem `thiet_ke_hoat_dong`) để trang duyệt
+    hiện đúng việc thầy/cô sẽ làm trong tiết học, không phải một câu mẫu dùng chung.
+    """
+    ten_bai = lay_ten_bai(doc)
+    ds, canh_bao = AIGD.goi_y(pt.get("lop"), mon=pt.get("mon"), ten_bai=ten_bai,
+                              van_ban=noi_dung_bai(doc), toi_da=toi_da, mach_chon=mach_chon)
+    bc = TKD.doc_bai(doc=doc, pt=pt, ten_bai=ten_bai,
+                     muc_tieu=[(x.get("de_xuat") or {}).get("muc_tieu") or "" for x in ds],
+                     thiet_bi=thiet_bi)
+    da_dung = set()
+    for x in ds:
+        khoa = "%s|%s|%s" % (ten_bai or "", x["id"], pt.get("lop") or "")
+        tk = TKD.thiet_ke(bc, muc_tieu_chuan=(x.get("de_xuat") or {}).get("muc_tieu") or "",
+                          khoa=khoa, thoi_luong=thoi_luong, da_dung=da_dung,
+                          cap_ngan=cap_hoc(pt.get("lop")))
+        da_dung.add(tk["kieu_i"])
+        x["thiet_ke"] = tk
+        dx = x["de_xuat"]
+        dx["hoat_dong"] = "%s Cách làm: %s" % (tk["muc_tieu"], tk["cac_buoc"])
+        if tk.get("san_pham"):
+            dx["san_pham"] = tk["san_pham"]
+        if tk.get("minh_chung") and not dx.get("minh_chung"):
+            dx["minh_chung"] = tk["minh_chung"]
+    if any(x.get("thiet_ke") for x in ds):
+        canh_bao.append("Hoạt động tích hợp được thiết kế theo đúng nội dung giáo án này "
+                        "(đọc bài → chọn cách tổ chức phù hợp lứa tuổi); giáo án khác sẽ có "
+                        "cách tổ chức khác.")
+    return ds, canh_bao
 
 
 def chen_hoat_dong(doc, pt, hd, mau=RE_HOAT_DONG_BANG, mau_chu=DO):
@@ -870,11 +934,16 @@ def _chen_vao_bang(doc, tt, hd, mau=RE_HOAT_DONG_BANG, neo_mau=None, mau_chu=DO)
     # chọn vị trí: ưu tiên hoạt động có nội dung khớp từ khoá;
     # nếu không khớp thì đặt trước dòng cuối (thường là vận dụng/tổng kết)
     vitri = None
-    for ri in range(len(hang) - 1, 0, -1):
-        noi = khong_dau(" ".join(gon(c.text) for c in hang[ri].cells))
-        if any(k in noi for k in ("tim", "tra cuu", "thuc hanh", "luyen tap", "van dung",
-                                  "hinh thanh", "kham pha")):
-            vitri = ri
+    # Ưu tiên chèn vào hoạt động DẠY/HỌC (hình thành kiến thức, khám phá, luyện tập, thực hành,
+    # tra cứu, tìm hiểu); chỉ dùng tới “vận dụng” (thường là giao việc về nhà) khi bài không có
+    # hoạt động nào khác phù hợp.
+    for k in ("hinh thanh kham pha luyen tap thuc hanh tra cuu tim", "van dung"):
+        for ri in range(len(hang) - 1, 0, -1):
+            noi = khong_dau(" ".join(gon(c.text) for c in hang[ri].cells))
+            if any(x in noi for x in k.split()):
+                vitri = ri
+                break
+        if vitri is not None:
             break
     if vitri is None:
         vitri = len(hang) - 2 if len(hang) > 2 else 1
@@ -907,12 +976,18 @@ def _chen_vao_bang(doc, tt, hd, mau=RE_HOAT_DONG_BANG, neo_mau=None, mau_chu=DO)
 
 
 def _noi_dung_o(ci, cot, hd):
+    """Nội dung từng ô của dòng hoạt động trong bảng tiến trình.
+
+    Ghi đủ Thiết kế: mục tiêu hoạt động · cách làm (4 bước đã soạn theo nội dung bài) ·
+    nhiệm vụ giáo viên · nhiệm vụ học sinh · chỗ lồng ghép — để thầy/cô dạy được ngay.
+    """
+    _cach = [f"Cách làm: {hd['cac_buoc']}"] if hd.get("cac_buoc") else []
     if cot.get("thoi_gian") == ci:
         return [f"{hd['thoi_luong']} phút"]
     if cot.get("hoat_dong") == ci:
         return [hd["ten"], f"Mục tiêu: {hd['muc_tieu']}"]
     if cot.get("gv") == ci:
-        dong = [hd["gv"]]
+        dong = _cach + [hd["gv"]]
         # Bảng không có cột "Hoạt động" riêng (ví dụ bảng GV | HS | Hỗ trợ HSKT):
         # ghi tên hoạt động ngay đầu cột GV, đúng như cách giáo án vẫn trình bày.
         if cot.get("hoat_dong") is None:
@@ -921,7 +996,8 @@ def _noi_dung_o(ci, cot, hd):
     if cot.get("hs") == ci:
         return [hd["hs"]]
     if ci in (cot.get("ho_tro") or []):
-        return ["Giáo viên quan sát, gợi ý thêm cho học sinh cần hỗ trợ."]
+        _lo = f"Gắn vào: {hd['gan_vao']}. " if hd.get("gan_vao") else ""
+        return [_lo + "Giáo viên quan sát, gợi ý thêm cho học sinh cần hỗ trợ."]
     return [hd["ten"]] if ci == 0 else [""]
 
 
@@ -1395,8 +1471,11 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
 
     if chon:
         kq_mt = chen_muc_tieu(doc, pt, chon, ten_bai=ten_bai, mon=pt["mon"])
+        bc_bai = TKD.doc_bai(doc=doc, pt=pt, ten_bai=ten_bai,
+                             muc_tieu=[x.get("ten_hoat_dong") or "" for x in chon],
+                             thiet_bi=thiet_bi)
         hd = soan_hoat_dong(ten_bai, pt["lop"], pt["mon"], chon,
-                            thoi_luong=thoi_luong, thiet_bi=thiet_bi)
+                            thoi_luong=thoi_luong, thiet_bi=thiet_bi, boi_canh=bc_bai)
         kq_hd = chen_hoat_dong(doc, pt, hd, mau=None) if hd else {"da_chen": False}
         kq_hd["thoi_luong"] = thoi_luong if kq_hd.get("da_chen") else 0
     else:
@@ -1419,8 +1498,11 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
         kq_ai_mt = chen_muc_ai(doc, pt_sau, chon_ai, ten_bai=ten_bai, mon=pt["mon"],
                                so_nld=kq_mt.get("so_muc", ""), thoi_luong=ai_thoi_luong)
         pt_sau2 = phan_tich_an_toan(doc)     # mục AI vừa chèn lại dịch chỉ số đoạn phía sau
+        bc_ai = TKD.doc_bai(doc=doc, pt=pt_sau2, ten_bai=ten_bai,
+                            muc_tieu=[(x.get("de_xuat") or {}).get("muc_tieu") or "" for x in chon_ai],
+                            thiet_bi=thiet_bi)
         hd_ai = AIGD.soan_hoat_dong(ten_bai, pt["lop"], pt["mon"], chon_ai,
-                                    thoi_luong=ai_thoi_luong)
+                                    thoi_luong=ai_thoi_luong, boi_canh=bc_ai)
         kq_ai_hd = chen_hoat_dong_ai(doc, pt_sau2, hd_ai) if hd_ai else {"da_chen": False}
         kq_ai_hd["thoi_luong"] = ai_thoi_luong if kq_ai_hd.get("da_chen") else 0
         bao_cao["buoc"].append("Đã chèn mục “Tích hợp giáo dục trí tuệ nhân tạo (AI)” và hoạt động "
@@ -1431,7 +1513,8 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
                                 "muc_tieu": kq_ai_mt, "hoat_dong": kq_ai_hd,
                                 "hoat_dong_chi_tiet": (AIGD.soan_hoat_dong(ten_bai, pt["lop"],
                                                                            pt["mon"], chon_ai,
-                                                                           thoi_luong=ai_thoi_luong)
+                                                                           thoi_luong=ai_thoi_luong,
+                                                                           boi_canh=locals().get("bc_ai"))
                                                        if chon_ai else None)}
 
     # Sửa chính tả: CHỈ áp dụng những đề xuất giáo viên đã tích chọn ở trang duyệt.

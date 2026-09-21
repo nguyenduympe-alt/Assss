@@ -107,7 +107,8 @@
       “{{m.yccd}}”{% if not loop.last %}<br>{% endif %}{% endfor %}<br>
     {% else %}<span class="muted">Tiêu chí:</span> chưa có mã nào sát bài trong kho mã lớp {{ctx.lop or '…'}}<br>{% endif %}
     <span class="muted">Mục tiêu:</span> {{x.de_xuat.muc_tieu}}<br>
-    <span class="muted">Hoạt động:</span> {{x.de_xuat.hoat_dong}}<br>
+    <span class="muted">Hoạt động <b>thiết kế riêng cho bài này</b> (đọc nội dung giáo án rồi mới soạn;
+      giáo án khác sẽ có cách tổ chức khác):</span><br>{{x.de_xuat.hoat_dong}}<br>
     <span class="muted">Sản phẩm học tập:</span> {{x.de_xuat.san_pham}}<br>
     <span class="muted">Minh chứng đánh giá:</span> {{x.de_xuat.minh_chung}}
    </div>

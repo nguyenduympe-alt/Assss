@@ -67,7 +67,8 @@ def index():
 
             chon, canh_bao = TH.chon_tieu_chi(doc, pt, thiet_bi=thiet_bi, toi_da=toi_da)
             # giáo dục AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT)
-            chon_ai, canh_bao_ai = TH.chon_muc_ai(doc, pt, toi_da=2)
+            chon_ai, canh_bao_ai = TH.chon_muc_ai(doc, pt, toi_da=2,
+                                                  thoi_luong=AI_THOI_LUONG, thiet_bi=thiet_bi)
 
             token = save(
                 name=(file.filename or 'giao-an.docx')[:200],

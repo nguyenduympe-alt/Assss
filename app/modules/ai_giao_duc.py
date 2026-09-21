@@ -20,6 +20,7 @@ import re
 from pathlib import Path
 
 from .giao_an import khong_dau
+from . import thiet_ke_hoat_dong as TKD
 
 ASSET = Path(__file__).resolve().parents[1] / "assets" / "khung-giao-duc-ai.json"
 
@@ -249,24 +250,53 @@ def _mot_muc(kho_dl, m, k, lop, co_so="", can_duyet=False, ds_ma=None):
 
 
 # ------------------------------------------------------------------ soạn hoạt động
-def soan_hoat_dong(ten_bai, lop, mon, chon, thoi_luong=6):
-    """Soạn hoạt động giáo dục AI để chèn vào tiến trình bài dạy (lồng ghép)."""
+def soan_hoat_dong(ten_bai, lop, mon, chon, thoi_luong=6, boi_canh=None, thiet_bi="co"):
+    """Soạn hoạt động giáo dục AI để chèn vào tiến trình bài dạy (lồng ghép).
+
+    Hoạt động được THIẾT KẾ THEO NỘI DUNG THẬT của giáo án: đọc bài (tên bài, yêu cầu cần đạt,
+    tiến trình, đồ dùng) rồi chọn kiểu tổ chức lớp học phù hợp lứa tuổi; giáo án khác nhau cho
+    thiết kế khác nhau (xem `thiet_ke_hoat_dong`). Chạy hoàn toàn cục bộ — không gửi bài ra ngoài.
+    """
     if not chon:
         return None
     ten = "Hoạt động tích hợp giáo dục AI (QĐ 2422/QĐ-BGDĐT)"
-    muc_tieu = "; ".join(f"“{x['ten_mach']}”: {x['de_xuat']['muc_tieu']}" for x in chon)
+    cap = ten_cap(muc_do_lop(lop))
+    bc = boi_canh or TKD.doc_bai(doc=None, pt={"lop": lop, "mon": mon}, ten_bai=ten_bai,
+                                 muc_tieu=[x["de_xuat"].get("muc_tieu") or "" for x in chon],
+                                 thiet_bi=thiet_bi)
+    phan, so_mach = TKD.chia_thoi_luong(thoi_luong, len(chon))
+    ds_tk, da_dung = [], set()
+    for i, x in enumerate(chon):
+        if x.get("thiet_ke"):                    # đã thiết kế ở bước duyệt: dùng lại đúng bản đó
+            ds_tk.append(x["thiet_ke"])
+            da_dung.add(x["thiet_ke"].get("kieu_i", -1))
+            continue
+        khoa = "%s|%s|%s" % (ten_bai or "", x["id"], lop or "")
+        tk = TKD.thiet_ke(bc, muc_tieu_chuan=x["de_xuat"].get("muc_tieu") or "", khoa=khoa,
+                          thoi_luong=phan[min(i, len(phan) - 1)], da_dung=da_dung,
+                          cap_ngan=muc_do_lop(lop))
+        da_dung.add(tk["kieu_i"])
+        ds_tk.append(tk)
+    _tong_phut = sum(phan)
     return {
         "ten": ten,
-        "muc_tieu": muc_tieu,
+        "muc_tieu": "; ".join(dict.fromkeys(tk["muc_tieu"] for tk in ds_tk)),
         "ma": "AI",
-        "thoi_luong": thoi_luong,
-        "gv": _gv(chon, lop, mon),
-        "hs": _hs(chon, lop),
-        "cong_cu": _cong_cu(lop),
-        "cac_buoc": _cac_buoc(chon, lop),
-        "san_pham": "; ".join(dict.fromkeys(x["de_xuat"]["san_pham"] for x in chon if x["de_xuat"]["san_pham"])),
-        "danh_gia": "; ".join(dict.fromkeys(x["de_xuat"]["minh_chung"] for x in chon if x["de_xuat"]["minh_chung"])),
-        "cap_hoc": ten_cap(muc_do_lop(lop)),
+        "thoi_luong": _tong_phut,
+        "gv": " ".join([tk["gv"] for tk in ds_tk[:so_mach]] + [_gv(chon, lop, mon)]),
+        "hs": " ".join([tk["hs"] for tk in ds_tk[:so_mach]] + [_hs(chon, lop)]),
+        "cong_cu": _cong_cu(lop) + (f" Đồ dùng nêu trong giáo án: {bc['tb']}." if bc.get("tb") else ""),
+        "cac_buoc": " ".join(tk["cac_buoc"] for tk in ds_tk[:so_mach]),
+        "san_pham": "; ".join(dict.fromkeys(
+            [x["de_xuat"]["san_pham"] for x in chon if x["de_xuat"]["san_pham"]]
+            + [tk["san_pham"] for tk in ds_tk[:1] if tk.get("san_pham")])),
+        "danh_gia": "; ".join(dict.fromkeys(
+            [x["de_xuat"]["minh_chung"] for x in chon if x["de_xuat"]["minh_chung"]]
+            + [tk["minh_chung"] for tk in ds_tk[:1] if tk.get("minh_chung")])),
+        "gan_vao": "; ".join(dict.fromkeys(tk["gan_vao"] for tk in ds_tk if tk.get("gan_vao"))),
+        "kieu": [tk["kieu"] for tk in ds_tk],
+        "nd": bc.get("nd") or "",
+        "cap_hoc": cap,
         "ten_bai": ten_bai,
     }
 
