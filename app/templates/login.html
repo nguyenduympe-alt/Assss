@@ -1,5 +1,6 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng nhập — EduAssist</title>
+{% include '_head_icon.html' %}
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;font-family:"Inter",system-ui,"Segoe UI",Roboto,Arial,sans-serif;
@@ -13,8 +14,9 @@ body{margin:0;min-height:100vh;display:flex;font-family:"Inter",system-ui,"Segoe
   linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px}
 .left>*{position:relative;z-index:1}
 .lg{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:800;margin-bottom:34px}
-.lg .mk{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:22px;
- background:linear-gradient(135deg,#0d9488,#059669);box-shadow:0 10px 30px -8px #14b8a6}
+.lg .mk{width:46px;height:46px;border-radius:14px;display:block;overflow:hidden;flex:0 0 auto;
+ box-shadow:0 12px 30px -10px #14b8a6}
+.lg .mk img{width:100%;height:100%;display:block}
 .left h2{font-size:31px;line-height:1.25;margin:0 0 14px;font-weight:750;letter-spacing:-.5px}
 .left p{color:#9fc7bd;font-size:14.5px;line-height:1.65;margin:0 0 30px;max-width:430px}
 .fe{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;max-width:430px}
@@ -57,7 +59,7 @@ button:hover{filter:brightness(1.07);transform:translateY(-1px)}
 @media(max-width:900px){.left{display:none}.right{flex:1;width:auto}}
 </style></head><body>
 <div class="left">
- <div class="lg"><span class="mk">🎓</span>EduAssist</div>
+ <div class="lg"><span class="mk"><img src="{{url_for('static', filename='logo/ea-mark-b.svg')}}?v=logo1" alt="EduAssist"></span>EduAssist</div>
  <h2>Trợ lý số cho<br>giáo viên hiện đại</h2>
  <p>Tải giáo án lên là có bản tích hợp năng lực số, kiểm tra chính tả, xuất lịch báo giảng và nhận xét học sinh —
  tất cả trên một trang, dùng được cho <b style="color:#fff">lớp 1 đến lớp 12</b>.</p>

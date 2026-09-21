@@ -2,6 +2,7 @@
 <html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{% block title %}EduAssist{% endblock %} — Trợ lý giáo viên</title>
+{% include '_head_icon.html' %}
 <style>
 :root{
  --bg:#f3f8f6; --card:#fff; --ink:#0f172a; --mut:#64748b; --line:#e4eeea;
@@ -21,8 +22,9 @@ a{color:inherit;text-decoration:none}
 aside{width:252px;flex:0 0 252px;background:#0a1f1c;color:#b7cdc7;display:flex;flex-direction:column;
  position:sticky;top:0;height:100vh;background-image:radial-gradient(900px 420px at -10% -8%,#064e3b 0%,transparent 62%),radial-gradient(700px 380px at 110% 105%,#0f766e 0%,transparent 60%)}
 .brand{display:flex;align-items:center;gap:11px;padding:20px 18px 16px;font-weight:800;color:#fff;font-size:17px;letter-spacing:.2px}
-.brand .mk{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:18px;
- background:linear-gradient(135deg,var(--pri),var(--pri2));box-shadow:0 6px 18px -6px var(--pri)}
+.brand .mk{width:38px;height:38px;border-radius:12px;display:block;overflow:hidden;flex:0 0 auto;
+ box-shadow:0 8px 20px -10px rgba(13,148,136,.95)}
+.brand .mk img{width:100%;height:100%;display:block}
 .brand small{display:block;font-weight:500;font-size:11px;color:#94a3b8;letter-spacing:.3px}
 .navgrp{padding:8px 12px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#5b7d75;margin-top:8px}
 aside nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;overflow-y:auto}
@@ -145,7 +147,7 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 {% if user %}
 <div class="shell">
 <aside id="sb">
-  <div class="brand"><span class="mk">{{SITE_LOGO}}</span><span>{{SITE_NAME}}<small>{{SITE_TAGLINE}}</small></span></div>
+  <div class="brand"><span class="mk"><img src="{{url_for('static', filename='logo/ea-mark-b.svg')}}?v=logo1" alt="{{SITE_NAME}}"></span><span>{{SITE_NAME}}<small>{{SITE_TAGLINE}}</small></span></div>
   {% set ep = request.endpoint %}
   <div class="navgrp">Tổng quan</div>
   <nav>

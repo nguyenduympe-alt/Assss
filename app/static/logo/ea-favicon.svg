@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="64" height="64"><defs>
+  <linearGradient id="fabg" x1="0.12" y1="0" x2="0.88" y2="1">
+    <stop offset="0" stop-color="#15B39E"/><stop offset="0.52" stop-color="#0D9488"/><stop offset="1" stop-color="#0A6B5D"/>
+  </linearGradient>
+  <linearGradient id="fapg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4F6F1"/>
+  </linearGradient>
+  <linearGradient id="fasp" x1="0" y1="0" x2="0.4" y2="1">
+    <stop offset="0" stop-color="#FFD063"/><stop offset="1" stop-color="#F6B02C"/>
+  </linearGradient>
+  <radialGradient id="fahl" cx="0.28" cy="0.16" r="0.9">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+  </radialGradient>
+  <clipPath id="faclip"><rect x="10" y="10" width="236" height="236" rx="56"/></clipPath>
+</defs><rect x="10" y="10" width="236" height="236" rx="56" fill="url(#fabg)"/><rect x="10" y="10" width="236" height="236" rx="56" fill="url(#fahl)"/><path d="M126,150 C100,132 68,124 34,130 L34,200 C68,194 100,202 126,220 Z" fill="#FFFFFF"/><path d="M130,150 C156,132 188,124 222,130 L222,200 C188,194 156,202 130,220 Z" fill="#FFFFFF" opacity="0.86"/><path d="M128,52 C140.0,80.0 140.0,80.0 168,92 C140.0,104.0 140.0,104.0 128,132 C116.0,104.0 116.0,104.0 88,92 C116.0,80.0 116.0,80.0 128,52 Z" fill="url(#fasp)"/></svg>

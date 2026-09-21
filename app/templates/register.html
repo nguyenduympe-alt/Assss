@@ -1,5 +1,6 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng ký — EduAssist</title>
+{% include '_head_icon.html' %}
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;
@@ -8,8 +9,9 @@ body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:c
   radial-gradient(800px 520px at 85% 90%,#059669 0%,transparent 55%)}
 .box{background:#fff;padding:34px;border-radius:20px;width:100%;max-width:430px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5)}
 .lg{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px;margin-bottom:20px}
-.lg .mk{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;color:#fff;
- background:linear-gradient(135deg,#0d9488,#059669)}
+.lg .mk{width:42px;height:42px;border-radius:13px;display:block;overflow:hidden;flex:0 0 auto;
+ box-shadow:0 10px 26px -10px #14b8a6}
+.lg .mk img{width:100%;height:100%;display:block}
 h1{font-size:21px;margin:0 0 5px;font-weight:750}.s{color:#64748b;font-size:13.5px;margin:0 0 22px}
 label{display:block;font-size:12.5px;font-weight:650;color:#475569;margin:0 0 6px}
 input{width:100%;padding:11px 13px;margin-bottom:14px;border:1px solid #d8e6e1;border-radius:11px;font:inherit;outline:none;transition:.15s}
@@ -28,7 +30,7 @@ button:hover{filter:brightness(1.07)}
 </style></head><body>
 <form class="box" method="post">
 <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
- <div class="lg"><span class="mk">🎓</span>EduAssist</div>
+ <div class="lg"><span class="mk"><img src="{{url_for('static', filename='logo/ea-mark-b.svg')}}?v=logo1" alt="EduAssist"></span>EduAssist</div>
  <h1>Tạo tài khoản giáo viên</h1><p class="s">Chỉ mất 30 giây để bắt đầu sử dụng hệ thống.</p>
  {% with ms=get_flashed_messages() %}{% for m in ms %}<div class="err">{{m}}</div>{% endfor %}{% endwith %}
  {% if errors %}<div class="err" role="alert" tabindex="-1" id="error-summary"><b>Chưa thể đăng ký tài khoản.</b> Vui lòng kiểm tra các mục bên dưới.{% if errors.get('form') %}<p>{{errors.form}}</p>{% endif %}</div>{% endif %}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 224" width="720" height="448"
+ role="img" aria-label="EduAssist — Trợ lý giáo viên"><title>EduAssist — logo dọc</title>
+  <style>
+    .nm { font-family: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; font-weight: 700; font-size: 46px; letter-spacing: -1.1px; }
+    .tg { font-family: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; font-weight: 500; font-size: 17.5px; letter-spacing: .4px; fill: #64748B; }
+  </style>
+  <g transform="translate(108,4) scale(0.5625)"><title>EduAssist — biểu tượng</title><defs>
+  <linearGradient id="dbbg" x1="0.12" y1="0" x2="0.88" y2="1">
+    <stop offset="0" stop-color="#15B39E"/><stop offset="0.52" stop-color="#0D9488"/><stop offset="1" stop-color="#0A6B5D"/>
+  </linearGradient>
+  <linearGradient id="dbpg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4F6F1"/>
+  </linearGradient>
+  <linearGradient id="dbsp" x1="0" y1="0" x2="0.4" y2="1">
+    <stop offset="0" stop-color="#FFD063"/><stop offset="1" stop-color="#F6B02C"/>
+  </linearGradient>
+  <radialGradient id="dbhl" cx="0.28" cy="0.16" r="0.9">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+  </radialGradient>
+  <clipPath id="dbclip"><rect x="10" y="10" width="236" height="236" rx="56"/></clipPath>
+</defs><rect x="10" y="10" width="236" height="236" rx="56" fill="url(#dbbg)"/><rect x="10" y="10" width="236" height="236" rx="56" fill="url(#dbhl)"/><path d="M58,78 a16,16 0 0 1 16,-16 H152 l28,28 V178 a16,16 0 0 1 -16,16 H74 a16,16 0 0 1 -16,-16 Z" fill="url(#dbpg)"/><path d="M152,62 L180,90 H168 a16,16 0 0 1 -16,-16 Z" fill="#CBEDE4"/><rect x="80" y="104" width="82" height="11" rx="5.5" fill="#0D9488" opacity="0.42"/><rect x="80" y="128" width="62" height="11" rx="5.5" fill="#0D9488" opacity="0.42"/><rect x="80" y="152" width="72" height="11" rx="5.5" fill="#0D9488" opacity="0.42"/><path d="M199,30 C207.1,48.9 207.1,48.9 226,57 C207.1,65.1 207.1,65.1 199,84 C190.9,65.1 190.9,65.1 172,57 C190.9,48.9 190.9,48.9 199,30 Z" fill="url(#dbsp)"/></g>
+  <text class="nm" x="180" y="188" text-anchor="middle" fill="#0F172A">Edu<tspan fill="#0D9488">Assist</tspan></text>
+  <text class="tg" x="180" y="214" text-anchor="middle">Trợ lý giáo viên</text>
+</svg>

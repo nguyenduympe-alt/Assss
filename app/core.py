@@ -1,6 +1,6 @@
 import io, json, datetime, csv, re, os, time, uuid
 from flask import (Blueprint, render_template, request, redirect, url_for, session,
-                   send_file, jsonify, flash, Response)
+                   send_file, send_from_directory, jsonify, flash, Response)
 from .db import get_db, setting, set_setting
 from .auth import (login_required, current_user, admin_required, google_bat,
                     google_callback_url, google_tinh_trang, kiem_tra_google)
@@ -921,6 +921,13 @@ def qt_caidat():
                            CFG=CFG, suc_khoe=CFG.suc_khoe(),
                            google_tt=google_tinh_trang(),
                            webhook_url=request.url_root.rstrip("/") + "/webhook/bank")
+
+
+@bp.route("/favicon.ico")
+def favicon():
+    """(LOGO-B) favicon cho trình duyệt cũ và các yêu cầu /favicon.ico mặc định."""
+    return send_from_directory(os.path.join(os.path.dirname(__file__), "static"), "favicon.ico",
+                               mimetype="image/vnd.microsoft.icon")
 
 
 @bp.route("/suc-khoe")

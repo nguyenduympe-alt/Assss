@@ -9,6 +9,8 @@ def create_app():
     # Khi deploy: đặt biến môi trường SECRET_KEY (chuỗi ngẫu nhiên dài)
     app.secret_key = os.environ.get("SECRET_KEY", "edu-dev-secret-change-me")
     app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
+    # (LOGO-B) tệp nhận diện (logo, favicon) cho trình duyệt nhớ 7 ngày — đổi logo thì đổi số ?v= trong template
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 7
     if os.environ.get("HTTPS_ONLY", "").lower() in ("1", "true", "yes"):
         app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True,
                           SESSION_COOKIE_SAMESITE="Lax")

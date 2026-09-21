@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="512" height="512" role="img" aria-label="EduAssist"><title>EduAssist — biểu tượng</title><defs>
+  <linearGradient id="mbbg" x1="0.12" y1="0" x2="0.88" y2="1">
+    <stop offset="0" stop-color="#15B39E"/><stop offset="0.52" stop-color="#0D9488"/><stop offset="1" stop-color="#0A6B5D"/>
+  </linearGradient>
+  <linearGradient id="mbpg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4F6F1"/>
+  </linearGradient>
+  <linearGradient id="mbsp" x1="0" y1="0" x2="0.4" y2="1">
+    <stop offset="0" stop-color="#FFD063"/><stop offset="1" stop-color="#F6B02C"/>
+  </linearGradient>
+  <radialGradient id="mbhl" cx="0.28" cy="0.16" r="0.9">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+  </radialGradient>
+  <clipPath id="mbclip"><rect x="10" y="10" width="236" height="236" rx="56"/></clipPath>
+</defs><rect x="10" y="10" width="236" height="236" rx="56" fill="#0F172A"/><path d="M58,78 a16,16 0 0 1 16,-16 H152 l28,28 V178 a16,16 0 0 1 -16,16 H74 a16,16 0 0 1 -16,-16 Z" fill="#0F172A"/><path d="M152,62 L180,90 H168 a16,16 0 0 1 -16,-16 Z" fill="#0F172A" opacity="0.55"/><rect x="80" y="104" width="82" height="11" rx="5.5" fill="#0F172A" opacity="0.45"/><rect x="80" y="128" width="62" height="11" rx="5.5" fill="#0F172A" opacity="0.45"/><rect x="80" y="152" width="72" height="11" rx="5.5" fill="#0F172A" opacity="0.45"/><path d="M199,30 C207.1,48.9 207.1,48.9 226,57 C207.1,65.1 207.1,65.1 199,84 C190.9,65.1 190.9,65.1 172,57 C190.9,48.9 190.9,48.9 199,30 Z" fill="#0F172A"/></svg>
