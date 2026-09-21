@@ -1,19 +1,15 @@
 {% extends 'base.html' %}
 {% block head %}Quản lý môn học{% endblock %}
-{% block crumb %}Gom mọi môn + khối về một chỗ — nhập phân phối chương trình cho từng môn{% endblock %}
+{% block crumb %}Gom mọi môn + khối — nhập, xem và sửa phân phối chương trình ngay trong từng môn{% endblock %}
 {% block body %}
 <div class="card">
  <div class="chead">
   <h3>📚 Môn học của thầy/cô</h3>
   <span class="chip">{{tk.so_mon}} môn + khối</span>
  </div>
- <p class="sub">Danh sách này gom <b>mọi môn + khối</b> thầy/cô đang có: môn đã khai ở
-  <a href="{{url_for('core.cai_dat')}}">Cài đặt</a>, môn trong kho
-  <a href="{{url_for('digital.index')}}">KHDH + NLS + AI + STEM</a>, môn đã có
-  <a href="{{url_for('core.ppct')}}">phân phối chương trình</a> và môn đã xếp ở
-  <a href="{{url_for('core.tkb')}}">thời khoá biểu</a>.
-  Môn chính (môn đầu danh sách) hiện là <b>{{mon_chinh or 'chưa chọn'}}</b> — dùng làm mặc định ở các ô chọn môn.
-  Mỗi giáo viên tối đa {{TOI_DA_MON}} môn.</p>
+ <p class="sub">Đây là nơi <b>thống nhất</b> để đưa phân phối chương trình cho từng môn: tải tệp lên hoặc
+  thêm từng bài ngay dưới môn đó — hệ thống tự gắn đúng môn + khối, không phải chọn lại.
+  Môn chính hiện là <b>{{mon_chinh or 'chưa chọn'}}</b>. Mỗi giáo viên tối đa {{TOI_DA_MON}} môn.</p>
  <div class="row" style="gap:6px;flex-wrap:wrap">
   <span class="chip" style="background:#ecfdf5;color:#0d9488">{{tk.co_ppct}} môn đã có PPCT</span>
   <span class="chip" style="background:#eff6ff;color:#1d4ed8">{{tk.co_khdh}} môn đã có KHDH trong kho</span>
@@ -23,10 +19,22 @@
  </div>
 </div>
 
+{% if ket_qua_nhap %}
+<div class="card" style="border-color:#fecdd3;background:#fff1f2">
+ <h3>⚠️ Không nhập được tệp — dữ liệu PPCT cũ vẫn còn</h3>
+ {% for k in ket_qua_nhap %}
+  <p class="sub" style="margin:6px 0"><b>{{k.ten}}</b>
+   {% if k.loi %}— {{k.loi}}{% endif %}
+   {% for p in k.phan %}{% if p.loi %} · {{p.loi}}{% endif %}{% if p.canh_bao %} · {{p.canh_bao}}{% endif %}{% endfor %}
+  </p>
+ {% endfor %}
+</div>
+{% endif %}
+
 <div class="card">
  <h3>➕ Thêm môn</h3>
- <p class="sub">Thêm môn (và khối nếu thầy/cô dạy nhiều khối) — môn mới vào danh sách môn dạy và hiện sẵn
-  trong các ô chọn môn ở Phân phối chương trình / Thời khoá biểu.</p>
+ <p class="sub">Thêm môn (và khối nếu dạy nhiều khối) — môn mới vào danh sách môn dạy và hiện sẵn
+  trong các ô chọn môn ở Thời khoá biểu / Lịch báo giảng.</p>
  <form method="post" class="row">
   <input type="hidden" name="act" value="them">
   <label class="f">Tên môn<input name="mon_moi" list="goi_y_mon" maxlength="60" required
@@ -43,7 +51,7 @@
 {% endif %}
 
 {% for d in ds %}
-<div class="card">
+<div class="card" id="{{d.slug}}">
  <div class="chead">
   <h3>{{d.mon}}{% if d.khoi %} <span class="chip">Khối {{d.khoi}}</span>{% endif %}
    {% if d.chinh %}<span class="chip" style="background:#ecfdf5;color:#0d9488">Môn chính</span>{% endif %}
@@ -58,7 +66,8 @@
   <input type="hidden" name="act" value="ppct">
   <input type="hidden" name="mon" value="{{d.mon}}">
   <input type="hidden" name="khoi" value="{{d.khoi}}">
-  <label class="f" style="flex:1;min-width:230px">📥 Nhập phân phối chương trình cho môn này
+  <input type="hidden" name="slug" value="{{d.slug}}">
+  <label class="f" style="flex:1;min-width:230px">📥 Tải tệp PPCT cho môn này
    <input type="file" name="files" accept=".docx,.xlsx,.xls,.csv" multiple required></label>
   {% if not d.khoi %}
   <label class="f">Khối của môn này<select name="khoi_moi" required style="width:130px">
@@ -68,13 +77,77 @@
    <input type="checkbox" name="thay_cu" value="1" checked style="width:18px;margin-top:12px">
    <span style="margin-top:10px">Thay PPCT cũ của đúng môn + khối này</span></label>
   <button class="ok">Nhập PPCT</button>
-  <a class="btn sec" href="{{url_for('core.ppct', mon=d.mon, khoi=d.khoi)}}">👁 Xem PPCT</a>
+  <a class="btn sec" href="{{url_for('core.mau_excel', kind='ppct')}}">⬇ File mẫu</a>
  </form>
  {% if d.co_kho and d.ten_file %}
  <div class="muted" style="font-size:12px;margin-top:6px">KHDH trong kho: {{d.ten_file}}</div>
  {% endif %}
 
- <details style="margin-top:10px">
+ <div style="margin-top:14px">
+  <div class="chead" style="margin-bottom:8px">
+   <h3 style="font-size:14px">📘 Phân phối chương trình của môn này
+    <span class="chip">{{d.ppct|length}} dòng</span></h3>
+  </div>
+  {% if d.ppct %}
+  <div class="tbl-wrap" style="max-height:320px;overflow-y:auto"><table>
+   <thead><tr><th>Tuần</th><th>Tiết</th><th>Tên bài dạy</th><th>Ghi chú</th><th></th></tr></thead>
+   <tbody>
+   {% for r in d.ppct %}
+   <tr>
+    <td><span class="chip">T{{r.tuan}}</span></td>
+    <td>{{r.tiet_pp or '—'}}</td>
+    <td>{{r.ten_bai}}</td>
+    <td class="muted">{{r.ghi_chu or ''}}</td>
+    <td style="text-align:right;white-space:nowrap">
+     <button class="btn sec sm" type="button"
+      onclick="var f=document.getElementById('pp{{r.id}}');f.style.display=(f.style.display=='table-row'?'none':'table-row')">✏️ Sửa</button>
+     <form method="post" style="display:inline" onsubmit="return confirm('Xoá bài này?')">
+      <input type="hidden" name="act" value="xoa_dong">
+      <input type="hidden" name="id" value="{{r.id}}">
+      <input type="hidden" name="slug" value="{{d.slug}}">
+      <button class="dan">Xoá</button></form>
+    </td>
+   </tr>
+   <tr id="pp{{r.id}}" style="display:none;background:#f8fbfa">
+    <td colspan="5">
+     <form method="post" class="row" style="gap:8px">
+      <input type="hidden" name="act" value="sua_dong">
+      <input type="hidden" name="id" value="{{r.id}}">
+      <input type="hidden" name="slug" value="{{d.slug}}">
+      <label class="f">Tuần<input name="tuan" type="number" min="1" max="60" value="{{r.tuan}}" style="width:82px" required></label>
+      <label class="f">Tiết PPCT<input name="tiet_pp" type="number" value="{{r.tiet_pp or ''}}" style="width:92px"></label>
+      <label class="f" style="flex:1;min-width:180px">Tên bài dạy<input name="ten_bai" value="{{r.ten_bai or ''}}" required></label>
+      <label class="f" style="flex:1;min-width:140px">Ghi chú<input name="ghi_chu" value="{{r.ghi_chu or ''}}"></label>
+      <button class="ok">💾 Lưu bài</button>
+      <button class="btn sec" type="button" onclick="document.getElementById('pp{{r.id}}').style.display='none'">Huỷ</button>
+     </form>
+    </td>
+   </tr>
+   {% endfor %}
+   </tbody>
+  </table></div>
+  {% else %}
+  <div class="empty" style="padding:18px"><span class="e">📘</span>Chưa có PPCT cho môn này — tải tệp ở trên hoặc thêm từng bài ở dưới.</div>
+  {% endif %}
+
+  <form method="post" class="row" style="gap:8px;margin-top:10px;align-items:flex-end">
+   <input type="hidden" name="act" value="them_dong">
+   <input type="hidden" name="mon" value="{{d.mon}}">
+   <input type="hidden" name="khoi" value="{{d.khoi}}">
+   <input type="hidden" name="slug" value="{{d.slug}}">
+   <label class="f">Tuần<input name="tuan" type="number" min="1" max="60" value="1" style="width:82px" required></label>
+   {% if not d.khoi %}
+   <label class="f">Khối<select name="khoi_moi" required style="width:110px">
+    <option value="">Chọn khối</option>{% for k in KHOI %}<option>{{k}}</option>{% endfor %}</select></label>
+   {% endif %}
+   <label class="f">Tiết PPCT<input name="tiet_pp" type="number" style="width:92px"></label>
+   <label class="f" style="flex:1;min-width:180px">Tên bài dạy<input name="ten_bai" required placeholder="Thêm trực tiếp một bài"></label>
+   <label class="f" style="flex:1;min-width:140px">Ghi chú<input name="ghi_chu"></label>
+   <button class="sec">+ Thêm bài</button>
+  </form>
+ </div>
+
+ <details style="margin-top:12px">
   <summary style="cursor:pointer;font-size:13px;color:#0f766e;font-weight:600">⚙️ Sửa tên môn · đặt môn chính · xoá môn</summary>
   <div class="row" style="gap:8px;align-items:flex-end;margin-top:9px">
    <form method="post" class="row" style="gap:8px;align-items:flex-end">
@@ -126,13 +199,12 @@
 <div class="card" style="background:#f8fbfa">
  <b style="font-size:13.5px">Cách dùng nhanh</b>
  <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;color:#475569;line-height:1.7">
-  <li><b>Đưa PPCT cho một môn:</b> bấm chọn tệp ở đúng dòng môn đó rồi <b>Nhập PPCT</b> — hệ thống tự lấy
-   môn + khối của dòng, không phải chọn lại; ô “Thay PPCT cũ…” giúp thay cả bộ khi nộp bản mới.</li>
-  <li>Tệp Word có thể ghi rõ “MÔN: TOÁN — LỚP 6” ở trên bảng, hoặc có cột Môn/Khối — hệ thống đọc theo đúng tệp.</li>
-  <li><b>Nhiều khối cùng môn:</b> thêm môn một lần nữa với khối khác (ví dụ Toán khối 6 và Toán khối 7) để mỗi khối có PPCT riêng.</li>
-  <li><b>Xoá nhầm thì yên tâm:</b> mọi lần xoá đều báo lại rõ đã xoá bao nhiêu dòng PPCT / tiết TKB / bản KHDH.
-   Nếu môn <b>còn dữ liệu</b> (còn PPCT hoặc tiết dạy) thì dòng vẫn hiện để thầy/cô khỏi mất dấu — dòng đó ghi
-   “Chưa có trong danh sách môn dạy” kèm nút <b>Thêm lại vào danh sách môn dạy</b>.</li>
+  <li><b>Đưa PPCT cho một môn:</b> chọn tệp ở đúng dòng môn rồi <b>Nhập PPCT</b> — hệ thống tự lấy
+   môn + khối, hiện nội dung bài ngay dưới môn đó. Ô “Thay PPCT cũ…” thay cả bộ khi nộp bản mới;
+   bỏ tích thì cộng thêm dòng. Tệp lỗi được báo rõ, <b>không làm mất</b> PPCT đang có.</li>
+  <li><b>Thêm từng bài:</b> điền tuần + tên bài rồi <b>+ Thêm bài</b> — không cần sang trang khác.</li>
+  <li>Tệp Word có thể ghi “MÔN: TOÁN — LỚP 6”; khi tải lên tại một môn, bài vẫn <b>gắn đúng môn đang thao tác</b>.</li>
+  <li>Lịch báo giảng và thời khoá biểu đọc PPCT vừa lưu theo đúng môn.</li>
  </ul>
 </div>
 {% endblock %}

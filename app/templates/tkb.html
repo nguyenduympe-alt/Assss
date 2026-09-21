@@ -1,13 +1,26 @@
 {% extends 'base.html' %}
 {% block head %}Thời khoá biểu{% endblock %}
-{% block crumb %}Thời khoá biểu cố định 1 tuần của giáo viên{% endblock %}
+{% block crumb %}Thời khoá biểu theo phiên bản — áp dụng từ tuần đã chọn{% endblock %}
 {% block body %}
+<div class="card">
+ <div class="chead"><h3>📅 Phiên bản thời khoá biểu</h3>
+  <span class="chip" style="background:#ecfdf5;color:#0d9488">Áp dụng từ tuần {{ap_dung_tu}}</span></div>
+ <p class="sub">Năm học <b>{{nam_hoc}}</b>. Đang xem tuần <b>{{tuan}}</b> — dùng phiên bản
+  <b>áp dụng từ tuần {{ap_dung_tu}}</b>.
+  Sửa ở tuần W chỉ đổi từ W trở đi; các tuần trước giữ nguyên bản cũ.
+  {% if ds_moc %}Mốc đã lưu: {% for m in ds_moc %}<a class="chip" href="?tuan={{m}}">từ tuần {{m}}</a> {% endfor %}{% endif %}</p>
+ <form method="get" class="row" style="gap:8px;align-items:flex-end">
+  <label class="f">Xem tuần<input type="number" name="tuan" min="1" max="60" value="{{tuan}}" style="width:90px"></label>
+  <button class="sec">Mở tuần</button>
+ </form>
+</div>
 <div class="card">
  <h3>➕ Thêm tiết dạy</h3><p class="sub">Chọn <b>môn đã tạo trong kho KHDH</b>, nhập <b>lớp dạy</b> — hệ thống đối chiếu
  số tiết mỗi tuần với KHDH của môn đó. Môn chưa có trong danh sách thì chọn “＋ Môn khác” rồi nhập tên môn + khối.
   <b>Thứ và buổi thầy/cô vừa chọn được giữ lại</b> cho lần thêm tiếp theo — lần sau chỉ cần đổi tiết / lớp / môn, không phải chọn lại từ đầu.</p>
  <form method="post">
   <input type="hidden" name="act" value="add">
+  <input type="hidden" name="tuan" value="{{tuan}}">
   <div class="row">
    <label class="f">Thứ<select name="thu">{% for i in range(2,9) %}<option value="{{i}}" {{'selected' if thu_chon==i|string}}>{{THU_NAME[i]}}</option>{% endfor %}</select></label>
    <label class="f">Buổi<select name="buoi">{% for b in ['Sáng','Chiều'] %}<option {{'selected' if buoi_chon==b}}>{{b}}</option>{% endfor %}</select></label>
@@ -82,8 +95,8 @@
 {% if rows %}
 <div class="card">
  <div class="chead"><h3>Danh sách chi tiết <span class="muted" style="font-weight:400;font-size:12.5px">— sửa hoặc xoá từng tiết</span></h3>
-  <form method="post" onsubmit="return confirm('Xoá toàn bộ thời khoá biểu?')">
-   <input type="hidden" name="act" value="clear"><button class="dan">🗑 Xoá toàn bộ</button></form></div>
+  <form method="post" onsubmit="return confirm('Xoá phiên bản thời khoá biểu đang xem?')">
+   <input type="hidden" name="act" value="clear"><input type="hidden" name="tuan" value="{{tuan}}"><button class="dan">🗑 Xoá phiên bản này</button></form></div>
  <div class="tbl-wrap"><table>
   <thead><tr><th>Thứ</th><th>Buổi</th><th>Tiết</th><th>Lớp dạy</th><th>Môn</th><th>Khối</th><th>Phòng</th><th></th></tr></thead>
   <tbody>{% for r in rows %}<tr><td><b>{{THU_NAME[r['thu']]}}</b></td><td>{{r['buoi']}}</td><td>{{r['tiet']}}</td>
@@ -91,11 +104,13 @@
   <td style="text-align:right;white-space:nowrap">
    <button class="btn sec sm" type="button" onclick="var f=document.getElementById('su{{r['id']}}');f.style.display=(f.style.display=='table-row'?'none':'table-row');if(f.style.display=='table-row'){f.scrollIntoView({block:'center'})}">✏️ Sửa</button>
    <form method="post" style="display:inline"><input type="hidden" name="act" value="del">
+   <input type="hidden" name="tuan" value="{{tuan}}">
    <input type="hidden" name="id" value="{{r['id']}}"><button class="dan">Xoá</button></form></td></tr>
   <tr id="su{{r['id']}}" style="display:none;background:#f8fbfa">
    <td colspan="8" style="padding:9px 10px 12px">
     <form method="post" class="row" style="gap:8px">
      <input type="hidden" name="act" value="edit"><input type="hidden" name="id" value="{{r['id']}}">
+     <input type="hidden" name="tuan" value="{{tuan}}">
      <label class="f">Thứ<select name="thu">{% for i in range(2,9) %}<option value="{{i}}" {{'selected' if r['thu']|string==i|string}}>{{THU_NAME[i]}}</option>{% endfor %}</select></label>
      <label class="f">Buổi<select name="buoi">{% for b in ['Sáng','Chiều'] %}<option {{'selected' if r['buoi']==b}}>{{b}}</option>{% endfor %}</select></label>
      <label class="f">Tiết<input name="tiet" type="number" min="1" max="10" value="{{r['tiet']}}" style="width:74px" required></label>

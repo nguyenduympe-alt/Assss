@@ -108,6 +108,8 @@ def liet_ke(db, uid, u=None):
         if "chinh" not in d:
             d["chinh"] = bool(chinh) and MD.bo_dau(chinh) == MD.bo_dau(d["mon"])
     ra.sort(key=lambda d: (not d["chinh"], MD.bo_dau(d["mon"]), int(d["khoi"]) if d["khoi"].isdigit() else 99))
+    for d in ra:
+        d["slug"] = "mh-%s-%s" % (MD.bo_dau(d["mon"]).replace(" ", "-"), d["khoi"] or "0")
     return ra
 
 
@@ -219,6 +221,73 @@ def dat_chinh(db, uid, mon):
     ten = next(x for x in ds if MD.bo_dau(x) == MD.bo_dau(mon))
     MD.luu(db, uid, [ten] + [x for x in ds if MD.bo_dau(x) != MD.bo_dau(ten)])
     return True, "Đã đặt %s làm môn chính (môn đầu danh sách)." % ten
+
+
+def dong_ppct(db, uid, mon, khoi):
+    """Các dòng PPCT của đúng một môn + khối, sắp theo tuần rồi tiết."""
+    return db.execute("SELECT * FROM ppct WHERE teacher_id=? AND lower(mon)=lower(?)"
+                      " AND COALESCE(khoi,'')=? ORDER BY tuan, tiet_pp, id",
+                      (uid, _gon(mon), str(khoi or ""))).fetchall()
+
+
+def them_dong(db, uid, mon, khoi, tuan, tiet_pp, ten_bai, ghi_chu=""):
+    """Thêm một dòng PPCT trực tiếp trên trang Quản lý môn — tự gắn môn + khối đang thao tác."""
+    mon, khoi = _gon(mon), str(khoi or "").strip()
+    ten_bai = _gon(ten_bai)
+    if not mon:
+        return False, "Thiếu tên môn."
+    if khoi not in KHO.KHOI:
+        return False, "Thêm bài PPCT cần có khối (1–12)."
+    try:
+        tuan = int(tuan or 0)
+    except Exception:
+        tuan = 0
+    if tuan < 1 or tuan > 60:
+        return False, "Tuần phải từ 1 đến 60."
+    if not ten_bai:
+        return False, "Vui lòng nhập tên bài dạy."
+    try:
+        tiet = int(tiet_pp) if str(tiet_pp or "").strip() != "" else None
+    except Exception:
+        return False, "Tiết PPCT phải là số."
+    db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu) VALUES(?,?,?,?,?,?,?)",
+               (uid, khoi, mon, tuan, tiet, ten_bai, _gon(ghi_chu) or None))
+    db.commit()
+    MD.them(db, uid, mon)
+    return True, "Đã thêm bài “%s” vào PPCT môn %s khối %s (tuần %d)." % (ten_bai, mon, khoi, tuan)
+
+
+def sua_dong(db, uid, iid, tuan, tiet_pp, ten_bai, ghi_chu=""):
+    """Sửa một dòng PPCT — chỉ dòng của đúng giáo viên."""
+    r = db.execute("SELECT * FROM ppct WHERE id=? AND teacher_id=?", (iid, uid)).fetchone()
+    if not r:
+        return False, "Không tìm thấy dòng PPCT cần sửa (có thể đã bị xoá)."
+    ten_bai = _gon(ten_bai)
+    if not ten_bai:
+        return False, "Vui lòng nhập tên bài dạy."
+    try:
+        tuan = int(tuan or 0)
+    except Exception:
+        tuan = 0
+    if tuan < 1 or tuan > 60:
+        return False, "Tuần phải từ 1 đến 60."
+    try:
+        tiet = int(tiet_pp) if str(tiet_pp or "").strip() != "" else None
+    except Exception:
+        return False, "Tiết PPCT phải là số."
+    db.execute("UPDATE ppct SET tuan=?, tiet_pp=?, ten_bai=?, ghi_chu=? WHERE id=? AND teacher_id=?",
+               (tuan, tiet, ten_bai, _gon(ghi_chu) or None, iid, uid))
+    db.commit()
+    return True, "Đã sửa bài “%s” (tuần %d) của môn %s." % (ten_bai, tuan, r["mon"])
+
+
+def xoa_dong(db, uid, iid):
+    r = db.execute("SELECT * FROM ppct WHERE id=? AND teacher_id=?", (iid, uid)).fetchone()
+    if not r:
+        return False, "Không tìm thấy dòng PPCT cần xoá."
+    db.execute("DELETE FROM ppct WHERE id=? AND teacher_id=?", (iid, uid))
+    db.commit()
+    return True, "Đã xoá bài “%s” khỏi PPCT môn %s." % (r["ten_bai"] or "", r["mon"])
 
 
 # ---------------------------------------------------------------- nhập PPCT cho môn

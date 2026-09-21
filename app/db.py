@@ -184,7 +184,9 @@ def init_db():
         except sqlite3.OperationalError:
             pass
     tcols = {r[1] for r in con.execute("PRAGMA table_info(tkb)")}
-    for name, ddl in (("khoi", "TEXT"),):
+    for name, ddl in (("khoi", "TEXT"),
+                      ("tuan_bd", "INTEGER DEFAULT 1"),   # (M32) tuần bắt đầu hiệu lực của phiên bản
+                      ("nam_hoc", "TEXT")):               # (M32) gắn đúng giáo viên + năm học
         if name not in tcols:
             try:
                 con.execute(f"ALTER TABLE tkb ADD COLUMN {name} {ddl}")

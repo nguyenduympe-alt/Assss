@@ -114,7 +114,9 @@ def build_docx(meta, rows):
     _cell(head.cell(1, 0), "Tổ: " + (meta.get("to") or ""), 10, False, C)
     _cell(head.cell(1, 1),
           f"TUẦN {meta.get('tuan','')} (Từ ngày {meta.get('tu_ngay','')} "
-          f"đến ngày {meta.get('den_ngay','')})", 11, False, C)
+          f"đến ngày {meta.get('den_ngay','')})"
+          + ((" · TKB áp dụng từ tuần %s" % meta["ap_dung_tu_tuan"]) if meta.get("ap_dung_tu_tuan") else ""),
+          11, False, C)
 
     _para(doc, "", 4, space_after=2)
     p = doc.add_paragraph()

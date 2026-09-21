@@ -13,6 +13,7 @@ from .modules import billing as BL
 from .modules import mon_day as MD
 from .modules import ppct_tach as PT
 from .modules import mon_hoc as MH
+from .modules import tkb_phien as TP
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
 from .modules import sms as SMS
@@ -46,11 +47,7 @@ def _cong_cu():
          "mo_ta": "Xuất lịch báo giảng ra PDF hoặc Word",
          "the": [], "moi": False},
         {"icon": "📚", "ten": "Quản lý môn học", "endpoint": "core.mon_hoc", "mau": "#0d9488",
-         "mo_ta": "Gom mọi môn + khối về một chỗ: nhập phân phối chương trình cho từng môn, sửa tên môn, "
-                  "xoá môn kèm dữ liệu",
-         "the": [], "moi": False},
-        {"icon": "📘", "ten": "Phân phối chương trình", "endpoint": "core.ppct", "mau": "#0ea5e9",
-         "mo_ta": "Nhập và quản lý phân phối chương trình theo tuần, theo bài",
+         "mo_ta": "Gom mọi môn + khối về một chỗ: nhập / xem / sửa phân phối chương trình ngay trong từng môn",
          "the": [], "moi": False},
         {"icon": "🗓️", "ten": "Thời khoá biểu", "endpoint": "core.tkb", "mau": "#6366f1",
          "mo_ta": "Xếp thời khoá biểu theo buổi, tiết, phòng học",
@@ -235,8 +232,9 @@ def dashboard():
 @bp.route("/mon-hoc", methods=["GET", "POST"])
 @login_required
 def mon_hoc():
-    """Gom mọi môn + khối về một trang: nhập PPCT cho từng môn, sửa tên, xoá môn kèm dữ liệu."""
+    """Gom mọi môn + khối về một trang: nhập / xem / sửa PPCT ngay trong từng môn."""
     db, uid, u = get_db(), session["uid"], current_user()
+    ket_qua_nhap = None
     if request.method == "POST":
         act = request.form.get("act")
         mon = (request.form.get("mon") or "").strip()
@@ -258,6 +256,19 @@ def mon_hoc():
         elif act == "chinh":
             ok, tb = MH.dat_chinh(db, uid, mon)
             flash(tb, "ok" if ok else "err")
+        elif act == "them_dong":
+            ok, tb = MH.them_dong(db, uid, mon, khoi or (request.form.get("khoi_moi") or ""),
+                                  request.form.get("tuan"), request.form.get("tiet_pp"),
+                                  request.form.get("ten_bai"), request.form.get("ghi_chu"))
+            flash(tb, "ok" if ok else "err")
+        elif act == "sua_dong":
+            ok, tb = MH.sua_dong(db, uid, request.form.get("id"),
+                                 request.form.get("tuan"), request.form.get("tiet_pp"),
+                                 request.form.get("ten_bai"), request.form.get("ghi_chu"))
+            flash(tb, "ok" if ok else "err")
+        elif act == "xoa_dong":
+            ok, tb = MH.xoa_dong(db, uid, request.form.get("id"))
+            flash(tb, "ok" if ok else "err")
         elif act == "ppct":
             ds_tep = [f for f in (request.files.getlist("files") + request.files.getlist("file"))
                       if (getattr(f, "filename", "") or "").strip()]
@@ -275,23 +286,42 @@ def mon_hoc():
                                                         ds_mon=ds_mon)
                 MD.them(db, uid, mon)
                 if so_dong:
-                    flash("Đã nhập %d dòng PPCT cho môn %s khối %s%s."
+                    flash("Đã nhập %d dòng PPCT cho môn %s khối %s%s — xem nội dung ngay dưới đây."
                           % (so_dong, mon, khoi,
                              " (đã thay PPCT cũ của đúng môn + khối này)" if thay_cu else ""),
                           "err" if so_loi else "ok")
                 elif so_loi:
-                    flash("Chưa nhập được dòng nào — xem lý do ở bảng bên dưới.", "err")
-        return redirect(url_for("core.mon_hoc"))
+                    flash("Chưa nhập được dòng nào — xem lý do ngay dưới đây. Dữ liệu PPCT cũ vẫn còn.", "err")
+                    ket_qua_nhap = ket_qua
+                else:
+                    flash("Tệp không có dòng bài học nào — dữ liệu PPCT cũ vẫn còn.", "err")
+                    ket_qua_nhap = ket_qua
+        if ket_qua_nhap is None:
+            slug = (request.form.get("slug") or "").strip()
+            return redirect(url_for("core.mon_hoc") + (("#" + slug) if slug else ""))
 
     ds = MH.liet_ke(db, uid, u)
+    for d in ds:
+        d["ppct"] = MH.dong_ppct(db, uid, d["mon"], d["khoi"])
     return render_template("monhoc.html", ds=ds, tk=MH.thong_ke(ds), KHOI=KHO.KHOI,
-                           mon_chinh=MD.mon_chinh(u), TOI_DA_MON=MD.TOI_DA_MON)
+                           mon_chinh=MD.mon_chinh(u), TOI_DA_MON=MD.TOI_DA_MON,
+                           ket_qua_nhap=ket_qua_nhap,
+                           mon_loc=(request.args.get("mon") or "").strip(),
+                           khoi_loc=(request.args.get("khoi") or "").strip())
 
 
 @bp.route("/ppct", methods=["GET", "POST"])
 @login_required
 def ppct():
+    """Liên kết cũ: GET đưa về Quản lý môn; POST (thêm/xoá/nhập) vẫn nhận rồi đưa về đó."""
     db, uid = get_db(), session["uid"]
+    if request.method != "POST":
+        kw = {}
+        if request.args.get("mon"):
+            kw["mon"] = request.args.get("mon")
+        if request.args.get("khoi"):
+            kw["khoi"] = request.args.get("khoi")
+        return redirect(url_for("core.mon_hoc", **kw))
     if request.method == "POST":
         act = request.form.get("act")
         if act == "add":
@@ -386,7 +416,7 @@ def ppct():
             return render_template("ppct_import_kq.html", ket_qua=ket_qua, so_dong=so_dong,
                                    so_loi=so_loi, xoa_cu=xoa_cu, mon_day=ds_mon)
         db.commit()
-        return redirect(url_for("core.ppct", tuan=request.args.get("tuan", "")))
+        return redirect(url_for("core.mon_hoc"))
     tuan = request.args.get("tuan", "")
     mon_loc = (request.args.get("mon") or "").strip()
     khoi_loc = (request.args.get("khoi") or "").strip()
@@ -450,12 +480,43 @@ def _tkb_nho_tkb(dt):
     session["tkb_thu"], session["tkb_buoi"] = dt["thu"], dt["buoi"]
 
 
+def _nam_hoc_gv(u):
+    s = setting("tuan1_%s" % u["id"], "")
+    try:
+        d = datetime.date.fromisoformat(s) if s else datetime.date.today()
+    except Exception:
+        d = datetime.date.today()
+    return TP.nam_hoc_tu_ngay(d)
+
+
+def _tuan_xem():
+    try:
+        return max(1, int(request.values.get("tuan") or 1))
+    except Exception:
+        return 1
+
+
+def _tkb_dong_phien(db, uid, r, nam, tuan):
+    """Tìm đúng dòng của phiên bản hiệu lực tại `tuan` (sao chép nếu đang đứng giữa hai mốc)."""
+    v = TP.dam_bao_phien(db, uid, nam, tuan)
+    if r and int(r["tuan_bd"] or 1) == v and (r["nam_hoc"] or nam) == nam:
+        return r, v
+    r2 = db.execute("SELECT * FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
+                    " AND COALESCE(tuan_bd,1)=? AND thu=? AND buoi=? AND tiet=?",
+                    (uid, nam, v, r["thu"], r["buoi"], r["tiet"])).fetchone() if r else None
+    return r2, v
+
+
 @bp.route("/tkb", methods=["GET", "POST"])
 @login_required
 def tkb():
-    db, uid = get_db(), session["uid"]
+    db, uid, u = get_db(), session["uid"], current_user()
+    tuan = _tuan_xem()
+    nam = _nam_hoc_gv(u)
     if request.method == "POST":
         act = request.form.get("act")
+        tuan = _tuan_xem()
+        nam = _nam_hoc_gv(u)
         if act in ("add", "edit"):
             dt, loi = _tkb_doc_form()
             mon, khoi, loi_mon = _tkb_mon_khoi()
@@ -468,62 +529,73 @@ def tkb():
                 if not r:
                     flash("Không tìm thấy tiết cần sửa (có thể đã bị xoá).", "err")
                 else:
-                    db.execute("UPDATE tkb SET thu=?,buoi=?,tiet=?,lop=?,mon=?,khoi=?,phong=?"
-                               " WHERE id=? AND teacher_id=?",
-                               (dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"],
-                                r["id"], uid))
-                    _tkb_nho_tkb(dt)          # (M30) nhớ thứ + buổi vừa dùng cho lần thêm sau
-                    flash("Đã sửa tiết dạy: %s · %s tiết %s · lớp %s · %s."
-                          % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
+                    r, v = _tkb_dong_phien(db, uid, r, nam, tuan)
+                    if not r:
+                        flash("Không tìm thấy tiết cần sửa (có thể đã bị xoá).", "err")
+                    else:
+                        db.execute("UPDATE tkb SET thu=?,buoi=?,tiet=?,lop=?,mon=?,khoi=?,phong=?"
+                                   " WHERE id=? AND teacher_id=?",
+                                   (dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"],
+                                    r["id"], uid))
+                        _tkb_nho_tkb(dt)
+                        flash("Đã sửa tiết dạy: %s · %s tiết %s · lớp %s · %s."
+                              % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
             else:
-                db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong)"
-                           " VALUES(?,?,?,?,?,?,?,?)",
-                           (uid, dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"]))
-                _tkb_nho_tkb(dt)              # (M30) nhớ thứ + buổi vừa dùng cho lần thêm sau
+                v = TP.dam_bao_phien(db, uid, nam, tuan)
+                db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong,tuan_bd,nam_hoc)"
+                           " VALUES(?,?,?,?,?,?,?,?,?,?)",
+                           (uid, dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"], v, nam))
+                _tkb_nho_tkb(dt)
                 flash("Đã thêm tiết dạy: %s · %s tiết %s · lớp %s · %s."
                       % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
         elif act == "del":
             r = db.execute("SELECT * FROM tkb WHERE id=? AND teacher_id=?",
                            (request.form.get("id"), uid)).fetchone()
-            db.execute("DELETE FROM tkb WHERE id=? AND teacher_id=?", (request.form.get("id"), uid))
+            r, v = _tkb_dong_phien(db, uid, r, nam, tuan) if r else (None, tuan)
             if r:
+                db.execute("DELETE FROM tkb WHERE id=? AND teacher_id=?", (r["id"], uid))
                 flash("Đã xoá tiết dạy: %s · %s tiết %s · lớp %s."
                       % (THU_NAME[int(r["thu"])] if str(r["thu"]).isdigit() else r["thu"],
                          r["buoi"], r["tiet"], r["lop"]), "ok")
         elif act == "clear":
-            n = db.execute("SELECT COUNT(*) FROM tkb WHERE teacher_id=?", (uid,)).fetchone()[0]
-            db.execute("DELETE FROM tkb WHERE teacher_id=?", (uid,))
-            flash("Đã xoá toàn bộ thời khoá biểu (%d tiết)." % n, "ok")
+            v = TP.phien_cho_tuan(db, uid, nam, tuan) or tuan
+            n = db.execute("SELECT COUNT(*) FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
+                           " AND COALESCE(tuan_bd,1)=?", (uid, nam, v)).fetchone()[0]
+            db.execute("DELETE FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=? AND COALESCE(tuan_bd,1)=?",
+                       (uid, nam, v))
+            flash("Đã xoá thời khoá biểu phiên bản áp dụng từ tuần %d (%d tiết)." % (v, n), "ok")
         db.commit()
-        return redirect(url_for("core.tkb", tuan=request.args.get("tuan", "")))
-    rows = db.execute("SELECT * FROM tkb WHERE teacher_id=? ORDER BY thu, buoi DESC, tiet", (uid,)).fetchall()
+        return redirect(url_for("core.tkb", tuan=tuan if tuan != 1 else None))
+    rows = TP.dong(db, uid, nam, tuan)
     grid = {}
     for r in rows:
         grid.setdefault((r["buoi"], r["tiet"]), {})[r["thu"]] = r
     tiets = sorted({r["tiet"] for r in rows}) or [1, 2, 3, 4, 5]
-    # (M12) chọn môn đã tạo + đối chiếu số tiết/tuần theo KHDH
     kho = [k for k in KHO.danh_sach(db, uid) if k["luu"]]
     doi_chieu = KHO.doi_chieu(db, uid, rows)
     dem = {"du": 0, "thieu": 0, "thua": 0, "chua_co_khdh": 0, "chua_ro": 0}
     for d in doi_chieu:
         dem[d["ket_luan"]] = dem.get(d["ket_luan"], 0) + 1
     ds_kho_khoi = KHO.danh_sach(db, uid)
-    # (M30) giữ lại THỨ + BUỔI đã chọn ở lần thêm trước
     thu_chon = session.get("tkb_thu") or "2"
     buoi_chon = session.get("tkb_buoi") or "Sáng"
+    ap_dung = TP.phien_cho_tuan(db, uid, nam, tuan)
     return render_template("tkb.html", rows=rows, grid=grid, tiets=tiets, kho=kho,
                            doi_chieu=doi_chieu, dem=dem,
                            kho_khoi=ds_kho_khoi,
                            KHOI=KHO.KHOI, mon_kho={("%s|%s" % (k["mon"], k["khoi"])): True
                                                   for k in ds_kho_khoi},
-                           thu_chon=str(thu_chon), buoi_chon=buoi_chon)
+                           thu_chon=str(thu_chon), buoi_chon=buoi_chon,
+                           tuan=tuan, nam_hoc=nam, ap_dung_tu=ap_dung or 1,
+                           ds_moc=TP.moc(db, uid, nam))
 
 
 # ---------------- Lịch báo giảng ----------------
-def _rows_for_week(uid, tuan, monday, offday=None):
+def _rows_for_week(uid, tuan, monday, offday=None, nam_hoc=""):
     db = get_db()
     offday = offday or {}
-    tkb = db.execute("SELECT * FROM tkb WHERE teacher_id=? ORDER BY thu, buoi DESC, tiet", (uid,)).fetchall()
+    tkb = TP.dong(db, uid, nam_hoc, tuan) if nam_hoc else \
+        db.execute("SELECT * FROM tkb WHERE teacher_id=? ORDER BY thu, buoi DESC, tiet", (uid,)).fetchall()
     pp = db.execute("SELECT * FROM ppct WHERE teacher_id=? AND tuan=? ORDER BY mon, tiet_pp", (uid, tuan)).fetchall()
     pool = {}
     for p in pp:
@@ -538,16 +610,16 @@ def _rows_for_week(uid, tuan, monday, offday=None):
             d = monday + datetime.timedelta(days=int(t["thu"]) - 2)
             ngay = d.strftime("%d/%m/%Y")
             nghi = offday.get(d)
+        khoa = "%s|%s|%s" % (t["thu"], t["buoi"], t["tiet"])
         if nghi:
-            # ngày nghỉ lễ: trả bài về lại kho để tuần/tiết sau dùng tiếp
             if bai:
                 lst.insert(0, bai)
             out.append({"thu": t["thu"], "buoi": t["buoi"], "tiet": t["tiet"], "lop": t["lop"],
                         "mon": t["mon"], "ngay": ngay, "tiet_pp": "", "ten_bai": nghi,
-                        "ghi_chu": "", "nghi": True})
+                        "ghi_chu": "", "nghi": True, "khoa": khoa})
             continue
         out.append({"thu": t["thu"], "buoi": t["buoi"], "tiet": t["tiet"], "lop": t["lop"],
-                    "mon": t["mon"], "ngay": ngay,
+                    "mon": t["mon"], "ngay": ngay, "khoa": khoa,
                     "tiet_pp": bai["tiet_pp"] if bai else "", "ten_bai": bai["ten_bai"] if bai else "",
                     "ghi_chu": (bai["ghi_chu"] if bai else "") or (t["phong"] or ""), "nghi": False})
     return out
@@ -586,7 +658,18 @@ def bao_giang():
     else:
         monday = LN.monday_for_week(tuan1, breaks, tuan)
 
-    rows = _rows_for_week(session["uid"], tuan, monday, offday)
+    nam = TP.nam_hoc_tu_ngay(tuan1)
+    act = request.form.get("act") if request.method == "POST" else None
+    if act == "luu_lop":
+        khoa = request.form.getlist("khoa")
+        lop = request.form.getlist("lop")
+        ds_doi = [{"khoa": k, "lop": v} for k, v in zip(khoa, lop)]
+        ok, tb, _n = TP.luu_lop(db, u["id"], nam, tuan, ds_doi)
+        flash(tb, "ok" if ok else "err")
+        return redirect(url_for("core.bao_giang", tuan=tuan))
+
+    rows = _rows_for_week(session["uid"], tuan, monday, offday, nam_hoc=nam)
+    ap_dung = TP.phien_cho_tuan(db, u["id"], nam, tuan) or 1
     meta = {"truong": request.values.get("truong") or u["school"] or "",
             "to": request.values.get("to", ""), "giao_vien": u["fullname"] or u["username"],
             "mon": request.values.get("mon") or u["subject"] or "",
@@ -594,9 +677,9 @@ def bao_giang():
             "den_ngay": (monday + datetime.timedelta(days=6)).strftime("%d/%m/%Y"),
             "noi_dung_khac": request.values.get("noi_dung_khac", ""),
             "dia_danh": request.values.get("dia_danh", "Sóc Trăng"),
-            "ngay_ky": monday.day, "thang_ky": monday.month, "nam_ky": monday.year}
+            "ngay_ky": monday.day, "thang_ky": monday.month, "nam_ky": monday.year,
+            "ap_dung_tu_tuan": ap_dung}
 
-    act = request.form.get("act") if request.method == "POST" else None
     if act in ("pdf", "word"):
         # (M14) PDF mở xem trực tuyến: KHÔNG tính lượt. Tải file Word về: tính 1 lượt.
         if act == "word":
@@ -624,12 +707,19 @@ def bao_giang():
                                    (u["id"],))) if m}
     nghi_tuan_nay = LN.week_label(monday, breaks)
     meta["nghi"] = nghi_tuan_nay
+    ds_lop = TP.ds_lop(db, u["id"], nam)
+    for r in rows:
+        if r.get("lop") and r["lop"] not in ds_lop:
+            ds_lop.append(r["lop"])
     return render_template("baogiang.html", rows=rows, meta=meta, monday=monday, tuan=tuan,
                            tuans_pp=tuans_pp, max_tuan=max_tuan, tuan_now=tuan_now,
                            tuan1=tuan1, da_xuat=da_xuat, cal=cal, breaks=breaks,
                            nghi_tuan_nay=nghi_tuan_nay, lich_tuan=lich_tuan,
                            da_chon_ngay=bool(s_t1),
-                           tuan1_txt=tuan1.strftime("%d/%m/%Y"))
+                           tuan1_txt=tuan1.strftime("%d/%m/%Y"),
+                           sua=request.values.get("sua") in ("1", "on", "true"),
+                           ds_lop=ds_lop, ap_dung_tu=ap_dung, ds_moc=TP.moc(db, u["id"], nam),
+                           nam_hoc=nam)
 
 
 # ---------------- Nhận xét AI ----------------

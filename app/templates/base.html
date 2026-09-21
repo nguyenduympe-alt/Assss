@@ -155,8 +155,7 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
   </nav>
   <div class="navgrp">Giảng dạy</div>
   <nav>
-    <a href="{{url_for('core.ppct')}}" class="{{'on' if ep=='core.ppct'}}"><i>📘</i>Phân phối chương trình</a>
-    <a href="{{url_for('core.mon_hoc')}}" class="{{'on' if ep=='core.mon_hoc'}}"><i>📚</i>Quản lý môn học</a>
+    <a href="{{url_for('core.mon_hoc')}}" class="{{'on' if ep=='core.mon_hoc' or ep=='core.ppct'}}"><i>📚</i>Quản lý môn học</a>
     <a href="{{url_for('core.tkb')}}" class="{{'on' if ep=='core.tkb'}}"><i>🗓️</i>Thời khoá biểu</a>
     <a href="{{url_for('core.bao_giang')}}" class="{{'on' if ep=='core.bao_giang'}}"><i>🖨️</i>Lịch báo giảng</a>
     <a href="{{url_for('core.lich_nghi')}}" class="{{'on' if ep=='core.lich_nghi'}}"><i>🎋</i>Lịch nghỉ</a>

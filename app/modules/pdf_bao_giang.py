@@ -47,7 +47,8 @@ def build_pdf(meta, rows):
                    Paragraph("LỊCH BÁO GIẢNG", S("b", 15, True, 1))],
                   [Paragraph("Tổ: " + meta.get("to", ""), S("c", 9, False, 1)),
                    Paragraph(f"TUẦN {meta.get('tuan','')} "
-                             f"(Từ ngày {meta.get('tu_ngay','')} đến ngày {meta.get('den_ngay','')})",
+                             f"(Từ ngày {meta.get('tu_ngay','')} đến ngày {meta.get('den_ngay','')})"
+                             + (f" · TKB áp dụng từ tuần {meta['ap_dung_tu_tuan']}" if meta.get("ap_dung_tu_tuan") else ""),
                              S("d", 10, False, 1))]],
                  colWidths=[70 * mm, 200 * mm])
     head.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))

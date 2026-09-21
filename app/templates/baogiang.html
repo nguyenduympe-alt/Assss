@@ -10,7 +10,8 @@
  </div>
  <p class="sub">Chọn <b>thứ Hai của tuần học đầu tiên (tuần 1)</b> — hệ thống tính lịch dạy các tuần tiếp theo
   từ ngày này, tuần nào nghỉ (Tết, lễ…) thì <a href="{{url_for('core.lich_nghi')}}">tự bỏ qua</a>.
-  Tuần đang xem: <b>tuần {{tuan}}</b> — từ <b>{{meta.tu_ngay}}</b> đến <b>{{meta.den_ngay}}</b>.</p>
+  Tuần đang xem: <b>tuần {{tuan}}</b> — từ <b>{{meta.tu_ngay}}</b> đến <b>{{meta.den_ngay}}</b>.
+  Thời khoá biểu <b>áp dụng từ tuần {{ap_dung_tu}}</b>{% if nam_hoc %} · năm học {{nam_hoc}}{% endif %}.</p>
  <form method="get" class="row" style="gap:8px;align-items:flex-end">
   <input type="hidden" name="tuan" value="{{tuan}}">
   <label class="f">Thứ Hai của tuần 1<input type="date" name="tuan_1" value="{{tuan1}}" required></label>
@@ -29,9 +30,12 @@
    Tuần {{t.tuan}}: {{t.tu}} → {{t.den}}</a>
   {% endfor %}
  </div>
- <p class="sub" style="margin:9px 0 0;font-size:12.5px">Bấm vào một tuần để mở lịch báo giảng của tuần đó.
+ <p class="sub" style="margin:9px 0 0;font-size:12.5px">Bấm vào một tuần để mở lịch báo giảng của tuần đó
+  (tuần chọn là mốc hiệu lực của thời khoá biểu).
   Tuần <span style="color:#0f766e;font-weight:600">xanh đậm</span> là tuần đã có PPCT (có bài để ghép),
-  tuần xám là chưa có PPCT.</p>
+  tuần xám là chưa có PPCT.
+  {% if ds_moc %}Các mốc TKB đã lưu:
+   {% for m in ds_moc %}<span class="chip">từ tuần {{m}}</span>{% endfor %}{% endif %}</p>
  {% endif %}
 </div>
 
@@ -147,11 +151,28 @@
   <div style="font-size:12.5px;font-weight:700;color:#475569;letter-spacing:.05em">{{meta.truong|upper}}</div>
   {% if meta.to %}<div class="muted">Tổ: {{meta.to}}</div>{% endif %}
   <div style="font-size:20px;font-weight:800;margin:9px 0 3px;letter-spacing:.5px">LỊCH BÁO GIẢNG</div>
-  <div style="font-size:13.5px;color:#334155">TUẦN {{meta.tuan}} — từ {{meta.tu_ngay}} đến {{meta.den_ngay}}</div>
+  <div style="font-size:13.5px;color:#334155">TUẦN {{meta.tuan}} — từ {{meta.tu_ngay}} đến {{meta.den_ngay}}
+   · TKB áp dụng từ tuần {{ap_dung_tu}}</div>
+  <div style="margin-top:10px">
+   {% if sua %}
+   <span class="chip" style="background:#fff7ed;color:#c2410c">Đang sửa lớp — chỉ ghi khi bấm Lưu</span>
+   {% else %}
+   <a class="btn sm" href="?tuan={{tuan}}&amp;sua=1">✏️ Sửa lớp</a>
+   {% endif %}
+  </div>
   <div style="margin-top:9px;font-size:13px">Giáo viên: <b>{{meta.giao_vien}}</b>
    {% if meta.mon %}&nbsp;·&nbsp; Môn: <b>{{meta.mon}}</b>{% endif %}</div>
  </div>
  {% if rows %}
+ {% if sua %}<form method="post">
+  <input type="hidden" name="act" value="luu_lop">
+  <input type="hidden" name="tuan" value="{{tuan}}">
+  <div class="row" style="padding:10px 14px;gap:8px;align-items:center">
+   <button class="ok">💾 Lưu (áp dụng từ tuần {{tuan}})</button>
+   <a class="btn sec" href="?tuan={{tuan}}">Huỷ</a>
+   <span class="muted">Chọn lại lớp rồi Lưu — tuần {{tuan}} trở đi dùng bản mới, các tuần trước giữ nguyên.</span>
+  </div>
+ {% endif %}
  <table>
   <thead><tr><th>Thứ / Ngày</th><th>Buổi</th><th>Tiết</th><th>Lớp</th><th>Môn</th><th>Tiết PPCT</th>
    <th style="width:32%">Tên bài dạy</th><th>Đồ dùng / Ghi chú</th></tr></thead>
@@ -161,12 +182,21 @@
    <td>{% if newday %}<b>{{THU_NAME[r.thu]}}</b><div class="muted">{{r.ngay}}</div>{% endif %}</td>
    <td><span class="chip" style="background:{{'#ecfdf5' if r.buoi=='Sáng' else '#fff7ed'}};
      color:{{'#0d9488' if r.buoi=='Sáng' else '#ea580c'}}">{{r.buoi}}</span></td>
-   <td><b>{{r.tiet}}</b></td><td><span class="chip">{{r.lop}}</span></td><td>{{r.mon}}</td>
+   <td><b>{{r.tiet}}</b></td>
+   <td>{% if sua and not r.nghi %}
+     <input type="hidden" name="khoa" value="{{r.khoa}}">
+     <select name="lop" required>
+      {% for l in ds_lop %}<option {{'selected' if l==r.lop}}>{{l}}</option>{% endfor %}
+      {% if r.lop and r.lop not in ds_lop %}<option selected>{{r.lop}}</option>{% endif %}
+     </select>
+     {% else %}<span class="chip">{{r.lop}}</span>{% endif %}</td>
+   <td>{{r.mon}}</td>
    <td>{{r.tiet_pp or '—'}}</td>
    <td>{% if r.nghi %}<b style="color:#be123c">🏖️ {{r.ten_bai}}</b>
        {% elif r.ten_bai %}{{r.ten_bai}}{% else %}<span style="color:#cbd5e1">— chưa có trong PPCT —</span>{% endif %}</td>
    <td class="muted">{{r.ghi_chu or ''}}</td></tr>{% endfor %}</tbody>
  </table>
+ {% if sua %}</form>{% endif %}
  {% if meta.noi_dung_khac %}<div style="padding:14px 18px;border-top:1px solid var(--line)">
    <b>Nội dung công tác khác:</b> {{meta.noi_dung_khac}}</div>{% endif %}
  {% else %}<div class="empty" style="padding:48px"><span class="e">🗓️</span>Chưa có thời khoá biểu.<br>
