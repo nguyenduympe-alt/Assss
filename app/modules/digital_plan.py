@@ -55,12 +55,16 @@ def read_word(data):
 # đúng nội dung của nhóm đó (không dùng chung một câu cho mọi bài).
 NHOM_TICH_HOP = [
     {'ten': 'An toàn và bảo vệ dữ liệu',
+     'ngu_canh_ai': 'bảo vệ thông tin cá nhân và dữ liệu cá nhân khi sử dụng AI, rủi ro khi lạm dụng công cụ AI, giữ bí mật thông tin cá nhân',
+     'mach_ai': 'B',
      'ngu_canh': 'an toàn trên mạng, mật khẩu, thông tin cá nhân',
      'tu_khoa': ['an toan', 'bao ve', 'mat khau', 'thong tin ca nhan', 'phan cung', 'ban phim',
                  'chuot', 'thiet bi', 'tu the ngoi', 'phong tranh', 'dau moi', 'dung luong'],
      'nls': 'An toàn: thực hành sử dụng thiết bị đúng cách; nhận biết thông tin cần bảo vệ; nêu một quy tắc an toàn phù hợp bài học.',
      'ai': 'Giáo viên chuẩn bị trước một phản hồi của AI về nội dung bài; học sinh đối chiếu với sách giáo khoa và chỉ ra chỗ AI có thể sai; không nhập thông tin cá nhân vào công cụ.'},
     {'ten': 'Khai thác dữ liệu và thông tin',
+     'ngu_canh_ai': 'kiểm tra lại kết quả do AI tạo ra, so sánh với nhiều nguồn thông tin, thông tin do AI tạo ra có thể không đúng với sự thật, kiểm chứng thông tin',
+     'mach_ai': 'A',
      'ngu_canh': 'thu thập số liệu, biểu đồ, thống kê, số liệu',
      'tu_khoa': ['tim kiem', 'thong tin', 'internet', 'du lieu', 'bang tinh', 'so lieu', 'thong ke',
                  'bieu do', 'tra cuu', 'tu lieu', 'ban do', 'khao sat', 'bao cao', 'bang bieu'],
@@ -68,18 +72,24 @@ NHOM_TICH_HOP = [
      'ai': 'Học sinh dùng kết quả do AI gợi ý (giáo viên chuẩn bị trước) rồi đối chiếu với số liệu trong sách hoặc nguồn chính thống, nêu rõ điểm cần kiểm chứng.',
      'stem': 'Gợi ý STEM: thu thập số liệu ngoài lớp, ghi vào bảng tính rồi đọc kết quả bằng biểu đồ; nêu nhận xét và cách làm lại cho chính xác hơn.'},
     {'ten': 'Sáng tạo nội dung số',
+     'ngu_canh_ai': 'sử dụng AI hỗ trợ học tập và tạo sản phẩm, sản phẩm do AI tạo ra, ứng dụng của AI trong học tập và đời sống',
+     'mach_ai': 'C',
      'ngu_canh': 'soạn thảo văn bản, trình chiếu, vẽ trên máy tính, tạo bài trình chiếu',
      'tu_khoa': ['ve tranh', 've hinh', 've so do', 'trinh chieu', 'van ban', 'thiep', 'thiet ke', 'soan thao', 'hinh anh',
                  'viet doan', 'ke chuyen', 'lam phim', 'poster', 'to roi', 'bao tuong', 'so tay'],
      'nls': 'Sáng tạo nội dung số: tạo một sản phẩm số ngắn minh họa nội dung bài; ghi nguồn hình ảnh/tư liệu và trình bày sản phẩm cho nhóm.',
      'stem': 'Gợi ý STEAM: thiết kế sản phẩm trực quan gắn nội dung bài; kết hợp công nghệ, bố cục/hình học và thẩm mỹ; trình bày lựa chọn thiết kế, nhận phản hồi và cải tiến.'},
     {'ten': 'Giải quyết vấn đề (thuật toán, lập trình)',
+     'ngu_canh_ai': 'ý tưởng sử dụng AI để giải quyết vấn đề, kế hoạch dự án AI, quy trình các bước',
+     'mach_ai': 'D',
      'ngu_canh': 'lập trình, thuật toán, chương trình',
      'tu_khoa': ['lap trinh', 'scratch', 'robot', 'thuat toan', 'mo phong', 'mach dien', 'co cau',
                  'quy trinh', 'tung buoc', 'chuong trinh'],
      'nls': 'Giải quyết vấn đề: chia nhiệm vụ thành các bước, thử nghiệm chương trình hoặc mô hình, phát hiện lỗi và điều chỉnh dựa trên kết quả.',
      'stem': 'Gợi ý STEM: tổ chức nhiệm vụ thiết kế – chế tạo – thử nghiệm theo quy trình; ghi kết quả từng lần thử và cải tiến sản phẩm.'},
     {'ten': 'Giao tiếp và hợp tác trong môi trường số',
+     'ngu_canh_ai': 'trợ lí học tập thông minh, ứng dụng học ngôn ngữ, cùng máy thông minh làm việc, trao đổi và làm việc nhóm với công cụ AI',
+     'mach_ai': 'C',
      'ngu_canh': 'thư điện tử, chia sẻ thông tin, trao đổi, hợp tác trực tuyến',
      'tu_khoa': ['hop tac', 'chia se', 'thu dien tu', 'giao tiep', 'thuyet trinh', 'thao luan',
                  'lam viec nhom', 'trao doi', 'dong vai', 'phong van', 'doc hieu', 'tap doc',
@@ -89,33 +99,47 @@ NHOM_TICH_HOP = [
      'nls': 'Giao tiếp và hợp tác trong môi trường số: chia sẻ sản phẩm trong nhóm dưới sự hướng dẫn của giáo viên, phản hồi lịch sự và không công khai dữ liệu cá nhân.',
      'ai': 'Học sinh soạn câu hỏi cho bạn cùng nhóm rồi dùng công cụ AI của lớp để gợi ý cách diễn đạt; cả nhóm kiểm tra lại xem gợi ý đó có phù hợp và trung thực không.'},
     {'ten': 'Ứng dụng trí tuệ nhân tạo',
+     'ngu_canh_ai': 'các ứng dụng của AI trong học tập và đời sống, trải nghiệm công cụ AI trực quan, cách AI thực hiện chức năng đọc nghe nhìn',
+     'mach_ai': 'C',
      'ngu_canh': 'trí tuệ nhân tạo, chatbot, học máy',
      'tu_khoa': ['tri tue nhan tao', 'chatbot', 'tro ly ao', 'tu dong hoa', 'may moc thong minh',
                  'nhan dang', 'du doan'],
      'nls': 'Ứng dụng trí tuệ nhân tạo: nhận biết sản phẩm có AI, nêu việc AI làm được và việc AI có thể sai, kiểm tra lại trước khi dùng.',
      'ai': 'Giáo viên minh họa một phản hồi AI, học sinh đối chiếu với học liệu đã xác minh, chỉ ra điểm cần kiểm tra và nêu vì sao không đưa dữ liệu cá nhân vào câu lệnh.'},
     {'ten': 'Thí nghiệm, đo lường, quan sát',
+     'ngu_canh_ai': 'thu thập ví dụ và cho AI học từ dữ liệu, bài toán học máy phân loại và dự đoán, dữ liệu dùng để huấn luyện AI',
+     'mach_ai': 'D',
      'ngu_canh': 'đo lường, đo dài, thí nghiệm, quan sát, ghi kết quả',
      'tu_khoa': ['thi nghiem', 'do dai', 'do nhiet', 'nhiet do', 'nang luong', 'tai che', 'trong cay',
                  'quan sat', 'nuoc', 'khong khi', 'dung dich', 'do luong', 'can nang', 'suc gio',
                  'thuc vat', 'dong vat', 'co the', 'suc khoe', 'thoi tiet', 'trai dat',
                  'cay xanh', 'cay coi', 'cham soc cay',
-                 'mat troi', 'thuc pham', 'nam va vi khuan'],
+                 'mat troi', 'thuc pham', 'nam va vi khuan', 'luc', 'ma sat', 'chuyen dong',
+                 'van toc', 'gia toc', 'dien', 'quang hoc', 'am thanh', 'phan ung', 'hoa hoc',
+                 'kim loai', 'axit', 'bazo', 'nguyen tu', 'phan tu', 'te bao', 'di truyen'],
      'nls': 'Giải quyết vấn đề: ghi kết quả đo/ quan sát vào bảng hoặc bảng tính số, so sánh các lần làm và giải thích chênh lệch bằng dữ liệu thu được.',
      'stem': 'Gợi ý STEM: tổ chức nhiệm vụ đo – thử – ghi kết quả – cải tiến gắn với bài học; dùng dụng cụ đơn giản và bảng ghi số liệu để học sinh giải thích kết quả.'},
     {'ten': 'Toán học với công cụ số',
+     'ngu_canh_ai': 'kiểm tra lại kết quả, quyết định có sử dụng AI hay không, công cụ trải nghiệm AI trực quan',
+     'mach_ai': 'A',
      'ngu_canh': 'bài toán, phân số, phép cộng, diện tích',
      'tu_khoa': ['bang nhan', 'phep cong', 'phep tru', 'phep nhan', 'phep chia', 'phan so', 'ti so',
-                 'phan tram', 'trung binh cong', 'hinh hoc', 'dien tich', 'the tich', 'so sanh so'],
+                 'phan tram', 'trung binh cong', 'hinh hoc', 'dien tich', 'the tich', 'so sanh so',
+                 'ham so', 'do thi', 'phuong trinh', 'bieu thuc', 'thong ke so lieu', 'xac suat',
+                 'so nguyen', 'so thap phan', 'rut gon', 'quy dong mau'],
      'nls': 'Giải quyết vấn đề: dùng công cụ số (bảng tính hoặc máy tính cầm tay) để kiểm tra lại kết quả, nêu các bước đã làm và chỗ dễ sai.',
      'ai': 'Học sinh tự làm bài trước, sau đó đối chiếu với kết quả do AI đưa ra (giáo viên chuẩn bị), tìm chỗ khác nhau và giải thích vì sao phải tự kiểm chứng.'},
     {'ten': 'Tra cứu tư liệu, bản đồ, mốc thời gian',
+     'ngu_canh_ai': 'kiểm chứng thông tin, AI có thể sai, ứng dụng dịch sai nghĩa, phản biện kết quả của AI',
+     'mach_ai': 'A',
      'ngu_canh': 'bản đồ, tư liệu, nhân vật lịch sử, di tích',
      'tu_khoa': ['ban do', 'dien bien', 'chien dich', 'thoi ki', 'nhan vat lich su', 'di tich',
                  'vung mien', 'khi hau', 'dan so', 'van hoa', 'le hoi', 'dia hinh'],
      'nls': 'Khai thác dữ liệu và thông tin: tra cứu bản đồ/tư liệu số do giáo viên chọn, ghi lại dẫn chứng, so sánh hai nguồn và nêu nguồn đã dùng.',
      'ai': 'Học sinh kiểm chứng một thông tin do AI trả lời về bài học bằng sách giáo khoa hoặc tư liệu chính thống; ghi lại thông tin đúng và nêu lý do AI sai (nếu có).'},
     {'ten': 'Kĩ năng sống, quy tắc ứng xử',
+     'ngu_canh_ai': 'đạo đức khi dùng AI, không sử dụng AI cho mục đích xấu như lừa đảo, bắt nạt, trách nhiệm giải trình khi sử dụng AI',
+     'mach_ai': 'B',
      'ngu_canh': 'ứng xử, quy tắc, trung thực, kĩ năng sống',
      'tu_khoa': ['dao duc', 'ung xu', 'quy tac', 'trung thuc', 'tiet kiem', 'an toan giao thong',
                  'moi truong', 'gia dinh', 'ban be', 'cam xuc', 'ki nang song', 'hop tac xa hoi',
@@ -123,6 +147,8 @@ NHOM_TICH_HOP = [
      'nls': 'An toàn: nêu việc nên và không nên làm trong tình huống của bài; phân biệt thông tin riêng tư với thông tin có thể chia sẻ.',
      'ai': 'Học sinh nghe/đọc một tình huống do AI tạo (giáo viên chuẩn bị), nhận xét việc làm nào đúng và nêu vì sao phải trung thực khi dùng kết quả của người khác.'},
     {'ten': 'Tạo hình, sản phẩm thủ công',
+     'ngu_canh_ai': 'sản phẩm hoặc hình ảnh do AI tạo ra có thể không đúng với sự thật, liên tục đánh giá và cải tiến sản phẩm',
+     'mach_ai': 'B',
      'ngu_canh': 'vẽ tranh, tạo hình, trang trí, thủ công',
      'tu_khoa': ['ve tranh', 'trang tri', 'thu cong', 'gap hinh', 'cat dan', 'ban ve', 'tranh anh',
                  'mau sac', 'tiet kiem giay', 'do choi'],
@@ -326,8 +352,25 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None):
         _notes = []
         # ---- mã giáo dục AI theo Quyết định 2422/QĐ-BGDĐT (không tự đặt mã) ----
         if 'ai' in chon and not row['original']['ai']:
+            # (M8b) đọc tựa bài → chọn MÃ TIÊU CHÍ AI: 1) đối chiếu thẳng với kho mã lớp;
+            #        2) theo nhóm nội dung đọc từ tựa bài; 3) theo mạch sát nội dung bài.
+            _hits = _nhom_theo_tua(row['title'])
             ds_ma, canh_bao_ai = AIGD.goi_y_ma(grade, ten_bai=row['title'],
                                                van_ban=row.get('topic', ''), mon=subject)
+            _cach_ma = 'đối chiếu tựa bài với kho mã lớp %s' % grade
+            if not ds_ma and _hits:
+                _ctx = '. '.join(n['ngu_canh_ai'] for n, _ in _hits[:2] if n.get('ngu_canh_ai'))
+                if _ctx:
+                    ds_ma, canh_bao_ai = AIGD.goi_y_ma(
+                        grade, ten_bai=row['title'],
+                        van_ban=(_ctx + ' ' + (row.get('topic') or '')).strip(), mon=subject)
+                    _cach_ma = 'theo nhóm nội dung “%s” đọc từ tựa bài' % _hits[0][0]['ten']
+            if not ds_ma and _hits:
+                _mach = _hits[0][0].get('mach_ai')
+                ds_ma = AIGD.ma_cho_mach(AIGD.ma_theo_lop(grade, gom_mo_rong=False), _mach, toi_da=2)
+                if ds_ma:
+                    _cach_ma = 'theo mạch “%s” sát nội dung bài' % next(
+                        (m['ten'] for m in AIGD.khoa()['mach'] if m['id'] == _mach), '')
             row['ai'] = '\n'.join(x['ma'] for x in ds_ma)
             row['ma_ai'] = [{'ma': x['ma'], 'yccd': x['yccd'], 'noi_dung': x.get('noi_dung', ''),
                              'chu_de_ten': x['chu_de_ten'], 'mach_ten': x['mach_ten'],
@@ -335,7 +378,8 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None):
                              'nguon': AIGD.NGUON_MA} for x in ds_ma]
             row['canh_bao_ai'] = canh_bao_ai
             if ds_ma:
-                _notes.append('Giáo dục AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT): ' +
+                _notes.append('Mã giáo dục AI lớp %s (%s) — Quyết định 2422/QĐ-BGDĐT + Công văn '
+                              '5588/BGDĐT-GDPT: ' % (grade, _cach_ma) +
                               '; '.join(x['yccd'][:110] for x in ds_ma) +
                               '\nGiáo viên rà soát mã và nội dung AI trước khi dùng.')
             elif _goi_y_ai:
