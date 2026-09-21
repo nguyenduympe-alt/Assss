@@ -26,13 +26,27 @@ function flt(){const q=document.getElementById('q').value.toLowerCase();
   </form>
  </div>
  <div class="card">
-  <h3>⬆ Nhập từ Excel</h3><p class="sub">Tự nhận diện cột: Tuần, Khối, Môn, Tiết PPCT, Tên bài, Ghi chú</p>
+  <h3>⬆ Nhập phân phối chương trình — <span style="color:#0d9488">nhiều môn, nhiều khối một lần</span></h3>
+  <p class="sub">Chọn <b>một hoặc nhiều tệp</b> Word (.docx) / Excel (.xlsx, .csv). Hệ thống tự tách theo
+   <b>từng môn và từng khối</b>: đọc tiêu đề ngay trên mỗi bảng (vd “MÔN: TOÁN — LỚP 6”), hoặc hai cột
+   <b>Môn</b> + <b>Khối/Lớp</b> trong bảng, hoặc tên tệp (vd <b>PPCT-Toan-6.docx</b>).</p>
   <form method="post" enctype="multipart/form-data" class="row">
    <input type="hidden" name="act" value="import">
-   <label class="f" style="flex:1;min-width:200px">Chọn file .xlsx / .csv<input type="file" name="file" accept=".xlsx,.xls,.csv" required></label>
-   <button class="ok">Nhập file</button>
-   <a class="btn sec" href="{{url_for('core.mau_excel', kind='ppct')}}">⬇ File mẫu</a>
+   <label class="f" style="flex:1;min-width:230px">Chọn tệp PPCT (chọn được nhiều tệp)<input type="file"
+    name="files" accept=".docx,.xlsx,.xls,.csv" multiple required></label>
+   <label class="f">Môn (để trống: tự đọc)<input name="mon" list="goi_y_mon" maxlength="100"
+    placeholder="Ví dụ: Toán" style="width:150px"></label>
+   <label class="f">Khối (để trống: tự đọc)<select name="khoi" style="width:110px">
+    <option value="">— tự đọc —</option>{% for k in range(1,13) %}<option>{{k}}</option>{% endfor %}</select></label>
+   <label class="f" style="display:flex;gap:8px;align-items:center;white-space:nowrap">
+    <input type="checkbox" name="xoa_cu" value="1" style="width:18px;margin-top:12px">
+    <span style="margin-top:10px">Xoá PPCT cũ của đúng môn + khối trước khi nhập</span></label>
+   <button class="ok">Nhập tệp</button>
+   <a class="btn sec" href="{{url_for('core.mau_excel', kind='ppct')}}">⬇ File mẫu Excel</a>
   </form>
+  <p class="sub" style="margin:8px 0 0;font-size:12.5px">Mẹo: ô <b>Môn</b> + <b>Khối</b> chỉ dùng khi trong tệp
+   không ghi rõ; nếu tệp đã có nhiều phần thì hệ thống ưu tiên đúng môn/khối ghi trong tệp.
+   Nhập PPCT <b>không tính lượt</b>.</p>
  </div>
 </div>
 

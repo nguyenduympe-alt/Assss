@@ -11,6 +11,7 @@ from ..modules import billing as BL
 from ..modules import digital_plan as DP
 from ..modules import khdh_kho as KHO
 from ..modules import mon_day as MD
+from ..modules import ppct_tach as PT
 
 bp = Blueprint('digital', __name__, url_prefix='/nang-luc-so')
 # (M11) Tên chức năng nói đủ phạm vi: KHDH (kế hoạch dạy học) + NLS + AI + STEM
@@ -211,14 +212,30 @@ def kho_them():
 
     ds_mon = MD.danh_sach(current_user())
 
-    # --- một tệp và đã ghi rõ môn + khối: giữ đúng luồng cũ (có hỏi khi trùng môn + khối)
-    if len(ds_tep) == 1 and mon and khoi:
-        file = ds_tep[0]
-        if not file.filename.lower().endswith('.docx'):
-            flash('Vui lòng chọn file KHDH Word .docx.', 'err')
-            return redirect(url_for('digital.index'))
+    # (M29) đọc từng tệp rồi TÁCH theo môn + khối — một tệp có thể chứa NHIỀU môn, NHIỀU khối
+    da_doc = []
+    for f in ds_tep:
+        ten = (f.filename or '')[:200]
+        if not ten.lower().endswith('.docx'):
+            da_doc.append((ten, None, None, 'không phải file Word .docx'))
+            continue
         try:
-            data = file.read(8 * 1024 * 1024 + 1)
+            data = f.read(8 * 1024 * 1024 + 1)
+            if len(data) > 8 * 1024 * 1024:
+                raise ValueError('File KHDH tối đa 8 MB.')
+            phan = PT.tach(data, ten, ds_mon, mon, khoi)
+        except ValueError as exc:
+            da_doc.append((ten, None, None, str(exc)))
+        except Exception:
+            da_doc.append((ten, None, None, 'không đọc được file Word (hãy lưu lại .docx rồi thử lại)'))
+        else:
+            da_doc.append((ten, data, phan, ''))
+
+    # --- một tệp duy nhất, CHỈ một môn + khối, đã ghi rõ môn + khối: giữ đúng luồng cũ
+    if len(ds_tep) == 1 and mon and khoi and not da_doc[0][3] and len(da_doc[0][2] or []) == 1:
+        file = ds_tep[0]
+        try:
+            data = da_doc[0][1]
             rows = KHO.rows_tu_tep(data)
         except ValueError as exc:
             flash(str(exc), 'err')
@@ -244,46 +261,48 @@ def kho_them():
             flash('Đã thêm môn %s với KHDH “%s”.' % (KHO.ten_mon(mon, khoi), file.filename[:80]), 'ok')
             return redirect(url_for('digital.index', kho=kid))
 
-    # --- nhiều tệp (hoặc để hệ thống tự đọc môn/khối từ tên tệp)
+    # --- nhiều tệp, hoặc tệp chứa NHIỀU môn + NHIỀU khối: lưu từng phần vào kho
     ket_qua, so_moi, so_ban, so_loi = [], 0, 0, 0
     kid_dau = None
-    for f in ds_tep:
-        ten_tep = (f.filename or '')[:200]
-        mon_tep, khoi_tep = MD.tu_ten_tep(ten_tep, MD.danh_sach(current_user()))
-        m = mon or mon_tep
-        k = khoi or khoi_tep
-        dong = {'ten': ten_tep, 'mon': m or mon_tep, 'khoi': k or khoi_tep, 'ok': False, 'ket': '',
-                'tu_ten_tep': bool(mon_tep or khoi_tep)}
-        if not ten_tep.lower().endswith('.docx'):
-            dong['ket'] = 'không phải file Word .docx'
-        elif not m:
-            dong['ket'] = 'chưa rõ MÔN — đặt tên tệp có tên môn (vd: KHDH Toan 6.docx) hoặc điền ô Môn'
-        elif k not in KHO.KHOI:
-            dong['ket'] = 'chưa rõ KHỐI — đặt tên tệp có khối (vd: Toan 6.docx) hoặc chọn ô Khối'
-        else:
-            try:
-                data = f.read(8 * 1024 * 1024 + 1)
-                rows = KHO.rows_tu_tep(data)
-            except ValueError as exc:
-                dong['ket'] = str(exc)
-            except Exception:
-                dong['ket'] = 'không đọc được file Word (hãy lưu lại .docx rồi thử lại)'
-            else:
-                tiet_tu_dong = int(tiet) if tiet else KHO.so_tiet_tuan(rows)
-                cu = KHO.ban_dang_dung(db, uid, m, k)
-                kid = KHO.luu(db, uid, m, k, ten_tep, data, rows, loai=loai, tiet_tuan=tiet_tu_dong,
-                              thay_the=not cu, so_tiet_tay=(int(tiet) if tiet else None))
-                kid_dau = kid_dau or kid
-                dong.update(ok=True, mon=m, khoi=k, kid=kid,
-                            ket=('phiên bản mới (bản cũ vẫn giữ)' if cu else 'đã thêm vào kho'),
-                            so_dong=len(rows))
-                if cu:
-                    so_ban += 1
-                else:
-                    so_moi += 1
-        if not dong['ok']:
+    for ten_tep, data, ds_phan, loi in da_doc:
+        if loi:
+            ket_qua.append({'ten': ten_tep, 'mon': '', 'khoi': '', 'ok': False, 'ket': loi,
+                            'cach': '', 'so_dong': 0})
             so_loi += 1
-        ket_qua.append(dong)
+            continue
+        for thu_tu, ph in enumerate(ds_phan):
+            m, k = ph['mon'], str(ph['khoi'])
+            dong = {'ten': ten_tep, 'mon': m, 'khoi': k, 'ok': False, 'ket': '',
+                    'cach': ' · '.join(ph.get('cach') or []),
+                    'phan_so': thu_tu + 1, 'nhieu_phan': len(ds_phan) > 1,
+                    'tu_ten_tep': 'tên tệp' in (ph.get('cach') or [])}
+            if not m:
+                dong['ket'] = ('chưa rõ MÔN — ghi “MÔN: … — LỚP …” trong tệp, đặt tên tệp có tên môn'
+                               ' (vd: KHDH Toan 6.docx) hoặc điền ô Môn')
+            elif k not in KHO.KHOI:
+                dong['ket'] = 'chưa rõ KHỐI — ghi khối trong tệp (vd “LỚP 6”) hoặc chọn ô Khối'
+            else:
+                try:
+                    rows = PT.rows_kho(ph['rows']) or KHO.rows_tu_tep(data)
+                except ValueError as exc:
+                    dong['ket'] = str(exc)
+                except Exception:
+                    dong['ket'] = 'không đọc được file Word (hãy lưu lại .docx rồi thử lại)'
+                else:
+                    tiet_tu_dong = int(tiet) if tiet else KHO.so_tiet_tuan(rows)
+                    cu = KHO.ban_dang_dung(db, uid, m, k)
+                    kid = KHO.luu(db, uid, m, k, ten_tep, data, rows, loai=loai, tiet_tuan=tiet_tu_dong,
+                                  thay_the=not cu, so_tiet_tay=(int(tiet) if tiet else None))
+                    kid_dau = kid_dau or kid
+                    dong.update(ok=True, kid=kid, so_dong=len(rows),
+                                ket=('phiên bản mới (bản cũ vẫn giữ)' if cu else 'đã thêm vào kho'))
+                    if cu:
+                        so_ban += 1
+                    else:
+                        so_moi += 1
+            if not dong['ok']:
+                so_loi += 1
+            ket_qua.append(dong)
 
     # môn nào chưa có trong danh sách môn dạy → tự thêm (nhập mới thì vào danh sách)
     for d in ket_qua:
@@ -295,12 +314,12 @@ def kho_them():
                                                 KHO.ten_mon(ket_qua[0]['mon'], ket_qua[0]['khoi'])), 'ok')
         return redirect(url_for('digital.index', kho=ket_qua[0]['kid']))
     if so_loi:
-        flash('Có %d/%d tệp chưa lưu được — xem lý do ở bảng bên dưới.' % (so_loi, len(ket_qua)), 'err')
+        flash('Có %d/%d phần chưa lưu được — xem lý do ở bảng bên dưới.' % (so_loi, len(ket_qua)), 'err')
     flash('Đã xử lý %d tệp: %d môn thêm mới, %d phiên bản mới.%s'
-          % (len(ket_qua), so_moi, so_ban,
+          % (len(da_doc), so_moi, so_ban,
              (' Môn đọc từ tên tệp đã được thêm vào danh sách môn dạy.' if so_moi else '')), 'ok')
     return render_template('digital_kho_kq.html', ket_qua=ket_qua, so_moi=so_moi, so_ban=so_ban,
-                           so_loi=so_loi, mon_day=MD.danh_sach(current_user()))
+                           so_phan=len(ket_qua), so_loi=so_loi, mon_day=MD.danh_sach(current_user()))
 
 
 @bp.route('/kho/<int:kid>/xac-nhan', methods=['GET', 'POST'])

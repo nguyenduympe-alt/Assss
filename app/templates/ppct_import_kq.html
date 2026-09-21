@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block head %}Kết quả nhập PPCT{% endblock %}
+{% block crumb %}Nhập phân phối chương trình cho nhiều môn, nhiều khối{% endblock %}
+{% block body %}
+<div class="card">
+ <div class="chead"><h3>📥 Kết quả nhập phân phối chương trình</h3>
+  <span class="chip">{{ket_qua|length}} tệp</span></div>
+ <p class="sub">Đã nhập <b>{{so_dong}}</b> dòng vào bảng PPCT{% if so_loi %} ·
+  <b style="color:#b91c1c">{{so_loi}} phần chưa nhập được</b>{% endif %}.
+  {% if xoa_cu %}Đã xoá phần PPCT cũ của đúng môn + khối trước khi nhập.{% endif %}
+  Nhập PPCT <b>không tính lượt</b>.</p>
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>Tệp / phần</th><th>Môn</th><th>Khối</th><th>Số dòng</th><th>Cách nhận biết</th><th>Kết quả</th></tr></thead>
+  <tbody>
+  {% for t in ket_qua %}
+   {% if t.loi %}
+    <tr><td>{{t.ten}}</td><td colspan="4"><span class="muted">— cả tệp —</span></td>
+     <td><span style="color:#b91c1c">✘ {{t.loi}}</span></td></tr>
+   {% endif %}
+   {% for p in t.phan %}
+    <tr>
+     <td>{% if loop.first %}<b>{{t.ten}}</b>{% else %}<span class="muted">↳ phần {{loop.index}}</span>{% endif %}</td>
+     <td>{% if p.mon %}<b>{{p.mon}}</b>{% else %}<span class="muted">—</span>{% endif %}</td>
+     <td>{% if p.khoi %}<span class="chip">Khối {{p.khoi}}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+     <td>{{p.rows|length}}</td>
+     <td class="muted" style="font-size:12px">{{p.cach|join(' · ')}}</td>
+     <td>{% if p.loi %}<span style="color:#b91c1c">✘ {{p.loi}}</span>
+         {% else %}<span style="color:#15803d">✔ đã nhập {{p.rows|length}} dòng</span>{% endif %}</td>
+    </tr>
+   {% endfor %}
+  {% endfor %}
+  </tbody>
+ </table></div>
+ <div class="row" style="margin-top:14px">
+  <a class="btn" href="{{url_for('core.ppct')}}">← Về bảng phân phối chương trình</a>
+  <span class="muted">Môn đang dạy: {{mon_day|join(' · ') if mon_day else 'chưa khai — vào Cài đặt để khai môn'}}</span>
+ </div>
+</div>
+
+<div class="card" style="background:#f8fbfa">
+ <b style="font-size:13.5px">Mẹo để lần sau máy đọc đúng ngay:</b>
+ <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;color:#475569;line-height:1.7">
+  <li>Trong tệp, ghi rõ <b>“MÔN: TOÁN — LỚP 6”</b> (hoặc “Khối 7”) ở dòng ngay trên mỗi bảng.</li>
+  <li>Hoặc để bảng có hai cột <b>Môn</b> và <b>Khối/Lớp</b> — mỗi dòng một bài.</li>
+  <li>Không cần ghi gì trong tệp: chỉ cần đặt tên tệp có môn + khối (vd <b>PPCT-Toan-6.docx</b>).</li>
+  <li>Tải <b>nhiều tệp một lần</b> cũng được — mỗi tệp tự tách theo môn và khối của nó.</li>
+ </ul>
+</div>
+{% endblock %}

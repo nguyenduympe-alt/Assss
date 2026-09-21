@@ -11,6 +11,7 @@ from .modules.pdf_bao_giang import build_pdf, THU_NAME
 from .modules.word_bao_giang import build_docx
 from .modules import billing as BL
 from .modules import mon_day as MD
+from .modules import ppct_tach as PT
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
 from .modules import sms as SMS
@@ -237,27 +238,89 @@ def ppct():
         elif act == "del":
             db.execute("DELETE FROM ppct WHERE id=? AND teacher_id=?", (request.form["id"], uid))
         elif act == "import":
-            f = request.files.get("file")
-            if f and f.filename:
-                df = XL.read_table(f)
-                cmap = {c: XL._norm(c) for c in df.columns}
-                def pick(row, *names):
-                    for c, n in cmap.items():
-                        if n in names:
-                            v = row[c]
-                            return None if str(v) == "nan" else v
-                    return None
-                cnt = 0
-                for _, row in df.iterrows():
-                    tb = pick(row, "tenbai", "tenbaiday", "bai", "noidung")
-                    if not tb:
-                        continue
-                    db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu) VALUES(?,?,?,?,?,?,?)",
-                               (uid, pick(row, "khoi", "lop"), pick(row, "mon", "monhoc"),
-                                pick(row, "tuan") or 1, pick(row, "tietppct", "tiet", "tietpp", "sotiet"),
-                                tb, pick(row, "ghichu", "note")))
-                    cnt += 1
-                flash(f"Đã nhập {cnt} dòng PPCT", "ok")
+            # (M29) nhập PPCT cho NHIỀU MÔN + NHIỀU KHỐI: nhiều tệp một lần, hoặc một tệp có nhiều phần
+            ds_tep = [f for f in (request.files.getlist("file") + request.files.getlist("files"))
+                      if (getattr(f, "filename", "") or "").strip()]
+            mon_o = (request.form.get("mon") or "").strip()
+            khoi_o = (request.form.get("khoi") or "").strip()
+            xoa_cu = (request.form.get("xoa_cu") or "").lower() in ("1", "on", "true", "yes")
+            if not ds_tep:
+                flash("Vui lòng chọn tệp PPCT (.docx, .xlsx hoặc .csv).", "err")
+                return redirect(url_for("core.ppct"))
+            if len(ds_tep) > 25:
+                flash("Mỗi lượt nhập tối đa 25 tệp. Thầy/cô chia thành các lượt nhỏ hơn.", "err")
+                return redirect(url_for("core.ppct"))
+            if khoi_o and khoi_o not in KHO.KHOI:
+                flash("Khối phải từ 1 đến 12.", "err")
+                return redirect(url_for("core.ppct"))
+            if len(mon_o) > 100:
+                flash("Tên môn quá dài.", "err")
+                return redirect(url_for("core.ppct"))
+            ds_mon = MD.danh_sach(current_user())
+            ket_qua, so_dong, so_loi, da_xoa, phan_ok = [], 0, 0, set(), []
+            for f in ds_tep:
+                ten_tep = (f.filename or "")[:200]
+                dong_tep = {"ten": ten_tep, "phan": [], "loi": "", "so_dong": 0}
+                try:
+                    data = f.read(8 * 1024 * 1024 + 1)
+                    if len(data) > 8 * 1024 * 1024:
+                        raise ValueError("Tệp lớn hơn 8 MB — hãy lưu gọn lại rồi thử lại.")
+                    ds_phan = PT.tach(data, ten_tep, ds_mon, mon_o, khoi_o)
+                except ValueError as exc:
+                    dong_tep["loi"] = str(exc)
+                except Exception:
+                    dong_tep["loi"] = "Không đọc được tệp này (hãy lưu lại .docx / .xlsx rồi thử lại)."
+                else:
+                    if not ds_phan:
+                        dong_tep["loi"] = ("Không thấy bảng phân phối chương trình. Tệp cần có bảng với cột"
+                                           " “Tên bài dạy” (hoặc các dòng bắt đầu bằng “Bài 1…”).")
+                    for ph in ds_phan:
+                        if not ph["mon"]:
+                            ph["loi"] = ("chưa rõ MÔN — ghi tên môn vào tệp (vd “MÔN: TOÁN — LỚP 6”), hoặc"
+                                         " điền ô Môn ở trên, hoặc đặt tên tệp có tên môn")
+                        elif ph["khoi"] not in KHO.KHOI:
+                            ph["loi"] = ("chưa rõ KHỐI — ghi khối vào tệp (vd “LỚP 6”), hoặc chọn ô Khối,"
+                                         " hoặc đặt tên tệp có khối")
+                        else:
+                            m, k = ph["mon"], ph["khoi"]
+                            if xoa_cu and (MD.bo_dau(m), k) not in da_xoa:
+                                db.execute("DELETE FROM ppct WHERE teacher_id=? AND khoi=? AND lower(mon)=lower(?)",
+                                           (uid, k, m))
+                                da_xoa.add((MD.bo_dau(m), k))
+                            for d in ph["rows"]:
+                                db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu)"
+                                           " VALUES(?,?,?,?,?,?,?)",
+                                           (uid, k, m, d.get("tuan") or 1, d.get("tiet_pp"),
+                                            d.get("ten_bai"), PT.ghi_chu_ppct(d) or None))
+                            ph["loi"] = ""
+                            phan_ok.append(ph)
+                            dong_tep["so_dong"] += len(ph["rows"])
+                            so_dong += len(ph["rows"])
+                            if len(ph["rows"]) == 0:
+                                ph["loi"] = "phần này không có dòng bài học nào"
+                        dong_tep["phan"].append(ph)
+                        if ph.get("loi"):
+                            so_loi += 1
+                if dong_tep["loi"]:
+                    so_loi += 1
+                ket_qua.append(dong_tep)
+                if len(ds_tep) == 1 and not dong_tep["loi"] and len(dong_tep["phan"]) == 1:
+                    ph = dong_tep["phan"][0]
+                    if not ph.get("loi"):
+                        flash("Đã nhập %d dòng PPCT — môn %s khối %s."
+                              % (dong_tep["so_dong"], ph["mon"], ph["khoi"]), "ok")
+                        db.commit()
+                        return redirect(url_for("core.ppct"))
+            db.commit()
+            if so_dong:
+                flash("Đã nhập %d dòng PPCT — %s%s."
+                      % (so_dong, PT.tom_tat(phan_ok) or ("%d phần" % len(phan_ok)),
+                         " · một số phần chưa nhập được, xem bảng bên dưới" if so_loi else ""),
+                      "err" if so_loi and not so_dong else "ok")
+            elif so_loi:
+                flash("Chưa nhập được dòng nào — xem lý do ở bảng bên dưới.", "err")
+            return render_template("ppct_import_kq.html", ket_qua=ket_qua, so_dong=so_dong,
+                                   so_loi=so_loi, xoa_cu=xoa_cu, mon_day=ds_mon)
         db.commit()
         return redirect(url_for("core.ppct", tuan=request.args.get("tuan", "")))
     tuan = request.args.get("tuan", "")
