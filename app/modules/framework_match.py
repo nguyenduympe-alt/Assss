@@ -62,6 +62,45 @@ CONTEXTS = [
      ("6.1", "6.3"),
      "Giáo viên minh họa đầu ra của AI, học sinh đối chiếu với học liệu và nêu giới hạn; "
      "không nhập dữ liệu cá nhân."),
+    # ---- (M8) ngữ cảnh cho bài học ở các môn KHÁC Tin học (đọc tựa bài là ra mã thật của khung) ----
+    (("thu thap so lieu", "so lieu", "bieu do", "thong ke", "bang bieu", "thu thap du lieu",
+      "bang so lieu", "so sanh so lieu"),
+     ("1.3", "1.2"),
+     "Ghi số liệu thu được vào bảng/biểu đồ do giáo viên chọn; kiểm tra lại cách ghi "
+     "và đọc kết quả trước lớp."),
+    (("do luong", "do dai", "do nhiet", "thi nghiem", "quan sat", "ghi ket qua", "nang luong",
+      "tai che", "trong cay", "thoi tiet", "trai dat", "sinh truong", "dung cu do"),
+     ("5.1", "5.3"),
+     "Thực hiện phép đo/thí nghiệm theo các bước, ghi kết quả vào bảng số do giáo viên chuẩn bị; "
+     "nêu cách kiểm tra lại kết quả."),
+    (("ve tranh", "ve hinh", "tao hinh", "trang tri", "thu cong", "gap hinh", "cat dan", "ban ve",
+      "thiet ke san pham", "trinh bay san pham"),
+     ("3.1", "3.2"),
+     "Tạo sản phẩm số ngắn giới thiệu sản phẩm của nhóm (ảnh kèm vài dòng chữ), trình bày "
+     "và ghi nguồn hình ảnh."),
+    (("tap doc", "doc hieu", "ke chuyen", "ke lai", "thuyet trinh", "trinh bay", "thao luan",
+      "lam viec nhom", "luyen noi", "trao doi", "listen", "speak", "unit", "vocabulary", "reading"),
+     ("2.1", "2.4"),
+     "Trao đổi, chia sẻ nội dung học tập bằng công cụ số do giáo viên chọn; phản hồi lịch sự "
+     "và không đưa thông tin riêng tư."),
+    (("ban do", "tu lieu", "dien bien", "thoi ki", "nhan vat lich su", "di tich", "vung mien",
+      "khi hau", "dan so", "van hoa", "le hoi"),
+     ("1.1", "1.2"),
+     "Tra cứu tư liệu/bản đồ số do giáo viên chọn, ghi lại căn cứ và so sánh hai nguồn trước khi dùng."),
+    (("bang nhan", "phep cong", "phep tru", "phep nhan", "phep chia", "phan so", "ti so", "phan tram",
+      "trung binh cong", "hinh hoc", "dien tich", "the tich", "bai toan"),
+     ("5.2", "5.3"),
+     "Chọn công cụ số phù hợp (bảng tính hoặc máy tính cầm tay) để kiểm tra lại kết quả; "
+     "nêu các bước đã làm và chỗ dễ sai."),
+    (("ung xu", "quy tac", "trung thuc", "loi hua", "tiet kiem", "an toan giao thong", "gia dinh",
+      "ban be", "cam xuc", "ki nang song", "dao duc", "doan ket"),
+     ("2.5", "3.3"),
+     "Nêu quy tắc ứng xử khi trao đổi trên mạng và ghi nguồn khi dùng ý của người khác; "
+     "đánh giá bằng bảng kiểm."),
+    (("ban phim", "tu the ngoi", "go ban phim", "ghe ngoi", "anh sang lop hoc"),
+     ("4.3", "4.1"),
+     "Thực hành thao tác thiết bị đúng cách, giữ tư thế và khoảng cách hợp lý; "
+     "giáo viên quan sát theo bảng kiểm."),
 ]
 
 
