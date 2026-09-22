@@ -3,17 +3,66 @@
 {% block crumb %}Thời khoá biểu theo phiên bản — áp dụng từ tuần đã chọn{% endblock %}
 {% block body %}
 <div class="card">
- <div class="chead"><h3>📅 Phiên bản thời khoá biểu</h3>
+ <div class="chead"><h3>📅 Tuần dạy — chọn tuần áp dụng khi đổi TKB</h3>
   <span class="chip" style="background:#ecfdf5;color:#0d9488">Áp dụng từ tuần {{ap_dung_tu}}</span></div>
- <p class="sub">Năm học <b>{{nam_hoc}}</b>. Đang xem tuần <b>{{tuan}}</b> — dùng phiên bản
-  <b>áp dụng từ tuần {{ap_dung_tu}}</b>.
-  Sửa ở tuần W chỉ đổi từ W trở đi; các tuần trước giữ nguyên bản cũ.
-  {% if ds_moc %}Mốc đã lưu: {% for m in ds_moc %}<a class="chip" href="?tuan={{m}}">từ tuần {{m}}</a> {% endfor %}{% endif %}</p>
+ <p class="sub">Năm học <b>{{nam_hoc}}</b>. Tuần dạy lấy từ lịch báo giảng
+  (thứ Hai tuần 1{% if tuan1_txt %}: <b>{{tuan1_txt}}</b>{% endif %}{% if not da_chon_ngay %} — chưa lưu, tạm tính{% endif %}
+  + lịch nghỉ). Đang xem tuần <b>{{tuan}}</b> — dùng bản
+  <b>áp dụng từ tuần {{ap_dung_tu}}</b> đến lần đổi tiếp theo.
+  Thêm/sửa ở tuần đang mở: bản cũ giữ đến hết tuần trước đó; bản này dùng từ tuần đó đến lần đổi tiếp.
+  Cùng tuần = cập nhật mốc đó (không tạo TKB rời từng tuần).</p>
  <form method="get" class="row" style="gap:8px;align-items:flex-end">
-  <label class="f">Xem tuần<input type="number" name="tuan" min="1" max="60" value="{{tuan}}" style="width:90px"></label>
-  <button class="sec">Mở tuần</button>
+  <label class="f">Áp dụng từ tuần
+   <select name="tuan" style="min-width:220px">
+    {% for x in lich_tuan %}
+    <option value="{{x.tuan}}" {{'selected' if x.tuan==tuan}}>Tuần {{x.tuan}}: {{x.tu}} → {{x.den}}</option>
+    {% endfor %}
+    {% if not lich_tuan %}<option value="{{tuan}}" selected>Tuần {{tuan}}</option>{% endif %}
+   </select></label>
+  <button class="ok">Mở tuần này</button>
+  <span class="muted" style="font-size:12.5px;padding-bottom:9px">
+   {{'Đã chọn ngày tuần 1' if da_chon_ngay else 'Chưa lưu ngày tuần 1 — chọn ở Lịch báo giảng'}}:
+   <b>{{tuan1_txt}}</b>
+   · <a href="{{url_for('core.bao_giang', tuan=tuan)}}">Lịch báo giảng</a>
+   · <a href="{{url_for('core.lich_nghi')}}">Lịch nghỉ</a></span>
  </form>
+ {% if lich_tuan %}
+ <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+  {% for x in lich_tuan %}
+  <a href="?tuan={{x.tuan}}" title="Mở tuần {{x.tuan}} — TKB sẽ áp dụng từ tuần này"
+   style="text-decoration:none;font-size:12px;padding:5px 9px;border-radius:9px;
+   border:1px solid {{'#0d9488' if x.tuan==tuan else '#e4eeea'}};
+   background:{{'linear-gradient(135deg,#0d9488,#059669)' if x.tuan==tuan else '#fff'}};
+   color:{{'#fff' if x.tuan==tuan else ('#0f766e' if x.co_ppct else '#94a3b8')}}">
+   Tuần {{x.tuan}}: {{x.tu}} → {{x.den}}</a>
+  {% endfor %}
+ </div>
+ <p class="sub" style="margin:9px 0 0;font-size:12.5px">Bấm một tuần dạy để mở TKB của tuần đó.
+  Thêm/sửa/xoá lúc đang mở tuần W = lưu mốc <b>áp dụng từ tuần W</b>.
+  Tuần <span style="color:#0f766e;font-weight:600">xanh đậm</span> đã có PPCT.</p>
+ {% endif %}
 </div>
+
+{% if lich_su %}
+<div class="card">
+ <div class="chead"><h3>🗂️ Các lần đã lưu</h3>
+  <span class="chip">{{lich_su|length}} mốc</span></div>
+ <p class="sub">Mỗi lần thêm/đổi tạo một mốc (cùng tuần = cập nhật mốc đó). Bản cũ giữ đến hết tuần trước mốc kế.</p>
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>Lần</th><th>Áp dụng từ</th><th>Đến hết tuần</th><th>Ngày</th><th>Số tiết</th><th></th></tr></thead>
+  <tbody>{% for m in lich_su %}
+   <tr{% if m.tuan_bd==ap_dung_tu %} style="background:#ecfdf5"{% endif %}>
+    <td><b>{{m.lan}}</b></td>
+    <td>Tuần <b>{{m.tuan_bd}}</b></td>
+    <td>{% if m.den_tuan %}Tuần {{m.den_tuan}}{% else %}<span class="muted">đến lần đổi tiếp</span>{% endif %}</td>
+    <td class="muted">{% if m.tu %}{{m.tu}}{% if m.den %} → {{m.den}}{% endif %}{% else %}—{% endif %}</td>
+    <td>{{m.so_tiet}}</td>
+    <td><a class="btn sec sm" href="?tuan={{m.tuan_bd}}">Xem</a></td>
+   </tr>
+  {% endfor %}</tbody>
+ </table></div>
+</div>
+{% endif %}
 <div class="card">
  <h3>➕ Thêm tiết dạy</h3><p class="sub">Chọn <b>môn đã tạo trong kho KHDH</b>, nhập <b>lớp dạy</b> — hệ thống đối chiếu
  số tiết mỗi tuần với KHDH của môn đó. Môn chưa có trong danh sách thì chọn “＋ Môn khác” rồi nhập tên môn + khối.

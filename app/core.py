@@ -496,6 +496,25 @@ def _tuan_xem():
         return 1
 
 
+def _tkb_tb_moc(v, moc0):
+    """Câu thêm vào thông báo khi thêm/sửa TKB — nói rõ bản cũ được giữ."""
+    if v not in moc0 and v > 1:
+        return (" Bản cũ giữ đến hết tuần %d; bản này áp dụng từ tuần %d đến lần đổi tiếp theo."
+                % (v - 1, v))
+    return " Áp dụng từ tuần %d." % v
+
+
+def _tuan1_gv(u, db):
+    s = setting("tuan1_%s" % u["id"], "")
+    if s:
+        try:
+            return datetime.date.fromisoformat(s), True
+        except Exception:
+            pass
+    t = datetime.date.today()
+    return t - datetime.timedelta(days=t.weekday()), False
+
+
 def _tkb_dong_phien(db, uid, r, nam, tuan):
     """Tìm đúng dòng của phiên bản hiệu lực tại `tuan` (sao chép nếu đang đứng giữa hai mốc)."""
     v = TP.dam_bao_phien(db, uid, nam, tuan)
@@ -529,6 +548,7 @@ def tkb():
                 if not r:
                     flash("Không tìm thấy tiết cần sửa (có thể đã bị xoá).", "err")
                 else:
+                    moc0 = set(TP.moc(db, uid, nam))
                     r, v = _tkb_dong_phien(db, uid, r, nam, tuan)
                     if not r:
                         flash("Không tìm thấy tiết cần sửa (có thể đã bị xoá).", "err")
@@ -538,16 +558,19 @@ def tkb():
                                    (dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"],
                                     r["id"], uid))
                         _tkb_nho_tkb(dt)
-                        flash("Đã sửa tiết dạy: %s · %s tiết %s · lớp %s · %s."
-                              % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
+                        flash("Đã sửa tiết dạy: %s · %s tiết %s · lớp %s · %s.%s"
+                              % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon,
+                                 _tkb_tb_moc(v, moc0)), "ok")
             else:
+                moc0 = set(TP.moc(db, uid, nam))
                 v = TP.dam_bao_phien(db, uid, nam, tuan)
                 db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong,tuan_bd,nam_hoc)"
                            " VALUES(?,?,?,?,?,?,?,?,?,?)",
                            (uid, dt["thu"], dt["buoi"], dt["tiet"], dt["lop"], mon, khoi, dt["phong"], v, nam))
                 _tkb_nho_tkb(dt)
-                flash("Đã thêm tiết dạy: %s · %s tiết %s · lớp %s · %s."
-                      % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon), "ok")
+                flash("Đã thêm tiết dạy: %s · %s tiết %s · lớp %s · %s.%s"
+                      % (THU_NAME[int(dt["thu"])], dt["buoi"], dt["tiet"], dt["lop"], mon,
+                         _tkb_tb_moc(v, moc0)), "ok")
         elif act == "del":
             r = db.execute("SELECT * FROM tkb WHERE id=? AND teacher_id=?",
                            (request.form.get("id"), uid)).fetchone()
@@ -580,6 +603,17 @@ def tkb():
     thu_chon = session.get("tkb_thu") or "2"
     buoi_chon = session.get("tkb_buoi") or "Sáng"
     ap_dung = TP.phien_cho_tuan(db, uid, nam, tuan)
+    tuan1, da_chon_ngay = _tuan1_gv(u, db)
+    breaks = LN.get_breaks(db, uid)
+    tuans_pp = [r[0] for r in db.execute(
+        "SELECT DISTINCT tuan FROM ppct WHERE teacher_id=? ORDER BY tuan", (uid,))]
+    moc = TP.moc(db, uid, nam)
+    max_tuan = max((tuans_pp or [1]) + moc + [tuan, 18])
+    mp_tuan, _cal = LN.build_calendar(tuan1, breaks, max_hoc=max_tuan)
+    lich_tuan = [{"tuan": t, "tu": mp_tuan[t].strftime("%d/%m/%Y"),
+                  "den": (mp_tuan[t] + datetime.timedelta(days=6)).strftime("%d/%m/%Y"),
+                  "co_ppct": t in tuans_pp} for t in sorted(mp_tuan)]
+    ngay = {x["tuan"]: (x["tu"], x["den"]) for x in lich_tuan}
     return render_template("tkb.html", rows=rows, grid=grid, tiets=tiets, kho=kho,
                            doi_chieu=doi_chieu, dem=dem,
                            kho_khoi=ds_kho_khoi,
@@ -587,7 +621,10 @@ def tkb():
                                                   for k in ds_kho_khoi},
                            thu_chon=str(thu_chon), buoi_chon=buoi_chon,
                            tuan=tuan, nam_hoc=nam, ap_dung_tu=ap_dung or 1,
-                           ds_moc=TP.moc(db, uid, nam))
+                           ds_moc=moc, lich_tuan=lich_tuan,
+                           lich_su=TP.lich_su(db, uid, nam, ngay),
+                           tuan1=tuan1, tuan1_txt=tuan1.strftime("%d/%m/%Y"),
+                           da_chon_ngay=da_chon_ngay, max_tuan=max_tuan)
 
 
 # ---------------- Lịch báo giảng ----------------

@@ -149,6 +149,24 @@ def luu_lop(db, uid, nam, tuan, ds_doi):
                   "Các tuần trước mốc này giữ nguyên bản cũ." % (v, len(doi))), len(doi)
 
 
+def lich_su(db, uid, nam, ngay=None):
+    """Các lần TKB đã lưu: từ tuần nào đến hết tuần nào (trước mốc kế), kèm ngày nếu có.
+
+    `ngay`: {tuan: (tu_txt, den_txt)} lấy từ tuần dạy lịch báo giảng.
+    """
+    ds = moc(db, uid, nam)
+    ngay = ngay or {}
+    ra = []
+    for i, t in enumerate(ds):
+        den = (ds[i + 1] - 1) if i + 1 < len(ds) else None
+        n = db.execute("SELECT COUNT(*) FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
+                       " AND COALESCE(tuan_bd,1)=?", (uid, nam, t)).fetchone()[0]
+        tu_ngay, den_ngay = ngay.get(t, ("", ""))
+        ra.append({"tuan_bd": t, "den_tuan": den, "so_tiet": n,
+                   "tu": tu_ngay, "den": den_ngay, "lan": i + 1})
+    return ra
+
+
 def gan_phien(dt, tuan, nam):
     """Gắn tuan_bd + nam_hoc vào dict tiết khi INSERT."""
     dt = dict(dt)
