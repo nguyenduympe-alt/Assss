@@ -17,6 +17,7 @@ Với mỗi dòng, giáo viên làm được ngay:
 
 Bộ này KHÔNG tự đặt mã, không sửa nội dung bài học — chỉ gom nhóm, ghi vào đúng môn + khối.
 """
+import hashlib
 import re
 
 from . import khdh_kho as KHO
@@ -121,6 +122,23 @@ def thong_ke(ds):
             "chua_khdh": sum(1 for d in ds if not d["co_kho"]),
             "dong_ppct": sum(d["so_ppct"] for d in ds),
             "tiet_tkb": sum(d["so_tkb"] for d in ds)}
+
+
+def dau_ppct(db, uid):
+    """Dấu vân tay PPCT của giáo viên — đổi khi thêm/sửa/xoá bài.
+
+    Lịch báo giảng dùng dấu này để tự làm mới khi phân phối chương trình thay đổi.
+    """
+    rows = db.execute(
+        "SELECT id, tuan, COALESCE(tiet_pp,''), COALESCE(mon,''), COALESCE(khoi,''),"
+        " COALESCE(ten_bai,''), COALESCE(ghi_chu,'') FROM ppct WHERE teacher_id=? ORDER BY id",
+        (uid,)).fetchall()
+    h = hashlib.md5()
+    h.update(str(len(rows)).encode())
+    for r in rows:
+        h.update(b"\n")
+        h.update("|".join("" if x is None else str(x) for x in r).encode("utf-8", "replace"))
+    return h.hexdigest()
 
 
 def dem_ppct(db, uid, mon, khoi):

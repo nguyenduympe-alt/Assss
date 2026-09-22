@@ -1,6 +1,6 @@
 import io, json, datetime, csv, re, os, time, uuid
 from flask import (Blueprint, render_template, request, redirect, url_for, session,
-                   send_file, send_from_directory, jsonify, flash, Response)
+                   send_file, send_from_directory, jsonify, flash, Response, make_response)
 from .db import get_db, setting, set_setting
 from .auth import (login_required, current_user, admin_required, google_bat,
                     google_callback_url, google_tinh_trang, kiem_tra_google)
@@ -260,15 +260,15 @@ def mon_hoc():
             ok, tb = MH.them_dong(db, uid, mon, khoi or (request.form.get("khoi_moi") or ""),
                                   request.form.get("tuan"), request.form.get("tiet_pp"),
                                   request.form.get("ten_bai"), request.form.get("ghi_chu"))
-            flash(tb, "ok" if ok else "err")
+            flash(_tb_lbg_ppct(tb, ok, request.form.get("tuan")), "ok" if ok else "err")
         elif act == "sua_dong":
             ok, tb = MH.sua_dong(db, uid, request.form.get("id"),
                                  request.form.get("tuan"), request.form.get("tiet_pp"),
                                  request.form.get("ten_bai"), request.form.get("ghi_chu"))
-            flash(tb, "ok" if ok else "err")
+            flash(_tb_lbg_ppct(tb, ok, request.form.get("tuan")), "ok" if ok else "err")
         elif act == "xoa_dong":
             ok, tb = MH.xoa_dong(db, uid, request.form.get("id"))
-            flash(tb, "ok" if ok else "err")
+            flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
         elif act == "ppct":
             ds_tep = [f for f in (request.files.getlist("files") + request.files.getlist("file"))
                       if (getattr(f, "filename", "") or "").strip()]
@@ -287,6 +287,7 @@ def mon_hoc():
                 MD.them(db, uid, mon)
                 if so_dong:
                     flash("Đã nhập %d dòng PPCT cho môn %s khối %s%s — xem nội dung ngay dưới đây."
+                          " Lịch báo giảng tự làm mới theo PPCT vừa lưu."
                           % (so_dong, mon, khoi,
                              " (đã thay PPCT cũ của đúng môn + khối này)" if thay_cu else ""),
                           "err" if so_loi else "ok")
@@ -628,6 +629,20 @@ def tkb():
 
 
 # ---------------- Lịch báo giảng ----------------
+def _tb_lbg_ppct(tb, ok, tuan=None):
+    """Thêm câu: lịch báo giảng tự làm mới khi PPCT đổi."""
+    if not ok:
+        return tb
+    extra = " Lịch báo giảng tự làm mới theo PPCT vừa lưu"
+    try:
+        t = int(tuan or 0)
+    except Exception:
+        t = 0
+    if t >= 1:
+        extra += " (tuần %d)" % t
+    return tb + extra + "."
+
+
 def _rows_for_week(uid, tuan, monday, offday=None, nam_hoc=""):
     db = get_db()
     offday = offday or {}
@@ -748,7 +763,7 @@ def bao_giang():
     for r in rows:
         if r.get("lop") and r["lop"] not in ds_lop:
             ds_lop.append(r["lop"])
-    return render_template("baogiang.html", rows=rows, meta=meta, monday=monday, tuan=tuan,
+    html = render_template("baogiang.html", rows=rows, meta=meta, monday=monday, tuan=tuan,
                            tuans_pp=tuans_pp, max_tuan=max_tuan, tuan_now=tuan_now,
                            tuan1=tuan1, da_xuat=da_xuat, cal=cal, breaks=breaks,
                            nghi_tuan_nay=nghi_tuan_nay, lich_tuan=lich_tuan,
@@ -756,7 +771,20 @@ def bao_giang():
                            tuan1_txt=tuan1.strftime("%d/%m/%Y"),
                            sua=request.values.get("sua") in ("1", "on", "true"),
                            ds_lop=ds_lop, ap_dung_tu=ap_dung, ds_moc=TP.moc(db, u["id"], nam),
-                           nam_hoc=nam)
+                           nam_hoc=nam, dau_ppct=MH.dau_ppct(db, u["id"]))
+    resp = make_response(html)
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return resp
+
+
+@bp.route("/bao-giang/ppct-rev")
+@login_required
+def bao_giang_ppct_rev():
+    """Dấu PPCT hiện tại — trang lịch báo giảng hỏi định kỳ để tự làm mới khi PPCT đổi."""
+    db, uid = get_db(), session["uid"]
+    resp = jsonify(ok=True, dau=MH.dau_ppct(db, uid))
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 # ---------------- Nhận xét AI ----------------
