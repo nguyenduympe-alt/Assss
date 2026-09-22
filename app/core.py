@@ -269,6 +269,9 @@ def mon_hoc():
         elif act == "xoa_dong":
             ok, tb = MH.xoa_dong(db, uid, request.form.get("id"))
             flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
+        elif act == "xoa_ppct":
+            ok, tb, _n = MH.xoa_ppct(db, uid, mon, khoi)
+            flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
         elif act == "ppct":
             ds_tep = [f for f in (request.files.getlist("files") + request.files.getlist("file"))
                       if (getattr(f, "filename", "") or "").strip()]
@@ -281,22 +284,27 @@ def mon_hoc():
                 flash("Mỗi lượt nhập tối đa %d tệp." % MH.TOI_DA_TEP, "err")
             else:
                 thay_cu = (request.form.get("thay_cu") or "").lower() in ("1", "on", "true", "yes")
-                ds_mon = MD.danh_sach(u)
-                ket_qua, so_dong, so_loi = MH.nhap_ppct(db, uid, ds_tep, mon, khoi, thay_cu=thay_cu,
-                                                        ds_mon=ds_mon)
-                MD.them(db, uid, mon)
-                if so_dong:
-                    flash("Đã nhập %d dòng PPCT cho môn %s khối %s%s — xem nội dung ngay dưới đây."
-                          " Lịch báo giảng tự làm mới theo PPCT vừa lưu."
-                          % (so_dong, mon, khoi,
-                             " (đã thay PPCT cũ của đúng môn + khối này)" if thay_cu else ""),
-                          "err" if so_loi else "ok")
-                elif so_loi:
-                    flash("Chưa nhập được dòng nào — xem lý do ngay dưới đây. Dữ liệu PPCT cũ vẫn còn.", "err")
-                    ket_qua_nhap = ket_qua
+                n_cu = MH.dem_ppct(db, uid, mon, khoi)
+                if n_cu and not thay_cu:
+                    flash("Môn %s khối %s đã có %d dòng PPCT. Xác nhận xoá cái cũ rồi nhập bản mới "
+                          "(hệ thống sẽ hỏi trước khi xoá)." % (mon, khoi, n_cu), "err")
                 else:
-                    flash("Tệp không có dòng bài học nào — dữ liệu PPCT cũ vẫn còn.", "err")
-                    ket_qua_nhap = ket_qua
+                    ds_mon = MD.danh_sach(u)
+                    ket_qua, so_dong, so_loi = MH.nhap_ppct(db, uid, ds_tep, mon, khoi, thay_cu=thay_cu,
+                                                            ds_mon=ds_mon)
+                    MD.them(db, uid, mon)
+                    if so_dong:
+                        flash("Đã nhập %d dòng PPCT cho môn %s khối %s%s — xem nội dung ngay dưới đây."
+                              " Lịch báo giảng tự làm mới theo PPCT vừa lưu."
+                              % (so_dong, mon, khoi,
+                                 " (đã xoá PPCT cũ rồi nhập bản mới)" if (thay_cu and n_cu) else ""),
+                              "err" if so_loi else "ok")
+                    elif so_loi:
+                        flash("Chưa nhập được dòng nào — xem lý do ngay dưới đây. Dữ liệu PPCT cũ vẫn còn.", "err")
+                        ket_qua_nhap = ket_qua
+                    else:
+                        flash("Tệp không có dòng bài học nào — dữ liệu PPCT cũ vẫn còn.", "err")
+                        ket_qua_nhap = ket_qua
         if ket_qua_nhap is None:
             slug = (request.form.get("slug") or "").strip()
             return redirect(url_for("core.mon_hoc") + (("#" + slug) if slug else ""))
@@ -913,10 +921,11 @@ def mau_excel(kind):
         ws.append(["Trần Thị Bình", "5A", "Toán", 6, "", "hay quên vở bài tập"])
         ws.append(["Lê Minh Cường", "5A", "Toán", "", "CHT", ""])
     else:
-        ws.append(["Tuần", "Khối", "Môn", "Tiết PPCT", "Tên bài", "Ghi chú"])
-        ws.append([1, "5", "Toán", 1, "Ôn tập số tự nhiên", "Bảng phụ"])
-        ws.append([1, "5", "Toán", 2, "Ôn tập phân số", ""])
-    for i, w in enumerate([26, 10, 14, 10, 12, 40], 1):
+        ws.append(["Tuần", "Tiết PPCT", "Tên bài", "Ghi chú"])
+        ws.append([1, 1, "Ôn tập số tự nhiên", "Bảng phụ"])
+        ws.append([1, 2, "Ôn tập phân số", ""])
+    widths = [26, 10, 14, 10, 12, 40] if kind == "diem" else [10, 12, 40, 22]
+    for i, w in enumerate(widths, 1):
         ws.column_dimensions[chr(64 + i)].width = w
     bio = io.BytesIO(); wb.save(bio); bio.seek(0)
     return send_file(bio, as_attachment=True, download_name=f"mau-{kind}.xlsx",

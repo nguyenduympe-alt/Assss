@@ -308,6 +308,21 @@ def xoa_dong(db, uid, iid):
     return True, "Đã xoá bài “%s” khỏi PPCT môn %s." % (r["ten_bai"] or "", r["mon"])
 
 
+def xoa_ppct(db, uid, mon, khoi):
+    """Xoá hết PPCT (lịch môn) của đúng một môn + khối — không đụng TKB / môn khác."""
+    mon, khoi = _gon(mon), str(khoi or "").strip()
+    if not mon:
+        return False, "Thiếu tên môn cần xoá PPCT.", 0
+    n = dem_ppct(db, uid, mon, khoi)
+    if not n:
+        return True, "Môn %s%s chưa có dòng PPCT nào." % (mon, (" khối " + khoi) if khoi else ""), 0
+    db.execute("DELETE FROM ppct WHERE teacher_id=? AND lower(mon)=lower(?) AND COALESCE(khoi,'')=?",
+               (uid, mon, khoi))
+    db.commit()
+    return True, ("Đã xoá hết %d dòng PPCT của môn %s%s."
+                  % (n, mon, (" khối " + khoi) if khoi else "")), n
+
+
 # ---------------------------------------------------------------- nhập PPCT cho môn
 def _doc_tep(f, mon_mac_dinh, khoi_mac_dinh, ds_mon=()):
     """Đọc một tệp thành các phần (môn + khối) với môn/khối mặc định là của dòng đang nhập."""
@@ -353,7 +368,8 @@ def nhap_ppct(db, uid, ds_tep, mon, khoi, thay_cu=True, ds_mon=()):
             ket_qua.append(dong)
             continue
         for p in phan:
-            p["mon"], p["khoi"] = (p["mon"] or mon), (str(p["khoi"] or "") or khoi)
+            # Đưa đúng dòng môn thì đã biết môn + khối — tệp không cần cột lớp/khối.
+            p["mon"], p["khoi"] = mon, khoi
             if not p["khoi"]:
                 p["loi"] = "chưa rõ KHỐI — chọn khối cho môn này ở ô “Khối” rồi nhập lại"
                 so_loi += 1

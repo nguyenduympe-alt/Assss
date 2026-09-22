@@ -62,23 +62,25 @@
    · {{d.so_tkb}} tiết TKB{% if d.tiet_tuan %} · {{d.tiet_tuan}} tiết/tuần (KHDH){% endif %}</span>
  </div>
 
- <form method="post" enctype="multipart/form-data" class="row" style="gap:8px;align-items:flex-end">
+ <form method="post" enctype="multipart/form-data" class="row" style="gap:8px;align-items:flex-end"
+  onsubmit="return {{ d.so_ppct }} ? confirm('Môn {{d.mon}}{% if d.khoi %} khối {{d.khoi}}{% endif %} đã có {{d.so_ppct}} dòng PPCT. Xoá hết cái cũ rồi nhập bản mới?') : true">
   <input type="hidden" name="act" value="ppct">
   <input type="hidden" name="mon" value="{{d.mon}}">
   <input type="hidden" name="khoi" value="{{d.khoi}}">
   <input type="hidden" name="slug" value="{{d.slug}}">
+  <input type="hidden" name="thay_cu" value="1">
   <label class="f" style="flex:1;min-width:230px">📥 Tải tệp PPCT cho môn này
    <input type="file" name="files" accept=".docx,.xlsx,.xls,.csv" multiple required></label>
   {% if not d.khoi %}
   <label class="f">Khối của môn này<select name="khoi_moi" required style="width:130px">
    <option value="">Chọn khối</option>{% for k in KHOI %}<option>{{k}}</option>{% endfor %}</select></label>
   {% endif %}
-  <label class="f" style="display:flex;gap:7px;align-items:center;white-space:nowrap">
-   <input type="checkbox" name="thay_cu" value="1" checked style="width:18px;margin-top:12px">
-   <span style="margin-top:10px">Thay PPCT cũ của đúng môn + khối này</span></label>
   <button class="ok">Nhập PPCT</button>
   <a class="btn sec" href="{{url_for('core.mau_excel', kind='ppct')}}">⬇ File mẫu</a>
  </form>
+ <p class="muted" style="font-size:12px;margin:6px 0 0">Tệp chỉ cần cột <b>Tuần · Tiết PPCT · Tên bài · Ghi chú</b> —
+  không cần lớp/khối vì đang nhập đúng môn{% if d.khoi %} khối {{d.khoi}}{% endif %}.
+  {% if d.so_ppct %}Đã có PPCT: hệ thống <b>hỏi trước</b> rồi mới xoá cái cũ, nhập bản mới.{% endif %}</p>
  {% if d.co_kho and d.ten_file %}
  <div class="muted" style="font-size:12px;margin-top:6px">KHDH trong kho: {{d.ten_file}}</div>
  {% endif %}
@@ -87,6 +89,15 @@
   <div class="chead" style="margin-bottom:8px">
    <h3 style="font-size:14px">📘 Phân phối chương trình của môn này
     <span class="chip">{{d.ppct|length}} dòng</span></h3>
+   {% if d.ppct %}
+   <form method="post" onsubmit="return confirm('Xoá hết {{d.so_ppct}} dòng PPCT của môn {{d.mon}}{% if d.khoi %} khối {{d.khoi}}{% endif %}?')">
+    <input type="hidden" name="act" value="xoa_ppct">
+    <input type="hidden" name="mon" value="{{d.mon}}">
+    <input type="hidden" name="khoi" value="{{d.khoi}}">
+    <input type="hidden" name="slug" value="{{d.slug}}">
+    <button class="dan">🗑 Xoá hết PPCT của môn này</button>
+   </form>
+   {% endif %}
   </div>
   {% if d.ppct %}
   <div class="tbl-wrap" style="max-height:320px;overflow-y:auto"><table>
