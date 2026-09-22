@@ -3,7 +3,7 @@
 {% include '_head_icon.html' %}
 <style>
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:stretch;font-family:"Inter",system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+body{margin:0;min-height:100vh;display:flex;flex-direction:row;align-items:stretch;font-family:"Inter",system-ui,"Segoe UI",Roboto,Arial,sans-serif;
  color:#0f172a;background:#f3f8f6}
 .left{flex:1;background:#0a1f1c;color:#fff;padding:36px 48px 48px;display:flex;flex-direction:column;justify-content:flex-start;
  position:relative;overflow:auto;
@@ -32,9 +32,9 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:st
  color:#c9e7de;font-size:12.2px;line-height:1.5}
 .left .tinchay b{color:#fff}
 .fe span{color:#8aa8a1;font-size:12.5px;line-height:1.5}
-.right{width:100%;flex:0 0 auto;display:flex;align-items:flex-start;justify-content:flex-start;
- padding:28px 32px 32px;background:#fff;border-bottom:1px solid #e4eeea}
-.box{width:100%;max-width:380px;margin:0}
+.right{width:470px;flex:0 0 470px;display:flex;align-items:flex-start;justify-content:flex-start;
+ padding:36px 32px 32px;background:#fff}
+.box{width:100%;max-width:370px;margin:0}
 .box h1{font-size:25px;margin:0 0 6px;font-weight:750;letter-spacing:-.4px}
 .box .s{color:#64748b;font-size:14px;margin:0 0 26px}
 label{display:block;font-size:12.5px;font-weight:650;color:#475569;margin:0 0 6px}
@@ -57,28 +57,8 @@ button:hover{filter:brightness(1.07);transform:translateY(-1px)}
 .hint a{color:#0d9488;font-weight:650;text-decoration:none}
 .demo{margin-top:14px;padding:12px;border-radius:11px;background:#ecfdf5;border:1px solid #c7f0e4;font-size:12.5px;color:#475569;text-align:center}
 .demo b{color:#0d9488}
-@media(max-width:900px){.right{padding:20px 16px 24px}.left{padding:28px 20px 36px}}
+@media(max-width:900px){.left{display:none}.right{flex:1;width:auto;padding:24px 20px 32px}}
 </style></head><body>
-<div class="right"><form class="box" method="post">
-<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
- <div class="lg" style="margin-bottom:18px;font-size:18px"><span class="mk"><img src="{{url_for('static', filename='logo/ea-mark-b.svg')}}?v=logo1" alt="EduAssist"></span>EduAssist</div>
- <h1>Đăng nhập</h1><p class="s">Chào mừng trở lại! Vui lòng nhập thông tin tài khoản.</p>
- {% with ms=get_flashed_messages(with_categories=true) %}{% for c,m in ms %}<div class="{{'ok' if c=='ok' else 'err'}}">{{m}}</div>{% endfor %}{% endwith %}
- <label for="username">Tài khoản hoặc email</label><input id="username" name="username" placeholder="Tên đăng nhập hoặc email" value="{{request.form.get('username', '')}}" maxlength="254" autocomplete="username" required autofocus>
- <label for="password">Mật khẩu</label><input id="password" name="password" type="password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
- <button>Đăng nhập →</button>
- {% if google_enabled %}
- <div class="or"><span>hoặc</span></div>
- <a class="gbtn" href="{{url_for('auth.google_login')}}">
-  <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.4z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.1 2 20.4 2 24s.8 6.9 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C35 4.3 30 2 24 2 15.4 2 7.9 7 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>
-  Đăng nhập bằng Google</a>
- {% else %}
- <div class="or"><span>hoặc</span></div>
- <button type="button" class="gbtn" disabled aria-disabled="true">Đăng nhập bằng Google</button>
- <p style="font-size:12px;color:#64748b;text-align:left">Google chưa được quản trị viên kích hoạt. Bạn vẫn có thể đăng ký và đăng nhập bằng mật khẩu.</p>
- {% endif %}
- <div class="hint">Chưa có tài khoản? <a href="{{url_for('auth.register')}}">Đăng ký ngay</a></div>
-</form></div>
 <div class="left">
  <div class="lg"><span class="mk"><img src="{{url_for('static', filename='logo/ea-mark-b.svg')}}?v=logo1" alt="EduAssist"></span>EduAssist</div>
  <h2>Trợ lý số cho<br>giáo viên hiện đại</h2>
@@ -107,4 +87,23 @@ button:hover{filter:brightness(1.07);transform:translateY(-1px)}
  <div class="tinchay"><span style="font-size:16px">🔒</span><div><b>Không gửi bài của thầy/cô ra ngoài.</b>
   Toàn bộ xử lý chạy trên máy chủ của trường — không đưa nội dung giáo án lên Gemini hay bất kỳ dịch vụ AI bên ngoài.</div></div>
 </div>
+<div class="right"><form class="box" method="post">
+<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+ <h1>Đăng nhập</h1><p class="s">Chào mừng trở lại! Vui lòng nhập thông tin tài khoản.</p>
+ {% with ms=get_flashed_messages(with_categories=true) %}{% for c,m in ms %}<div class="{{'ok' if c=='ok' else 'err'}}">{{m}}</div>{% endfor %}{% endwith %}
+ <label for="username">Tài khoản hoặc email</label><input id="username" name="username" placeholder="Tên đăng nhập hoặc email" value="{{request.form.get('username', '')}}" maxlength="254" autocomplete="username" required autofocus>
+ <label for="password">Mật khẩu</label><input id="password" name="password" type="password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
+ <button>Đăng nhập →</button>
+ {% if google_enabled %}
+ <div class="or"><span>hoặc</span></div>
+ <a class="gbtn" href="{{url_for('auth.google_login')}}">
+  <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.4z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.1 2 20.4 2 24s.8 6.9 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C35 4.3 30 2 24 2 15.4 2 7.9 7 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>
+  Đăng nhập bằng Google</a>
+ {% else %}
+ <div class="or"><span>hoặc</span></div>
+ <button type="button" class="gbtn" disabled aria-disabled="true">Đăng nhập bằng Google</button>
+ <p style="font-size:12px;color:#64748b;text-align:left">Google chưa được quản trị viên kích hoạt. Bạn vẫn có thể đăng ký và đăng nhập bằng mật khẩu.</p>
+ {% endif %}
+ <div class="hint">Chưa có tài khoản? <a href="{{url_for('auth.register')}}">Đăng ký ngay</a></div>
+</form></div>
 </body></html>
