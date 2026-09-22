@@ -104,6 +104,22 @@
 </div>
 {% endif %}
 
+{% if canh_bao_tiet %}
+<div class="flash err" style="align-items:flex-start">
+ <span style="font-size:19px">⚠️</span>
+ <div><b>Tuần này lịch báo giảng chưa đủ số tiết chuẩn</b><br>
+  <span style="font-weight:400">
+   {% for d in canh_bao_tiet %}
+    Môn <b>{{d.mon}}</b>{% if d.lop %} lớp {{d.lop}}{% endif %}:
+    chuẩn {{d.can}} tiết/tuần, lịch có {{d.so_tiet}}
+    (thiếu {{d.can - d.so_tiet}}).{% if not loop.last %}<br>{% endif %}
+   {% endfor %}
+   Cảnh báo cũng ghi ở cột <b>Đồ dùng / Ghi chú</b> cuối bảng.
+   Cập nhật số tiết chuẩn tại <a href="{{url_for('core.mon_hoc')}}">Quản lý môn học</a>.
+  </span></div>
+</div>
+{% endif %}
+
 <div class="card">
  <h3>⚙️ Thông tin biểu mẫu</h3><p class="sub">Điền một lần, dùng cho mọi tuần</p>
  <form method="get" class="row">
@@ -195,7 +211,7 @@
    <td>{{r.tiet_pp or '—'}}</td>
    <td>{% if r.nghi %}<b style="color:#be123c">🏖️ {{r.ten_bai}}</b>
        {% elif r.ten_bai %}{{r.ten_bai}}{% else %}<span style="color:#cbd5e1">— chưa có trong PPCT —</span>{% endif %}</td>
-   <td class="muted">{{r.ghi_chu or ''}}</td></tr>{% endfor %}</tbody>
+   <td class="muted"{% if r.canh_bao_tiet %} style="color:#c2410c;font-weight:600"{% endif %}>{{r.ghi_chu or ''}}</td></tr>{% endfor %}</tbody>
  </table>
  {% if sua %}</form>{% endif %}
  {% if meta.noi_dung_khac %}<div style="padding:14px 18px;border-top:1px solid var(--line)">

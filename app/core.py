@@ -272,6 +272,10 @@ def mon_hoc():
         elif act == "xoa_ppct":
             ok, tb, _n = MH.xoa_ppct(db, uid, mon, khoi)
             flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
+        elif act == "tiet_tuan":
+            khoi = khoi or (request.form.get("khoi_moi") or "").strip()
+            ok, tb = KHO.dat_tiet_tuan_mon(db, uid, mon, khoi, request.form.get("so_tiet_tuan"))
+            flash(tb, "ok" if ok else "err")
         elif act == "ppct":
             ds_tep = [f for f in (request.files.getlist("files") + request.files.getlist("file"))
                       if (getattr(f, "filename", "") or "").strip()]
@@ -651,6 +655,35 @@ def _tb_lbg_ppct(tb, ok, tuan=None):
     return tb + extra + "."
 
 
+
+def _gan_canh_bao_tiet(rows, doi_chieu):
+    """Gắn cảnh báo thiếu tiết vào cột ghi chú lịch báo giảng. Trả về danh sách môn thiếu."""
+    mp, thieu = {}, []
+    for d in doi_chieu or []:
+        can = d.get("can")
+        try:
+            can_i = int(can) if can is not None else 0
+        except Exception:
+            can_i = 0
+        if d.get("ket_luan") != "thieu" or can_i < 2:
+            continue
+        so = int(d.get("so_tiet") or 0)
+        tb = "Thiếu %d tiết/tuần (chuẩn %d, lịch có %d)" % (can_i - so, can_i, so)
+        mp[(KHO.chuan(d.get("mon") or ""), (d.get("lop") or "").strip())] = tb
+        thieu.append(d)
+    for r in rows or []:
+        if r.get("nghi"):
+            continue
+        tb = mp.get((KHO.chuan(r.get("mon") or ""), (r.get("lop") or "").strip()))
+        if not tb:
+            continue
+        r["canh_bao_tiet"] = tb
+        cu = (r.get("ghi_chu") or "").strip()
+        r["ghi_chu"] = (cu + " · " if cu else "") + "⚠ " + tb
+    return thieu
+
+
+
 def _rows_for_week(uid, tuan, monday, offday=None, nam_hoc=""):
     db = get_db()
     offday = offday or {}
@@ -727,8 +760,15 @@ def bao_giang():
         ok, tb, _n = TP.luu_lop(db, u["id"], nam, tuan, ds_doi)
         flash(tb, "ok" if ok else "err")
         return redirect(url_for("core.bao_giang", tuan=tuan))
+    if act == "tiet_tuan":
+        ok, tb = KHO.dat_tiet_tuan_mon(db, u["id"], request.form.get("mon") or "",
+                                       request.form.get("khoi") or "", request.form.get("so_tiet_tuan"))
+        flash(tb, "ok" if ok else "err")
+        return redirect(url_for("core.bao_giang", tuan=tuan))
 
     rows = _rows_for_week(session["uid"], tuan, monday, offday, nam_hoc=nam)
+    tkb_tuan = TP.dong(db, u["id"], nam, tuan)
+    canh_bao_tiet = _gan_canh_bao_tiet(rows, KHO.doi_chieu(db, u["id"], tkb_tuan))
     ap_dung = TP.phien_cho_tuan(db, u["id"], nam, tuan) or 1
     meta = {"truong": request.values.get("truong") or u["school"] or "",
             "to": request.values.get("to", ""), "giao_vien": u["fullname"] or u["username"],
@@ -779,7 +819,8 @@ def bao_giang():
                            tuan1_txt=tuan1.strftime("%d/%m/%Y"),
                            sua=request.values.get("sua") in ("1", "on", "true"),
                            ds_lop=ds_lop, ap_dung_tu=ap_dung, ds_moc=TP.moc(db, u["id"], nam),
-                           nam_hoc=nam, dau_ppct=MH.dau_ppct(db, u["id"]))
+                           nam_hoc=nam, dau_ppct=MH.dau_ppct(db, u["id"]),
+                           canh_bao_tiet=canh_bao_tiet)
     resp = make_response(html)
     resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
     return resp

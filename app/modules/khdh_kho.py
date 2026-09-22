@@ -172,6 +172,23 @@ def tao_mon(db, teacher_id, mon, khoi):
     return cur.lastrowid
 
 
+
+def dat_tiet_tuan_mon(db, teacher_id, mon, khoi, so):
+    """Lưu số tiết dạy chuẩn mỗi tuần cho đúng môn + khối (tạo dòng kho nếu chưa có)."""
+    mon, khoi = (mon or "").strip(), str(khoi or "").strip()
+    if not mon:
+        return False, "Thiếu tên môn."
+    if khoi not in KHOI:
+        return False, "Cập nhật số tiết/tuần cần có khối (1–12)."
+    s = str(so or "").strip()
+    if not s.isdigit() or not 1 <= int(s) <= 40:
+        return False, "Số tiết dạy chuẩn mỗi tuần phải từ 1 đến 40."
+    kid = tao_mon(db, teacher_id, mon, khoi)
+    if not kid:
+        return False, "Không ghi nhận được môn."
+    dat_tiet_tuan(db, teacher_id, kid, int(s))
+    return True, "Đã lưu môn %s khối %s dạy %d tiết/tuần." % (mon, khoi, int(s))
+
 def dat_tiet_tuan(db, teacher_id, kid, so):
     """Giáo viên tự nhập số tiết/tuần (so=None → quay lại để hệ thống suy ra)."""
     row = tim(db, teacher_id, kid)
@@ -295,19 +312,20 @@ def doi_chieu(db, teacher_id, tkb_rows):
         if k and not d['khoi']:
             d['khoi'] = str(k['khoi'])
         can = k['so_tiet_tuan'] if k else None
-        if k and not k['luu']:
-            ket_luan, ghi_chu = 'chua_co_khdh', 'Môn này chưa có KHDH trong kho'
-        elif not k:
+        if not k:
             ket_luan, ghi_chu = 'chua_co_khdh', 'Môn này chưa có trong kho KHDH'
-        elif not can:
-            ket_luan, ghi_chu = 'chua_ro', ('Số tiết/tuần của KHDH chưa xác định — '
-                                            'thầy/cô nhập tay trong kho KHDH')
-        elif d['so_tiet'] < can:
-            ket_luan, ghi_chu = 'thieu', 'Còn thiếu %d tiết/tuần so với KHDH' % (can - d['so_tiet'])
-        elif d['so_tiet'] > can:
-            ket_luan, ghi_chu = 'thua', 'Đã xếp thừa %d tiết/tuần so với KHDH' % (d['so_tiet'] - can)
+        elif can:
+            if d['so_tiet'] < can:
+                ket_luan, ghi_chu = 'thieu', 'Còn thiếu %d tiết/tuần so với chuẩn' % (can - d['so_tiet'])
+            elif d['so_tiet'] > can:
+                ket_luan, ghi_chu = 'thua', 'Đã xếp thừa %d tiết/tuần so với chuẩn' % (d['so_tiet'] - can)
+            else:
+                ket_luan, ghi_chu = 'du', 'Đủ số tiết/tuần theo chuẩn'
+        elif not k['luu']:
+            ket_luan, ghi_chu = 'chua_co_khdh', 'Môn này chưa có KHDH trong kho'
         else:
-            ket_luan, ghi_chu = 'du', 'Đủ số tiết/tuần theo KHDH'
+            ket_luan, ghi_chu = 'chua_ro', ('Số tiết/tuần chưa xác định — '
+                                            'thầy/cô nhập số tiết dạy chuẩn mỗi tuần tại Quản lý môn học')
         ra.append(dict(d, khdh=k, can=can, ket_luan=ket_luan, ghi_chu=ghi_chu))
     ra.sort(key=lambda x: (chuan(x['mon']), str(x['khoi']), x['lop']))
     return ra
