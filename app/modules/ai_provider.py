@@ -158,8 +158,8 @@ def de_xuat_dich_vu_ngoai():
         {"nha_cung_cap": "Máy chủ nội bộ (tự chạy)", "dich_vu": "Mô hình mở tiếng Việt",
          "du_lieu_gui_di": "Không gửi ra ngoài — dữ liệu ở lại máy chủ",
          "du_lieu_khong_gui": "Tất cả",
-         "chi_phi": "Không tốn phí API, nhưng cần nâng cấp máy chủ: từ 4 lõi và 8 GB RAM trở lên",
-         "luu_y": "VPS hiện tại (1 lõi, 961 MB RAM) KHÔNG đủ. Cần nâng cấp gói trước.",
+         "chi_phi": "Không tốn phí API — ĐÃ ĐANG CHẠY trên VPS 4 lõi/4 GB (Qwen2.5-1.5B Q4, llama.cpp)",
+         "luu_y": "Đã triển khai: AI cục bộ là mặc định; RAM thấp tự hạ 0.5B; không gửi dữ liệu ra ngoài.",
          "can_dong_y": False},
     ]
 
@@ -176,12 +176,18 @@ def nhan_ban_ket_qua(ma):
 
 
 def _dang_ky_mac_dinh():
-    """Đăng ký sẵn bộ kiểm tra nội bộ để nhãn luôn hiển thị đúng bản chất."""
+    """Đăng ký sẵn các nhà cung cấp để nhãn luôn hiển thị đúng bản chất."""
     if "offline" not in _NHA_CUNG_CAP:
         dang_ky("offline", "Bộ kiểm tra nội bộ EduAssist (luật + từ điển thuật ngữ)",
                 False, None,
                 mo_ta="Kiểm tra chính tả, tra cứu chỉ báo và kiểm tra cấu trúc bằng luật. "
                       "Không phải mô hình AI đã huấn luyện.")
+    if "llm_cuc_bo" not in _NHA_CUNG_CAP:
+        dang_ky("llm_cuc_bo", "AI cục bộ Qwen2.5 (chạy trên máy chủ, offline)", True, None,
+                mo_ta="Mô hình ngôn ngữ Qwen2.5-Instruct chạy NGAY TRÊN máy chủ — dữ liệu "
+                      "không gửi ra ngoài. Ưu tiên bản 1.5B; RAM thấp tự hạ 0.5B; cả hai "
+                      "không đủ thì báo bận rõ ràng (không giả kết quả).",
+                nha_cung_cap="Máy chủ nội bộ", chi_phi="Không tốn phí API")
 
 
 _dang_ky_mac_dinh()

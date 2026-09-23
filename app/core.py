@@ -1,4 +1,4 @@
-import io, json, datetime, csv, re, os, time, uuid
+import io, json, datetime, csv, re, os, time, uuid, threading
 from flask import (Blueprint, render_template, request, redirect, url_for, session,
                    send_file, send_from_directory, jsonify, flash, Response, make_response)
 from .db import get_db, setting, set_setting
@@ -1000,6 +1000,72 @@ def bao_giang_ppct_rev():
 
 
 # ---------------- Nhận xét AI ----------------
+def _nx_sinh_llm_nen(uid, ids_rec, hocky):
+    """Thread nền: sinh nhận xét bằng AI cục bộ từng dòng, cập nhật DB ngay khi xong.
+    Tổng thời hạn 8 phút; hết hạn → các dòng còn lại đánh dấu để GV bấm "Tạo lại"."""
+    import sqlite3
+    import time as _time
+    from .db import DB_PATH
+    from .modules import llm_cuc_bo as LB
+    han = _time.monotonic() + 480
+    try:
+        con = sqlite3.connect(DB_PATH)
+        con.row_factory = sqlite3.Row
+        for gid, rec in ids_rec:
+            if _time.monotonic() > han:
+                con.execute("UPDATE danhgia SET nhan_xet=? WHERE id=? AND (nhan_xet='' OR nhan_xet IS NULL)",
+                            ("(chưa sinh — bấm “Tạo lại”)", gid))
+                continue
+            kq = LB.sinh(*_nx_prompt(rec), toi_da_token=100)
+            txt = ""
+            if kq.get("ok") and kq.get("text"):
+                txt = " ".join(kq["text"].split()).strip(" \"'-–—.")
+                txt = re.sub(r"^(?:nhận xét|nhan xet|câu nhận xét)\s*[:\-]\s*", "", txt, flags=re.I)
+                if txt and not txt[0].isupper():
+                    txt = txt[0].upper() + txt[1:]
+                if txt and not txt.endswith((".", "!", "?")):
+                    txt += "."
+            if not txt:
+                txt = "(dự phòng) " + AI.sinh_nhan_xet(rec, "ngan")
+            if rec.get("hien_diem") and rec.get("diem") is not None:
+                txt += " (%gđ)" % rec["diem"]
+            con.execute("UPDATE danhgia SET nhan_xet=? WHERE id=?", (txt[:300], gid))
+            con.commit()
+        con.close()
+    except Exception:
+        try:
+            con.close()
+        except Exception:
+            pass
+
+
+def _nx_prompt(rec):
+    """(prompt_hệ, prompt_người) chuẩn cho AI cục bộ — dùng chung sync & nền."""
+    md = rec.get("muc_do") or AI.diem_to_mucdo(rec.get("diem"), rec.get("thang", 10)) or "HT"
+    xl = {"HTT": "Hoàn thành tốt", "HT": "Hoàn thành", "CHT": "Chưa hoàn thành"}.get(md, md)
+    mon = rec.get("mon") or "môn học"
+    diem = rec.get("diem")
+    goc = (rec.get("nhan_xet_goc") or "").strip()
+    p_he = ("Bạn là giáo viên tiểu học Việt Nam. Viết ĐÚNG MỘT câu nhận xét ngắn "
+            "(15-25 từ) cho học sinh, xưng gọi là 'Em', giọng tích cực khích lệ, "
+            "không nêu tên học sinh, không đánh số, không markdown, "
+            "chỉ trả về duy nhất câu nhận xét bằng tiếng Việt.")
+    p_user = ("Môn: %s. Kết quả: %s%s. %sHãy viết một câu nhận xét."
+              % (mon, xl,
+                 (" (điểm %g/10)" % diem) if diem is not None else "",
+                 ("Ghi chú của giáo viên: %s. " % goc) if goc else ""))
+    return p_he, p_user
+
+
+@bp.route("/nhan-xet/ai-trang-thai")
+@login_required
+def nx_ai_trang_thai():
+    from .modules import llm_cuc_bo as LB
+    return jsonify(LB.thong_tin() or {"ok": False, "trang_thai": "khong_chay",
+                                      "ly_do": "Dịch vụ AI không phản hồi",
+                                      "ma_loi": "loi_dich_vu"})
+
+
 @bp.route("/nhan-xet", methods=["GET", "POST"])
 @login_required
 def nhan_xet():
@@ -1008,7 +1074,7 @@ def nhan_xet():
     if request.method == "POST":
         # (M14) sinh nhận xét và xem trực tuyến KHÔNG tính lượt — lượt chỉ tính khi xuất Excel
         u = current_user()
-        provider = request.form.get("provider", "rule")
+        provider = request.form.get("provider", "llm")
         thang = float(request.form.get("thang") or 10)
         mon = request.form.get("mon", "")
         lop = request.form.get("lop", "")
@@ -1043,26 +1109,64 @@ def nhan_xet():
                 except Exception: d = None
                 records.append({"ho_ten": nm.strip(), "diem": d,
                                 "muc_do": (mds[i] or None), "nhan_xet_goc": "", "lop": lop, "mon": mon})
-        for rec in records:
-            rec["thang"] = thang
-            rec["hien_diem"] = hien_diem
-            if not rec["muc_do"]:
-                rec["muc_do"] = AI.diem_to_mucdo(rec["diem"], thang)
-            rec["xep_loai"] = AI.diem_to_xeploai(rec["diem"], thang) if rec["diem"] is not None else (rec["muc_do"] or "")
-            rec["nhan_xet"] = AI.sinh_nhan_xet(rec, provider)
-            db.execute("""INSERT INTO danhgia(teacher_id,lop,mon,hocky,ho_ten,diem,muc_do,nhan_xet_goc,nhan_xet,created)
-                          VALUES(?,?,?,?,?,?,?,?,?,?)""",
-                       (uid, rec["lop"], rec["mon"], hocky, rec["ho_ten"], rec["diem"], rec["muc_do"],
-                        rec["nhan_xet_goc"], rec["nhan_xet"], datetime.datetime.now().isoformat(timespec="seconds")))
-        db.commit()
-        result = records
+        dang_sinh_nen = False
+        if provider == "llm" and len(records) >= 8:
+            # HÀNG LOẠT bằng AI cục bộ: ghi dòng rỗng trước, thread nền sinh từng dòng
+            # (trang tự cập nhật tiến độ — không treo request web)
+            ids_cho = []
+            for rec in records:
+                rec["thang"] = thang
+                rec["hien_diem"] = hien_diem
+                if not rec["muc_do"]:
+                    rec["muc_do"] = AI.diem_to_mucdo(rec["diem"], thang)
+                rec["xep_loai"] = AI.diem_to_xeploai(rec["diem"], thang) if rec["diem"] is not None else (rec["muc_do"] or "")
+                rec["nhan_xet"] = ""
+                cur = db.execute("""INSERT INTO danhgia(teacher_id,lop,mon,hocky,ho_ten,diem,muc_do,nhan_xet_goc,nhan_xet,created)
+                                    VALUES(?,?,?,?,?,?,?,?,?,?)""",
+                                 (uid, rec["lop"], rec["mon"], hocky, rec["ho_ten"], rec["diem"], rec["muc_do"],
+                                  rec["nhan_xet_goc"], "", datetime.datetime.now().isoformat(timespec="seconds")))
+                ids_cho.append((cur.lastrowid, rec))
+            db.commit()
+            threading.Thread(target=_nx_sinh_llm_nen, args=(uid, ids_cho, hocky),
+                             daemon=True).start()
+            dang_sinh_nen = True
+            result = records
+        else:
+            for rec in records:
+                rec["thang"] = thang
+                rec["hien_diem"] = hien_diem
+                if not rec["muc_do"]:
+                    rec["muc_do"] = AI.diem_to_mucdo(rec["diem"], thang)
+                rec["xep_loai"] = AI.diem_to_xeploai(rec["diem"], thang) if rec["diem"] is not None else (rec["muc_do"] or "")
+                rec["nhan_xet"] = AI.sinh_nhan_xet(rec, provider)
+                db.execute("""INSERT INTO danhgia(teacher_id,lop,mon,hocky,ho_ten,diem,muc_do,nhan_xet_goc,nhan_xet,created)
+                              VALUES(?,?,?,?,?,?,?,?,?,?)""",
+                           (uid, rec["lop"], rec["mon"], hocky, rec["ho_ten"], rec["diem"], rec["muc_do"],
+                            rec["nhan_xet_goc"], rec["nhan_xet"], datetime.datetime.now().isoformat(timespec="seconds")))
+            db.commit()
+            result = records
         session["last_meta"] = {"lop": lop, "mon": mon, "hocky": hocky}
         session["nx_goc"] = False
         if bang_goc and tep_goc is not None:
             XL.luu_tam(uid, tep_goc, ten_goc, bang_goc, records)
             session["nx_goc"] = True
             session["nx_ten"] = ten_goc
+        # thông báo rõ model AI thực tế đã dùng / lý do hạ model / lỗi
+        if provider == "llm":
+            from .modules import llm_cuc_bo as LB
+            tt = LB.thong_tin() or {}
+            if dang_sinh_nen:
+                flash("🤖 Đang AI cục bộ (%s) sinh nhận xét cho %d học sinh — trang sẽ "
+                      "tự cập nhật mỗi 5 giây, không cần thao tác gì thêm."
+                      % (LB.nhan_mo_hinh(tt), len(records)), "ok")
+            elif tt.get("mo_hinh"):
+                flash("🤖 Đã dùng AI cục bộ: %s — %s" % (LB.nhan_mo_hinh(tt), tt.get("ly_do") or ""),
+                      "ok")
+            else:
+                flash("⚠️ AI cục bộ chưa sẵn sàng: %s — các câu có tiền tố “(dự phòng)” "
+                      "là MẪU NHANH, không phải AI." % (tt.get("ly_do") or "không rõ lý do"), "err")
     return render_template("nhanxet.html", result=result, cols=cols,
+                           dang_cho=len([r for r in (result or []) if not (r.get("nhan_xet") or "")]),
                            nx_goc=session.get("nx_goc"), nx_ten=session.get("nx_ten") or "")
 
 
@@ -1088,7 +1192,7 @@ def sua_nx():
 @login_required
 def tao_lai():
     d = request.get_json(force=True)
-    txt = AI.sinh_nhan_xet(d, d.get("provider", "rule"))
+    txt = AI.sinh_nhan_xet(d, d.get("provider", "llm"))
     return jsonify(nhan_xet=txt)
 
 
@@ -1106,7 +1210,7 @@ def xuat_excel():
     rows = get_db().execute(q + " ORDER BY id ASC", p).fetchall()
     data = [{"ho_ten": r["ho_ten"], "lop": r["lop"], "mon": r["mon"], "diem": r["diem"],
              "muc_do": r["muc_do"], "xep_loai": AI.diem_to_xeploai(r["diem"]) if r["diem"] is not None else "",
-             "nhan_xet": r["nhan_xet"]} for r in rows]
+             "nhan_xet": (r["nhan_xet"] or "(chưa sinh xong)")} for r in rows]
     # (M14) lượt tính khi TẢI TỆP VỀ — tải lại đúng bảng nhận xét này không trừ thêm
     if not BL.tra_luot_tai(get_db(), u, "excel",
                            "excel-%s-%s-%d" % (u["id"], ids or "all", len(data)),

@@ -63,7 +63,9 @@
 {% if preview %}
 <div class="card">
  <div class="chead"><h3>Xem trước {{preview.so}} câu
-  {% if preview.nguon=='file_cau_hoi' %}<span class="chip">Từ file câu hỏi</span>
+  {% if preview.nguon=='ai_cuc_bo' %}<span class="chip" style="background:#d1fae5;color:#065f46">🤖 AI cục bộ Qwen (offline)</span>
+  {% elif preview.nguon=='file_cau_hoi' %}<span class="chip">Từ file câu hỏi</span>
+  {% elif preview.nguon=='tai_lieu' %}<span class="chip" style="background:#e0e7ff;color:#3730a3">Bộ sinh nội bộ (không phải AI)</span>
   {% elif preview.nguon=='soan_tay' %}<span class="chip" style="background:#fef3c7;color:#b45309">Soạn tay</span>
   {% else %}<span class="chip" style="background:#e0f2fe;color:#075985">AI sinh từ tài liệu</span>{% endif %}</h3>
  </div>

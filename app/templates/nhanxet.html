@@ -58,6 +58,7 @@
    <a href="{{url_for('core.nang_cap')}}">nâng VIP</a> để tải Excel.</span>
   {% endif %}
  </div>
+ <div id="ai-tt" class="muted" style="margin-top:8px;font-size:13px">⏳ Đang kiểm tra AI cục bộ…</div>
 </form>
 </div>
 
@@ -71,6 +72,14 @@
  <div class="kpi" style="--c:#06b6d4"><div class="ic">✅</div><b>{{nHT}}</b><span>Hoàn thành</span></div>
  <div class="kpi" style="--c:#f43f5e"><div class="ic">⚠️</div><b>{{nCHT}}</b><span>Chưa hoàn thành</span></div>
 </div>
+{% if dang_cho %}
+<div class="card" style="border-color:#fcd34d;background:#fffbeb">
+ <b>⏳ Đang AI cục bộ sinh nhận xét… còn {{dang_cho}}/{{result|length}} dòng.</b>
+ <span class="muted"> Trang tự cập nhật mỗi 5 giây — bạn có thể chờ tại đây; kết quả
+ được lưu lại nên rời trang cũng không mất.</span>
+</div>
+<script>setTimeout(function(){location.reload();},5000);</script>
+{% endif %}
 <div class="card">
  <div class="chead"><h3>Kết quả nhận xét</h3>
   <div class="row" style="gap:8px">
@@ -96,7 +105,7 @@
     <b>{{r.ho_ten}}</b></div></td>
    <td>{{ '%g'|format(r.diem) if r.diem is not none else '—' }}</td>
    <td>{% if r.muc_do %}<span class="badge {{r.muc_do}}">{{r.muc_do}}</span>{% endif %}</td>
-   <td class="muted">{{r.xep_loai}}</td><td>{{r.nhan_xet}}</td></tr>{% endfor %}</tbody></table></div>
+   <td class="muted">{{r.xep_loai}}</td><td>{% if r.nhan_xet %}{{r.nhan_xet}}{% else %}<span class="muted">⏳ đang sinh…</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
  {% else %}<div class="empty"><span class="e">🤔</span>Không đọc được dòng nào. Hãy kiểm tra cột <b>Họ và tên</b> trong file.</div>{% endif %}
 </div>
 {% endif %}
@@ -104,6 +113,16 @@
 <script>
 function tab(i,b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
  document.getElementById('t0').style.display=i==0?'':'none';document.getElementById('t1').style.display=i==1?'':'none';}
+fetch('{{ url_for("core.nx_ai_trang_thai") }}').then(r=>r.json()).then(d=>{
+ const el=document.getElementById('ai-tt'); if(!el) return;
+ const mh=(d.mo_hinh||'').includes('1.5b')?'Qwen2.5-1.5B (mặc định, chất lượng tốt)':
+          (d.mo_hinh||'').includes('0.5b')?'Qwen2.5-0.5B (hạ do RAM thấp)':'';
+ if(d.trang_thai==='san_sang'&&mh){el.innerHTML='🤖 AI cục bộ sẵn sàng: <b>'+mh+'</b> — chạy ngay trên máy chủ, dữ liệu không gửi ra ngoài. RAM trống '+d.ram_trong_mb+'MB';}
+ else if(d.trang_thai==='dang_tai'){el.innerHTML='⏳ AI đang nạp mô hình… sẽ sẵn sàng trong ít phút.';}
+ else if(d.trang_thai==='het_ram'){el.innerHTML='⚠️ AI tắt tạm: '+d.ly_do+' — chọn “Mẫu nhanh nội bộ” hoặc thử lại sau.';}
+ else if(d.trang_thai==='loi'){el.innerHTML='❌ AI gặp lỗi dịch vụ: '+d.ly_do+' (KHÔNG phải do RAM — cần xử lý khác).';}
+ else{el.innerHTML='⚠️ AI cục bộ: '+d.ly_do;}
+}).catch(()=>{const el=document.getElementById('ai-tt');if(el)el.textContent='⚠️ Không kết nối được dịch vụ AI cục bộ — vẫn dùng được các chế độ mẫu nhanh.';});
 function addRow(){const t=document.querySelector('#tb tbody');const r=t.insertRow(-1);
  r.innerHTML='<td><input name="ten[]" style="width:100%"></td><td><input name="diem[]" type="number" step="0.1" style="width:96px"></td><td><select name="md[]"><option value="">Tự động theo điểm</option><option>CHT</option><option>HT</option><option>HTT</option></select></td>';}
 </script>

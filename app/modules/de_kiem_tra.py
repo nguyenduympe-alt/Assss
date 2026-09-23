@@ -409,6 +409,96 @@ def sinh_tu_tai_lieu(text, so=10, so_dap_an=4):
     return ra[:so]
 
 
+def _tach_json_llm(s):
+    """Tách object JSON đầu tiên trong văn bản AI trả về (bỏ lời dẫn)."""
+    s = (s or '').replace('```json', '```')
+    if '```' in s:
+        for phan in s.split('```'):
+            phan = phan.strip()
+            if phan.startswith('{'):
+                s = phan
+                break
+    dau = s.find('{')
+    cuoi = s.rfind('}')
+    if dau < 0 or cuoi <= dau:
+        return None
+    try:
+        obj = json.loads(s[dau:cuoi + 1])
+        return obj if isinstance(obj, dict) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def sinh_cau_hoi_llm(text, so=10, so_dap_an=4):
+    """Sinh câu hỏi trắc nghiệm bằng AI cục bộ (Qwen2.5, chạy trên máy chủ).
+
+    Sinh 1 câu/lần gọi (JSON ngắn — model nhỏ bám nội dung tốt hơn), chặn lặp,
+    tổng thời gian có hạn. Trả LIST câu hỏi (rỗng nếu AI không dùng được →
+    caller tự bù bằng sinh_tu_tai_lieu, nguồn hiển thị 'tai_lieu').
+    """
+    try:
+        from . import llm_cuc_bo as LB
+    except Exception:  # noqa: BLE001
+        return []
+    text = (text or '').strip()
+    if len(text) < 80:
+        return []
+    text = text[:6000]
+    so = max(1, min(40, int(so or 10)))
+    so_dap_an = max(2, min(6, int(so_dap_an or 4)))
+    p_he = ('Bạn là giáo viên tiểu học tạo câu hỏi trắc nghiệm tiếng Việt bám bài học. '
+            'CHỈ trả về MỘT object JSON, không giải thích, dạng: '
+            '{"cau": "câu hỏi", "lua_chon": {"A": "...", "B": "...", "C": "...", "D": "..."}, '
+            '"dap_an": "A"}. Đáp án đúng phải có thật trong bài học.')
+    ds, da_co = [], set()
+    vong = 0
+    from time import time as _now
+    bat_dau = _now()
+    while len(ds) < so and vong < so * 3 and _now() - bat_dau < 95:
+        vong += 1
+        p_user = ('Bài học:\n"""\n%s\n"""\n\nTạo 1 câu hỏi trắc nghiệm %s đáp án bám sát bài trên. '
+                  'Các câu đã có (tránh lặp): %s'
+                  % (text, so_dap_an, ' | '.join(sorted(da_co)[:8]) or '(chưa có)'))
+        kq = LB.sinh(p_he, p_user, toi_da_token=280, nhiet_do=0.7, han=25)
+        if not kq.get('ok'):
+            if kq.get('loai_loi') in ('het_ram', 'ban', 'loi_dich_vu', 'het_han'):
+                break
+            continue
+        obj = _tach_json_llm(kq.get('text') or '')
+        if not obj or not str(obj.get('cau') or '').strip():
+            continue
+        cau = re.sub(r'\s+', ' ', str(obj['cau']).strip())
+        if len(cau) < 12 or cau.lower().startswith(('xin chào', 'i ')):
+            continue
+        khoa = _khong_dau(cau)[:50]
+        if khoa in da_co:
+            continue
+        # lua_chon: nhận cả dict {A:..} lẫn list ["A. ..", ...]
+        goc = obj.get('lua_chon') or {}
+        lc = {}
+        if isinstance(goc, dict):
+            for k, v in goc.items():
+                chu = str(k).strip().upper()[:1]
+                if chu in CHU and str(v or '').strip():
+                    lc[chu] = re.sub(r'\s+', ' ', str(v).strip()).lstrip('A-Fa-f.):–- ')
+        elif isinstance(goc, list):
+            for item in goc:
+                m = re.match(r'^\s*([A-Fa-f])[\.\)\:\-–]\s*(.+)$', str(item or '').strip())
+                if m:
+                    lc[m.group(1).upper()] = re.sub(r'\s+', ' ', m.group(2).strip())
+        da = str(obj.get('dap_an') or '').strip().upper()[:1]
+        if not da or da not in CHU:
+            da = 'A' if 'A' in lc else (sorted(lc)[0] if lc else '')
+        if len(lc) < 2 or not da:
+            continue
+        q = {'cau': cau, 'lua_chon': lc, 'dap_an': da, 'loai': 'tn'}
+        if _gop_lua_chon(q, so_dap_an):
+            da_co.add(khoa)
+            q['id'] = len(ds) + 1
+            ds.append(q)
+    return ds
+
+
 def chuan_so(so_cau, so_dap_an):
     try:
         so_cau = int(so_cau or 10)
@@ -435,9 +525,20 @@ def doc_file(blob, ten_tep, so_cau=10, so_dap_an=4):
         for t in doc.tables:
             for row in t.rows:
                 text += '\n' + ' '.join(c.text for c in row.cells)
-        gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
+        gen, nguon_gen = sinh_cau_hoi_llm(text, so=so_cau, so_dap_an=so_dap_an), 'ai_cuc_bo'
+        if gen and len(gen) < so_cau:
+            for q in sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an):
+                if len(gen) >= so_cau:
+                    break
+                if all(_khong_dau(q['cau'])[:50] != _khong_dau(x['cau'])[:50] for x in gen):
+                    gen.append(q)
+        if not gen:
+            gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
+            nguon_gen = 'tai_lieu'
         if gen:
-            return gen, 'tai_lieu', ''
+            for i, q in enumerate(gen, 1):
+                q['id'] = i
+            return gen[:so_cau] if so_cau else gen, nguon_gen, ''
         if ds:
             thieu = [q['id'] for q in ds if not q.get('dap_an')]
             if thieu:
@@ -455,9 +556,20 @@ def doc_file(blob, ten_tep, so_cau=10, so_dap_an=4):
         ds = _phan_tich_dong(dong)
         if len(ds) >= 2 and all(q.get('dap_an') for q in ds):
             return ds[:so_cau], 'file_cau_hoi', ''
-        gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
+        gen, nguon_gen = sinh_cau_hoi_llm(text, so=so_cau, so_dap_an=so_dap_an), 'ai_cuc_bo'
+        if gen and len(gen) < so_cau:
+            for q in sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an):
+                if len(gen) >= so_cau:
+                    break
+                if all(_khong_dau(q['cau'])[:50] != _khong_dau(x['cau'])[:50] for x in gen):
+                    gen.append(q)
+        if not gen:
+            gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
+            nguon_gen = 'tai_lieu'
         if gen:
-            return gen, 'tai_lieu', ''
+            for i, q in enumerate(gen, 1):
+                q['id'] = i
+            return gen[:so_cau] if so_cau else gen, nguon_gen, ''
         if ds:
             return [], '', ('PDF câu hỏi cần dòng “Đáp án: A” (PDF không giữ in đậm/gạch chân). '
                             'Nên dùng file Word.')

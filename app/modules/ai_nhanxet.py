@@ -105,13 +105,48 @@ def provider_ngan(ctx):
     return _cau(ctx)
 
 
+def provider_llm(ctx):
+    """AI CỤC BỘ (Qwen2.5-1.5B trên máy chủ, offline; RAM thấp tự hạ 0.5B).
+
+    Gọi qua LỚP DÙNG CHUNG llm_cuc_bo; thất bại → câu mẫu dự phòng, ghi rõ
+    tiền tố "(dự phòng)" — không giả là kết quả AI."""
+    from . import llm_cuc_bo as LB
+    md = _muc_do(ctx)
+    mon = ctx.get("mon") or "môn học"
+    diem = ctx.get("diem")
+    xl = {"HTT": "Hoàn thành tốt", "HT": "Hoàn thành", "CHT": "Chưa hoàn thành"}.get(md, md)
+    goc = (ctx.get("nhan_xet_goc") or "").strip()
+    p_he = ("Bạn là giáo viên tiểu học Việt Nam. Viết ĐÚNG MỘT câu nhận xét ngắn "
+            "(15-25 từ) cho học sinh, xưng gọi là 'Em', giọng tích cực khích lệ, "
+            "không nêu tên học sinh, không đánh số, không markdown, "
+            "chỉ trả về duy nhất câu nhận xét bằng tiếng Việt.")
+    p_user = ("Môn: %s. Kết quả: %s%s. %sHãy viết một câu nhận xét."
+              % (mon, xl,
+                 (" (điểm %g/10)" % diem) if diem is not None else "",
+                 ("Ghi chú của giáo viên: %s. " % goc) if goc else ""))
+    kq = LB.sinh(p_he, p_user, toi_da_token=100)
+    if kq.get("ok") and kq.get("text"):
+        txt = " ".join(kq["text"].split()).strip(" \"'-–—.")
+        txt = re.sub(r"^(?:nhận xét|nhan xet|câu nhận xét)\s*[:\-]\s*", "", txt, flags=re.I)
+        if txt and not txt[0].isupper():
+            txt = txt[0].upper() + txt[1:]
+        if txt:
+            if not txt.endswith((".", "!", "?")):
+                txt += "."
+            if ctx.get("diem") is not None and ctx.get("hien_diem"):
+                txt += f" ({ctx['diem']:g}đ)"
+            return txt[:300]
+    return "(dự phòng) " + _cau(ctx)
+
+
 PROVIDERS = {
-    "ngan": ("AI nội bộ — nhận xét ngắn gọn", provider_ngan),
-    "rule": ("AI nội bộ — nhận xét ngắn gọn", provider_rule),
+    "llm": ("AI tự động — Qwen 1.5B ưu tiên (offline)", provider_llm),
+    "ngan": ("Mẫu nhanh nội bộ (không phải AI)", provider_ngan),
+    "rule": ("Mẫu nhanh nội bộ (không phải AI)", provider_rule),
 }
 
 
-def sinh_nhan_xet(ctx, provider="ngan"):
+def sinh_nhan_xet(ctx, provider="llm"):
     fn = PROVIDERS.get(provider, PROVIDERS["ngan"])[1]
     try:
         return fn(ctx)
