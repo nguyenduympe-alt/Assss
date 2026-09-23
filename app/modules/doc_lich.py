@@ -19,6 +19,7 @@ import shutil
 import subprocess
 import tempfile
 
+from . import anh_ocr as AO
 from . import mon_day as MD
 
 TOI_DA = 8 * 1024 * 1024
@@ -727,6 +728,142 @@ def phan_tich_luoi_docx(data, ds_mon=()):
     return ra
 
 
+def phan_tich_anh_tkb(lines, ds_mon=()):
+    """Dựng tiết dạy từ OCR tokens CÓ TỌA ĐỘ của ảnh TKB lưới Buổi × Tiết × Thứ 2..7.
+
+    Gán từng dòng chữ: cột Thứ theo MÉP TRÁI (x0 ≈ mép cột), tiết theo mốc cột số
+    (so ĐỈNH dòng y0), buổi theo ranh giới Sáng/Chiều — rồi gom các dòng cùng ô.
+    Ô 'Mỹ Phước D' (điểm trường), tiêu đề, cột số tự loại."""
+    lines = [dict(l) for l in (lines or []) if _gon(l.get("t"))]
+    if not lines:
+        return []
+    for l in lines:
+        l["cx"] = (l["x0"] + l["x1"]) / 2.0
+        l["cy"] = (l["y0"] + l["y1"]) / 2.0
+        l["h"] = max(1.0, l["y1"] - l["y0"])
+    # 1) cột Thứ từ tiêu đề "Thứ N"; mốc cột Tiết
+    thu_cot, cot_tiet_x = [], None
+    for l in lines:
+        s = _bo_dau(l["t"]).replace(" ", "")
+        # OCR hay đọc lệch: "Thứ 3"→"Thuú 3", "Thứ 4"→"Thur 4" — nới khớp th+chữ+[2-8]
+        m = re.match(r"^th[a-z]{0,3}([2-8])$", s)
+        if m and len(s) <= 7:
+            thu = int(m.group(1))
+            if all(thu != t for t, _ in thu_cot):
+                thu_cot.append((thu, l["cx"]))
+        if cot_tiet_x is None and s == "tiet":
+            cot_tiet_x = l["cx"]
+    if not thu_cot:
+        return []
+    thu_cot.sort(key=lambda z: z[1])
+    # OCR mất mốc một cột giữa → nội suy đều các cột thiếu từ khe hở
+    day_du = []
+    for (ta, xa), (tb, xb) in zip(thu_cot, thu_cot[1:]):
+        day_du.append((ta, xa))
+        for k in range(1, tb - ta):
+            day_du.append((ta + k, xa + (xb - xa) * k / (tb - ta)))
+    day_du.append(thu_cot[-1])
+    thu_cot = day_du
+    xs = [c for _, c in thu_cot]
+    buoc_cot = min((b - a for a, b in zip(xs, xs[1:])), default=120.0) or 120.0
+    if cot_tiet_x is None:
+        cot_tiet_x = min(xs) - buoc_cot
+
+    # 2) mốc y các tiết: token thuần số (1..10) ở cột Tiết — so theo đỉnh dòng
+    tiet_anchors = []
+    for l in lines:
+        s = _bo_dau(l["t"]).replace(" ", "")
+        m = re.match(r"^(?:tiet)?([0-9]|10)$", s)
+        if not m or l["h"] > buoc_cot * 0.6:
+            continue
+        if abs(l["cx"] - cot_tiet_x) < buoc_cot * 0.6:
+            tiet_anchors.append((int(m.group(1)), l["y0"]))
+    # 3) ranh giới Sáng/Chiều
+    y_sang = y_chieu = None
+    for l in lines:
+        s = _bo_dau(l["t"]).replace(" ", "")
+        if l["x0"] < min(xs):
+            if s.endswith("sang"):
+                y_sang = l["cy"]
+            elif s.endswith("chieu"):
+                y_chieu = l["cy"]
+
+    def buoi_cua(cy):
+        if y_sang is not None and y_chieu is not None:
+            return "Sáng" if cy < (y_sang + y_chieu) / 2.0 else "Chiều"
+        if y_chieu is not None:
+            return "Sáng" if cy < y_chieu - 5 else "Chiều"
+        return "Sáng"
+
+    def tiet_cua(y0):
+        if not tiet_anchors:
+            return None
+        t, y_a = min(tiet_anchors, key=lambda z: abs(z[1] - y0))
+        if y_a - y0 > buoc_cot * 0.7:   # dòng phải nằm dưới mốc tiết của nó
+            return None
+        return t
+
+    # 4) gán từng token (thu, buoi, tiet) rồi gom các dòng cùng ô
+    khong_cho = set()
+    for l in lines:
+        s = _bo_dau(l["t"]).replace(" ", "")
+        if re.match(r"^th[a-z]{0,3}([2-8])$", s) and len(s) <= 7:
+            khong_cho.add(id(l))
+        elif s in ("buoi", "tiet") or re.match(r"^(?:tiet)?([0-9]|10)$", s):
+            khong_cho.add(id(l))
+        elif l["x0"] < min(xs) - buoc_cot * 0.45:
+            khong_cho.add(id(l))
+    o = {}
+    for l in lines:
+        if id(l) in khong_cho:
+            continue
+        thu = min(thu_cot, key=lambda z: abs(l["x0"] - z[1]))[0]
+        x_cot = dict(thu_cot)[thu]
+        if abs(l["x0"] - x_cot) > buoc_cot * 0.55:
+            continue
+        tiet = tiet_cua(l["y0"])
+        if not tiet:
+            continue
+        k = (thu, buoi_cua(l["cy"]), tiet)
+        o.setdefault(k, []).append(l)
+    ra, seen = [], set()
+    con_thieu_mon = []      # ô chỉ còn lớp (dòng tên môn bị OCR sót)
+    dem_mon = {}
+    for (thu, buoi, tiet), g in o.items():
+        g.sort(key=lambda l: (l["y0"], l["x0"]))
+        chu = " ".join(_gon(l["t"]) for l in g)[:160]
+        tk = _o_hoc(chu, ds_mon)
+        if not tk and not _tim_lop(chu) and re.search(r"(?i)p\s*t", _bo_dau(chu)):
+            # OCR hay nhầm B → 6 trong tên lớp khi ô có ghi phòng/GV: "461 - P.Thới" → "4B1"
+            chu2 = re.sub(r"\b(\d{1,2})6(?=[0-9]\b)", lambda m: m.group(1) + "B", chu)
+            if _tim_lop(chu2):
+                tk = _o_hoc(chu2, ds_mon)
+        if tk:
+            dem_mon[tk.get("mon")] = dem_mon.get(tk.get("mon"), 0) + 1
+            r = _dong_tkb(thu, buoi, tiet, tk.get("lop"), tk.get("mon"),
+                          tk.get("khoi"), tk.get("phong"))
+            if r:
+                k = (r["thu"], r["buoi"], r["tiet"], r["lop"], r["mon"])
+                if k not in seen:
+                    seen.add(k)
+                    ra.append(r)
+        else:
+            lop = _tim_lop(chu)
+            if lop:
+                con_thieu_mon.append((thu, buoi, tiet, lop, _tim_phong(chu)))
+    # ô thiếu tên môn → mượn môn xuất hiện nhiều nhất trong chính bảng này
+    if con_thieu_mon and dem_mon:
+        mon_cho = max(dem_mon, key=dem_mon.get)
+        for thu, buoi, tiet, lop, phong in con_thieu_mon:
+            r = _dong_tkb(thu, buoi, tiet, lop, mon_cho, "", phong)
+            if r:
+                k = (r["thu"], r["buoi"], r["tiet"], r["lop"], r["mon"])
+                if k not in seen:
+                    seen.add(k)
+                    ra.append(r)
+    return ra[:TOI_DA_TIET]
+
+
 def mau_xlsx_tkb():
     """File mẫu Excel LƯỚI: sheet 'TKB' trống để thầy/cô điền, sheet 'Vi du' tham khảo."""
     from openpyxl import Workbook
@@ -835,11 +972,21 @@ def _la_mau_tkb_trong(data):
 
 
 def doc_tkb(data, ten="", ds_mon=()):
-    """Đọc tệp Word / PDF / Excel → (ok, thong_bao, rows, nguon). Không đọc ảnh."""
+    """Đọc tệp Word / PDF / Excel / ẢNH → (ok, thong_bao, rows, nguon)."""
     ten = ten or ""
-    if la_anh(ten):
-        return False, ("Không đọc ảnh. Thầy/cô gửi Word (.docx), Excel (.xlsx) "
-                       "hoặc PDF có chữ."), [], ""
+    if la_anh(ten) or (not ten and data[:4] in (b"\x89PNG", b"\xff\xd8\xff\xe0",
+                                                b"\xff\xd8\xff\xe1", b"\xff\xd8\xff\xdb")):
+        # ẢNH CHỤP TKB — OCR tiếng Việt chạy nội bộ (RapidOCR, tiến trình riêng)
+        ok, tb, lines = AO.doc_tokens(data, ten)
+        if not ok:
+            return False, tb, [], "Ảnh (OCR)"
+        rows = phan_tich_anh_tkb(lines, ds_mon)
+        if rows:
+            return True, ("Đọc được %d tiết từ ảnh thời khoá biểu (OCR tiếng Việt — "
+                          "kiểm tra kỹ bảng xem trước trước khi lưu)." % len(rows)), rows, "Ảnh (OCR)"
+        return False, ("Đã nhận chữ trong ảnh (%s) nhưng chưa tách được tiết theo lưới "
+                       "Buổi × Tiết × Thứ. Ảnh nên chụp thẳng, đủ khung có tiêu đề "
+                       "Thứ 2…6, cột Buổi và Tiết." % tb), [], "Ảnh (OCR)"
     if ten and not (la_tkb(ten) or la_pdf(ten) or (data[:5] == b"%PDF-")):
         return False, "Chỉ nhận Word (.docx), Excel (.xlsx/.csv) hoặc PDF có chữ.", [], ""
     # (TKB-LUOI) bảng tính dạng lưới "Buổi | Tiết | Thứ 2..7" — đọc theo ô, đúng cột từng thứ

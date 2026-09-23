@@ -96,10 +96,11 @@
 
  <div class="card">
   <h3>📄 Đọc thời khoá biểu từ Word / PDF / Excel</h3>
-  <p class="sub">Tải <b>Word (.docx)</b>, <b>Excel (.xlsx)</b> hoặc <b>PDF có chữ</b> — hệ thống đọc
+  <p class="sub">Tải <b>Word (.docx)</b>, <b>Excel (.xlsx)</b>, <b>PDF có chữ</b> hoặc <b>ẢNH CHỤP TKB</b>
+   (.png .jpg) — hệ thống đọc
    <b>ngay trên máy chủ, không gửi tệp ra ngoài</b>, tách lớp · môn · khối rồi xếp tiết
-   (vd ô “Tin học 4B2 — P.Trường”, cột Thứ 2…6, sáng/chiều). Không nhận ảnh chụp.
-   Xem bảng trước khi ghi — hệ thống tự thêm môn + khối còn thiếu.
+   (vd ô “Tin học 4B2 — P.Trường”, cột Thứ 2…6, sáng/chiều). Ảnh nên chụp thẳng, đủ khung
+   tiêu đề Thứ 2…6. Xem bảng trước khi ghi — hệ thống tự thêm môn + khối còn thiếu.
    Nên tải <b>file mẫu</b> <code>mau-thoi-khoa-bieu.xlsx</code> — lưới <b>Buổi × Tiết × Thứ 2…6</b>:
    điền tiết dạy vào sheet <b>TKB</b> (mỗi ô ghi “Tin học 4B2 — P.Trường”),
    xem cách ghi ở sheet <b>Vi du</b>, lưu rồi tải lên.</p>
@@ -107,7 +108,7 @@
    <input type="hidden" name="act" value="doc_tkb">
    <input type="hidden" name="tuan" value="{{tuan}}">
    <label class="f" style="flex:1;min-width:240px">Tệp thời khoá biểu
-    <input type="file" name="file" accept=".docx,.xlsx,.xls,.csv,.pdf" required></label>
+    <input type="file" name="file" accept=".docx,.xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,.webp" required></label>
    <button class="ok">🔍 Đọc và xem trước</button>
    <a class="btn sec" href="{{url_for('core.mau_excel', kind='tkb')}}">⬇ Tải file mẫu</a>
   </form>
