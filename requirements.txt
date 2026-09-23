@@ -9,3 +9,6 @@ qrcode==8.2
 gunicorn==23.0.0
 requests==2.32.3
 xlrd>=2.0.1
+# OCR ảnh chụp thời khoá biểu (chạy nội bộ, CPU)
+rapidocr-onnxruntime
+opencv-python-headless
