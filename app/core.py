@@ -7,19 +7,24 @@ from .auth import (login_required, current_user, admin_required, google_bat,
 from .modules import ai_nhanxet as AI
 from .modules import excel_io as XL
 from .modules import khdh_kho as KHO
-from .modules.pdf_bao_giang import build_pdf, THU_NAME
+from .modules.pdf_bao_giang import THU_NAME, _ghi_in, gop_hang
 from .modules.word_bao_giang import build_docx
 from .modules import billing as BL
 from .modules import mon_day as MD
 from .modules import ppct_tach as PT
 from .modules import mon_hoc as MH
 from .modules import tkb_phien as TP
+from .modules import doc_lich as DL
 from .modules import vietqr as VQ
 from .modules import lichnghi as LN
 from .modules import sms as SMS
 from .modules import hoa_don as HD
 from .modules import bank_webhook as BW
 from .modules import config as CFG
+from .modules import sepay as SP
+from .modules import dung_luong as DLG
+from .modules import mail_lich as ML
+from .modules import mailer as MAIL
 
 bp = Blueprint("core", __name__)
 
@@ -34,7 +39,7 @@ def _cong_cu():
          "mo_ta": "Tải giáo án Word → tích chọn nội dung cần chèn → duyệt → tải bản .docx",
          "the": [], "moi": False},
         {"icon": "🤖", "ten": "Nhận xét AI", "endpoint": "core.nhan_xet", "mau": "#059669",
-         "mo_ta": "Nhập điểm cho lớp → tạo nhận xét → xuất file Excel",
+         "mo_ta": "Tải Excel / Word bất kỳ → tìm cột điểm & mức đạt → ghi vào cột nhận xét",
          "the": [], "moi": False},
         {"icon": "🔤", "ten": "Kiểm tra chính tả", "endpoint": "chinh_ta.index", "mau": "#06b6d4",
          "mo_ta": "Tải .docx hoặc dán văn bản → duyệt từng chỗ sửa → tải bản .docx",
@@ -44,7 +49,7 @@ def _cong_cu():
                   "năng lực số, AI, STEM → tải bản .docx",
          "the": [], "moi": False},
         {"icon": "🖨️", "ten": "Lịch báo giảng", "endpoint": "core.bao_giang", "mau": "#f59e0b",
-         "mo_ta": "Xuất lịch báo giảng ra PDF hoặc Word",
+         "mo_ta": "Xem lịch báo giảng trên trình duyệt (không tải PDF) hoặc tải file Word",
          "the": [], "moi": False},
         {"icon": "📚", "ten": "Quản lý môn học", "endpoint": "core.mon_hoc", "mau": "#0d9488",
          "mo_ta": "Gom mọi môn + khối về một chỗ: nhập / xem / sửa phân phối chương trình ngay trong từng môn",
@@ -52,6 +57,9 @@ def _cong_cu():
         {"icon": "🗓️", "ten": "Thời khoá biểu", "endpoint": "core.tkb", "mau": "#6366f1",
          "mo_ta": "Xếp thời khoá biểu theo buổi, tiết, phòng học",
          "the": [], "moi": False},
+        {"icon": "🏫", "ten": "Lớp học", "endpoint": "lop_hoc.index", "mau": "#0d9488",
+         "mo_ta": "Lớp lấy từ thời khoá biểu → tạo bài kiểm tra (Word/PDF) → học sinh làm qua link → xuất Excel + nhận xét AI",
+         "the": [], "moi": True},
         {"icon": "🎋", "ten": "Lịch nghỉ", "endpoint": "core.lich_nghi", "mau": "#ec4899",
          "mo_ta": "Nhập ngày nghỉ để tính đúng số tuần thực dạy",
          "the": [], "moi": False},
@@ -104,12 +112,13 @@ def inject():
     return {"user": u, "THU_NAME": THU_NAME, "PROVIDERS": AI.PROVIDERS,
             "timedelta": datetime.timedelta,
             "now": datetime.date.today(), "BL": BL,
-            "is_pro": BL.is_pro(u), "remaining": BL.remaining(u),
+            "is_pro": BL.khong_gioi_han(u), "remaining": BL.remaining(u),
             "days_left": BL.days_left(u), "FREE_QUOTA": BL.FREE_QUOTA,
             "CFG": CFG, "google_enabled": google_bat(), "google_callback_url": google_callback_url(),
             "SITE_NAME": CFG.get("SITE_NAME", "EduAssist"),
             "SITE_TAGLINE": CFG.get("SITE_TAGLINE", "Trợ lý giáo viên"),
             "SITE_LOGO": CFG.get("SITE_LOGO", "🎓"),
+            "gia_vip": BL.gia_hien("vip"), "gia_luot": BL.gia_hien("luot"),
             "so_viec_admin": _viec_admin(u),
             "canh_bao_mk": _mk_mac_dinh(u),
             # (M17) danh sách môn dạy của giáo viên + gợi ý môn phổ thông
@@ -134,6 +143,12 @@ def _viec_admin(u):
         db = get_db()
         n = db.execute("SELECT COUNT(*) c FROM bank_tx WHERE trang_thai='cho_doi_soat'").fetchone()["c"]
         n += db.execute("SELECT COUNT(*) c FROM sms_log WHERE ok=0").fetchone()["c"]
+        try:
+            muc, _con, _pct = DLG.canh_bao_o()
+            if muc in ("warn", "danger"):
+                n += 1
+        except Exception:
+            pass
         return n
     except Exception:
         return 0
@@ -269,6 +284,14 @@ def mon_hoc():
         elif act == "xoa_dong":
             ok, tb = MH.xoa_dong(db, uid, request.form.get("id"))
             flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
+        elif act == "sua_ppct":
+            ok, tb = MH.sua_hang_loat(db, uid, mon, khoi,
+                                      request.form.getlist("id"),
+                                      request.form.getlist("tuan"),
+                                      request.form.getlist("tiet_pp"),
+                                      request.form.getlist("ten_bai"),
+                                      request.form.getlist("ghi_chu"))
+            flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
         elif act == "xoa_ppct":
             ok, tb, _n = MH.xoa_ppct(db, uid, mon, khoi)
             flash(_tb_lbg_ppct(tb, ok), "ok" if ok else "err")
@@ -283,7 +306,7 @@ def mon_hoc():
             if not mon or khoi not in KHO.KHOI:
                 flash("Nhập PPCT cho một môn cần có MÔN và KHỐI — thầy/cô chọn khối rồi thử lại.", "err")
             elif not ds_tep:
-                flash("Vui lòng chọn tệp phân phối chương trình (.docx, .xlsx hoặc .csv).", "err")
+                flash("Vui lòng chọn tệp phân phối chương trình (.docx, .xlsx, .csv, .pdf hoặc ảnh).", "err")
             elif len(ds_tep) > MH.TOI_DA_TEP:
                 flash("Mỗi lượt nhập tối đa %d tệp." % MH.TOI_DA_TEP, "err")
             else:
@@ -539,17 +562,68 @@ def _tkb_dong_phien(db, uid, r, nam, tuan):
     return r2, v
 
 
+def _ghi_tkb_doc(db, uid, nam, tuan, ds):
+    """Ghi các tiết đọc từ Word/PDF/Excel: tạo môn + khối, thêm lớp, xếp TKB theo tuần đang mở."""
+    v = TP.dam_bao_phien(db, uid, nam, tuan)
+    n = 0
+    for r in ds or []:
+        thu = str(r.get("thu") or "").strip()
+        tiet = str(r.get("tiet") or "").strip()
+        buoi = r.get("buoi") or "Sáng"
+        lop = (r.get("lop") or "").strip()[:60]
+        mon = (r.get("mon") or "").strip()[:100]
+        khoi = str(r.get("khoi") or "").strip()
+        phong = (r.get("phong") or "").strip()[:120]
+        if buoi not in ("Sáng", "Chiều"):
+            buoi = "Sáng"
+        if not (thu.isdigit() and 2 <= int(thu) <= 8 and tiet.isdigit() and 1 <= int(tiet) <= 10
+                and lop and mon and khoi in KHO.KHOI):
+            continue
+        if db.execute("SELECT id FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=? AND COALESCE(tuan_bd,1)=?"
+                      " AND thu=? AND buoi=? AND tiet=? AND lop=?",
+                      (uid, nam, v, int(thu), buoi, int(tiet), lop)).fetchone():
+            continue
+        KHO.tao_mon(db, uid, mon, khoi)
+        MD.them(db, uid, mon)
+        db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong,tuan_bd,nam_hoc)"
+                   " VALUES(?,?,?,?,?,?,?,?,?,?)",
+                   (uid, int(thu), buoi, int(tiet), lop, mon, khoi, phong, v, nam))
+        n += 1
+    return n, v
+
+
 @bp.route("/tkb", methods=["GET", "POST"])
 @login_required
 def tkb():
     db, uid, u = get_db(), session["uid"], current_user()
     tuan = _tuan_xem()
     nam = _nam_hoc_gv(u)
+    xem_truoc = None
     if request.method == "POST":
         act = request.form.get("act")
         tuan = _tuan_xem()
         nam = _nam_hoc_gv(u)
-        if act in ("add", "edit"):
+        if act == "doc_tkb":
+            f = next((x for x in (request.files.getlist("file") + request.files.getlist("files"))
+                      if (getattr(x, "filename", "") or "").strip()), None)
+            if not f:
+                flash("Vui lòng chọn tệp thời khoá biểu (Word, PDF hoặc Excel).", "err")
+            else:
+                data = f.read(DL.TOI_DA + 1)
+                ok, tb, rows, _ng = DL.doc_tkb(data, f.filename or "", MD.danh_sach(u))
+                flash(tb, "ok" if ok else "err")
+                xem_truoc = rows if ok else None
+        elif act == "nhap_tkb_doc":
+            try:
+                ds = json.loads(request.form.get("ds") or "[]")
+            except Exception:
+                ds = []
+            n, v = _ghi_tkb_doc(db, uid, nam, tuan, ds)
+            db.commit()
+            flash(("Đã thêm %d tiết từ tệp — tự ghi nhận lớp, môn, khối. Áp dụng từ tuần %d."
+                   % (n, v)) if n else "Không có tiết hợp lệ để ghi.", "ok" if n else "err")
+            return redirect(url_for("core.tkb", tuan=tuan if tuan != 1 else None))
+        elif act in ("add", "edit"):
             dt, loi = _tkb_doc_form()
             mon, khoi, loi_mon = _tkb_mon_khoi()
             loi = loi_mon or loi
@@ -593,6 +667,9 @@ def tkb():
                 flash("Đã xoá tiết dạy: %s · %s tiết %s · lớp %s."
                       % (THU_NAME[int(r["thu"])] if str(r["thu"]).isdigit() else r["thu"],
                          r["buoi"], r["tiet"], r["lop"]), "ok")
+        elif act == "phong_tat_ca":
+            ok, tb, _n = TP.dat_phong_tat_ca(db, uid, nam, tuan, request.form.get("phong_tat_ca"))
+            flash(tb, "ok" if ok else "err")
         elif act == "clear":
             v = TP.phien_cho_tuan(db, uid, nam, tuan) or tuan
             n = db.execute("SELECT COUNT(*) FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
@@ -600,8 +677,9 @@ def tkb():
             db.execute("DELETE FROM tkb WHERE teacher_id=? AND COALESCE(nam_hoc,'')=? AND COALESCE(tuan_bd,1)=?",
                        (uid, nam, v))
             flash("Đã xoá thời khoá biểu phiên bản áp dụng từ tuần %d (%d tiết)." % (v, n), "ok")
-        db.commit()
-        return redirect(url_for("core.tkb", tuan=tuan if tuan != 1 else None))
+        if act != "doc_tkb":
+            db.commit()
+            return redirect(url_for("core.tkb", tuan=tuan if tuan != 1 else None))
     rows = TP.dong(db, uid, nam, tuan)
     grid = {}
     for r in rows:
@@ -637,7 +715,8 @@ def tkb():
                            ds_moc=moc, lich_tuan=lich_tuan,
                            lich_su=TP.lich_su(db, uid, nam, ngay),
                            tuan1=tuan1, tuan1_txt=tuan1.strftime("%d/%m/%Y"),
-                           da_chon_ngay=da_chon_ngay, max_tuan=max_tuan)
+                           da_chon_ngay=da_chon_ngay, max_tuan=max_tuan,
+                           xem_truoc=xem_truoc or [])
 
 
 # ---------------- Lịch báo giảng ----------------
@@ -684,37 +763,100 @@ def _gan_canh_bao_tiet(rows, doi_chieu):
 
 
 
+def _khoi_tiet(r):
+    """Khối của một tiết TKB / dòng PPCT: cột khối, không có thì suy từ tên lớp."""
+    try:
+        k = str(r["khoi"] or "").strip()
+    except Exception:
+        k = ""
+    if k in KHO.KHOI:
+        return k
+    try:
+        lop = r["lop"] or ""
+    except Exception:
+        lop = ""
+    m = re.match(r"\s*([0-9]{1,2})", lop)
+    if m:
+        k = str(int(m.group(1)))
+        if k in KHO.KHOI:
+            return k
+    return ""
+
+
+def _khoa_ppct(mon, khoi):
+    return (KHO.chuan(mon) or (mon or "").strip().lower(), str(khoi or "").strip())
+
+
+def _pool_ppct_tuan(db, uid, tuan):
+    """PPCT tuần này, gom theo (môn, khối) — mỗi lớp dùng chung một dãy bài, không 'xài hết' sang lớp khác."""
+    try:
+        tuan = int(tuan)
+    except Exception:
+        tuan = 0
+    rows = db.execute(
+        "SELECT * FROM ppct WHERE teacher_id=? AND CAST(tuan AS INTEGER)=? "
+        "ORDER BY mon, CAST(tiet_pp AS INTEGER), id",
+        (uid, tuan)).fetchall()
+    pool = {}
+    for p in rows:
+        pool.setdefault(_khoa_ppct(p["mon"], _khoi_tiet(p)), []).append(p)
+    return pool
+
+
+def _bai_ppct(pool, t, da_dung):
+    """Lấy bài PPCT cho một tiết: đúng môn + khối; mỗi lớp đi từ đầu dãy bài của tuần."""
+    mon_k = KHO.chuan(t["mon"]) or (t["mon"] or "").strip().lower()
+    khoi = _khoi_tiet(t)
+    lst = pool.get((mon_k, khoi)) if khoi else None
+    if not lst:
+        lst = pool.get((mon_k, "")) or []
+    if not lst and not khoi:
+        # TKB chưa ghi khối: ghép mọi khối của đúng môn (thứ tự ổn định)
+        for k, v in pool.items():
+            if k[0] == mon_k:
+                lst = v
+                khoi = k[1]
+                break
+    if not lst:
+        return None
+    khoa_lop = (mon_k, khoi, (t["lop"] or "").strip())
+    i = da_dung.get(khoa_lop, 0)
+    da_dung[khoa_lop] = i + 1
+    return lst[i] if i < len(lst) else None
+
+
 def _rows_for_week(uid, tuan, monday, offday=None, nam_hoc=""):
     db = get_db()
     offday = offday or {}
     tkb = TP.dong(db, uid, nam_hoc, tuan) if nam_hoc else \
         db.execute("SELECT * FROM tkb WHERE teacher_id=? ORDER BY thu, buoi DESC, tiet", (uid,)).fetchall()
-    pp = db.execute("SELECT * FROM ppct WHERE teacher_id=? AND tuan=? ORDER BY mon, tiet_pp", (uid, tuan)).fetchall()
-    pool = {}
-    for p in pp:
-        pool.setdefault((p["mon"] or "").strip().lower(), []).append(p)
+    pool = _pool_ppct_tuan(db, uid, tuan)
+    da_dung = {}
     out = []
     for t in tkb:
-        mon = (t["mon"] or "").strip().lower()
-        lst = pool.get(mon) or pool.get("") or []
-        bai = lst.pop(0) if lst else None
+        bai = _bai_ppct(pool, t, da_dung)
         ngay, nghi = "", None
         if monday:
             d = monday + datetime.timedelta(days=int(t["thu"]) - 2)
             ngay = d.strftime("%d/%m/%Y")
             nghi = offday.get(d)
         khoa = "%s|%s|%s" % (t["thu"], t["buoi"], t["tiet"])
+        try:
+            gc_tkb = (t["ghi_chu"] or "").strip()
+        except Exception:
+            gc_tkb = ""
+        phong = (t["phong"] or "").strip()
+        gc_pp = ((bai["ghi_chu"] if bai else "") or "").strip()
+        ghi = gc_tkb or gc_pp
         if nghi:
-            if bai:
-                lst.insert(0, bai)
             out.append({"thu": t["thu"], "buoi": t["buoi"], "tiet": t["tiet"], "lop": t["lop"],
                         "mon": t["mon"], "ngay": ngay, "tiet_pp": "", "ten_bai": nghi,
-                        "ghi_chu": "", "nghi": True, "khoa": khoa})
+                        "ghi_chu": "", "phong": phong, "nghi": True, "khoa": khoa})
             continue
         out.append({"thu": t["thu"], "buoi": t["buoi"], "tiet": t["tiet"], "lop": t["lop"],
-                    "mon": t["mon"], "ngay": ngay, "khoa": khoa,
+                    "mon": t["mon"], "ngay": ngay, "khoa": khoa, "phong": phong,
                     "tiet_pp": bai["tiet_pp"] if bai else "", "ten_bai": bai["ten_bai"] if bai else "",
-                    "ghi_chu": (bai["ghi_chu"] if bai else "") or (t["phong"] or ""), "nghi": False})
+                    "ghi_chu": ghi, "ghi_chu_tkb": gc_tkb, "nghi": False})
     return out
 
 
@@ -756,7 +898,16 @@ def bao_giang():
     if act == "luu_lop":
         khoa = request.form.getlist("khoa")
         lop = request.form.getlist("lop")
-        ds_doi = [{"khoa": k, "lop": v} for k, v in zip(khoa, lop)]
+        phong = request.form.getlist("phong")
+        ghi = request.form.getlist("ghi_chu")
+        ds_doi = []
+        for i, k in enumerate(khoa):
+            d = {"khoa": k, "lop": lop[i] if i < len(lop) else ""}
+            if phong:
+                d["phong"] = phong[i] if i < len(phong) else ""
+            if ghi:
+                d["ghi_chu"] = ghi[i] if i < len(ghi) else ""
+            ds_doi.append(d)
         ok, tb, _n = TP.luu_lop(db, u["id"], nam, tuan, ds_doi)
         flash(tb, "ok" if ok else "err")
         return redirect(url_for("core.bao_giang", tuan=tuan))
@@ -769,6 +920,7 @@ def bao_giang():
     rows = _rows_for_week(session["uid"], tuan, monday, offday, nam_hoc=nam)
     tkb_tuan = TP.dong(db, u["id"], nam, tuan)
     canh_bao_tiet = _gan_canh_bao_tiet(rows, KHO.doi_chieu(db, u["id"], tkb_tuan))
+    rows = gop_hang(rows)
     ap_dung = TP.phien_cho_tuan(db, u["id"], nam, tuan) or 1
     meta = {"truong": request.values.get("truong") or u["school"] or "",
             "to": request.values.get("to", ""), "giao_vien": u["fullname"] or u["username"],
@@ -781,7 +933,8 @@ def bao_giang():
             "ap_dung_tu_tuan": ap_dung}
 
     if act in ("pdf", "word"):
-        # (M14) PDF mở xem trực tuyến: KHÔNG tính lượt. Tải file Word về: tính 1 lượt.
+        # (M14) Xem trực tuyến: KHÔNG tính lượt, KHÔNG gửi tệp PDF (trình duyệt không tải được).
+        # Tải file Word về: tính 1 lượt.
         if act == "word":
             if not BL.tra_luot_tai(db, u, "baogiang", f"baogiang-{u['id']}-tuan{tuan}",
                                    f"Lịch báo giảng tuần {tuan} (tải file Word)"):
@@ -791,8 +944,18 @@ def bao_giang():
                              download_name=f"lich-bao-giang-tuan-{tuan}.docx",
                              mimetype="application/vnd.openxmlformats-officedocument."
                                       "wordprocessingml.document")
-        return send_file(build_pdf(meta, rows), mimetype="application/pdf", as_attachment=False,
-                         download_name=f"lich-bao-giang-tuan-{tuan}.pdf")
+        xem = []
+        for r in rows:
+            d = dict(r)
+            d["ghi_in"] = _ghi_in(d)
+            xem.append(d)
+        html = render_template("baogiang_xem.html", meta=meta, rows=xem)
+        resp = make_response(html)
+        resp.headers["Content-Type"] = "text/html; charset=utf-8"
+        resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        resp.headers["X-Content-Type-Options"] = "nosniff"
+        resp.headers.pop("Content-Disposition", None)
+        return resp
 
     tuans_pp = [r[0] for r in db.execute(
         "SELECT DISTINCT tuan FROM ppct WHERE teacher_id=? ORDER BY tuan", (u["id"],))]
@@ -852,26 +1015,22 @@ def nhan_xet():
         hocky = request.form.get("hocky", "HK1")
         hien_diem = bool(request.form.get("hien_diem"))
         records = []
+        bang_goc = None
+        tep_goc = None
+        ten_goc = ""
         f = request.files.get("file")
         if f and f.filename:
-            df = XL.read_table(f)
-            m = XL.map_columns(df.columns)
-            cols = m
-            for _, r in df.iterrows():
-                rec = {"ho_ten": "", "diem": None, "muc_do": None, "nhan_xet_goc": "",
-                       "lop": lop, "mon": mon}
-                for c, key in m.items():
-                    v = r[c]
-                    if str(v) == "nan":
-                        v = None
-                    if key == "diem":
-                        try: rec["diem"] = float(v)
-                        except Exception: rec["diem"] = None
-                    elif key == "muc_do":
-                        rec["muc_do"] = XL.chuan_muc_do(v)
-                    elif key in ("ho_ten", "nhan_xet_goc", "lop", "mon"):
-                        if v: rec[key] = str(v).strip()
-                if rec["ho_ten"]:
+            ten_goc = (f.filename or "")[:200]
+            tep_goc = f.read(8 * 1024 * 1024 + 1)
+            ok, tb, bang_goc = XL.doc_tep_hs(tep_goc, ten_goc)
+            flash(tb, "ok" if ok else "err")
+            cols = (bang_goc or {}).get("mp")
+            if ok and bang_goc:
+                for rec in bang_goc["rows"]:
+                    if lop and not rec.get("lop"):
+                        rec["lop"] = lop
+                    if mon and not rec.get("mon"):
+                        rec["mon"] = mon
                     records.append(rec)
         else:  # nhập tay
             names = request.form.getlist("ten[]")
@@ -898,7 +1057,13 @@ def nhan_xet():
         db.commit()
         result = records
         session["last_meta"] = {"lop": lop, "mon": mon, "hocky": hocky}
-    return render_template("nhanxet.html", result=result, cols=cols)
+        session["nx_goc"] = False
+        if bang_goc and tep_goc is not None:
+            XL.luu_tam(uid, tep_goc, ten_goc, bang_goc, records)
+            session["nx_goc"] = True
+            session["nx_ten"] = ten_goc
+    return render_template("nhanxet.html", result=result, cols=cols,
+                           nx_goc=session.get("nx_goc"), nx_ten=session.get("nx_ten") or "")
 
 
 @bp.route("/nhan-xet/lich-su")
@@ -937,7 +1102,8 @@ def xuat_excel():
     if ids:
         q += " AND id IN (%s)" % ",".join("?" * len(ids.split(",")))
         p += ids.split(",")
-    rows = get_db().execute(q + " ORDER BY id DESC", p).fetchall()
+    # (VNEDU-ORDER) id tăng dần = thứ tự dòng trong tệp đã tải lên — giữ nguyên khi xuất
+    rows = get_db().execute(q + " ORDER BY id ASC", p).fetchall()
     data = [{"ho_ten": r["ho_ten"], "lop": r["lop"], "mon": r["mon"], "diem": r["diem"],
              "muc_do": r["muc_do"], "xep_loai": AI.diem_to_xeploai(r["diem"]) if r["diem"] is not None else "",
              "nhan_xet": r["nhan_xet"]} for r in rows]
@@ -952,9 +1118,43 @@ def xuat_excel():
                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
+@bp.route("/nhan-xet/tai-tep")
+@login_required
+def tai_tep_nhan_xet():
+    """Tải lại đúng file gốc (Excel/Word/CSV) đã điền cột nhận xét — tính 1 lượt."""
+    u = current_user()
+    data, meta = XL.doc_tam(u["id"])
+    if not data or not meta:
+        flash("Chưa có tệp gốc để điền — thầy/cô tải bảng điểm lên rồi sinh nhận xét trước.", "err")
+        return redirect(url_for("core.nhan_xet"))
+    bang = {"loai": meta.get("loai"), "sheet": meta.get("sheet"), "sheet_i": meta.get("sheet_i") or 0,
+            "hang_tieu_de": meta.get("hang_tieu_de") or 0, "cot_nx": meta.get("cot_nx") or 0,
+            "ten_nx": meta.get("ten_nx") or "Nhận xét", "hdr": meta.get("hdr") or [],
+            "mp": meta.get("mp") or {}}
+    records = meta.get("rows") or []
+    ten = meta.get("ten") or "bang-diem.xlsx"
+    if not BL.tra_luot_tai(get_db(), u, "excel",
+                           "nxgoc-%s-%s-%d" % (u["id"], ten, len(records)),
+                           "Nhận xét — tải lại tệp gốc đã điền (%s)" % ten):
+        flash(BL.thong_bao_het(), "err")
+        return redirect(url_for("core.nang_cap", need="excel"))
+    bio = XL.dien_vao_tep_goc(data, ten, bang, records)
+    ten_tai = XL.ten_tai(ten)
+    mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    if ten_tai.lower().endswith(".docx"):
+        mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    elif ten_tai.lower().endswith(".csv"):
+        mime = "text/csv"
+    return send_file(bio, as_attachment=True, download_name=ten_tai, mimetype=mime)
+
+
 @bp.route("/mau-excel/<kind>")
 def mau_excel(kind):
     from openpyxl import Workbook
+    if kind == "tkb":
+        bio = io.BytesIO(DL.mau_xlsx_tkb()); bio.seek(0)
+        return send_file(bio, as_attachment=True, download_name="mau-thoi-khoa-bieu.xlsx",
+                         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     wb = Workbook(); ws = wb.active
     if kind == "diem":
         ws.append(["Họ và tên", "Lớp", "Môn", "Điểm", "Mức độ", "Nhận xét của GV"])
@@ -978,17 +1178,41 @@ def mau_excel(kind):
 def cai_dat():
     db = get_db()
     if request.method == "POST":
+        act = request.form.get("act") or "luu"
+        if act == "thu_mail_lich":
+            u = current_user()
+            st, msg = ML.gui_mot(db, u, bat_buoc=True, loai="mail_lich_thu")
+            flash(("Đã gửi thử lịch dạy hôm nay. " if st == "gui" else "") + msg,
+                  "ok" if st == "gui" else "err")
+            return redirect(url_for("core.cai_dat"))
         raw = request.form.get("phone", "").strip()
         phone = SMS.normalize(raw)
         if raw and not phone:
             flash("Số điện thoại không hợp lệ. Ví dụ đúng: 0912345678", "err")
             return redirect(url_for("core.cai_dat"))
-        db.execute("UPDATE teacher SET fullname=?,school=?,phone=? WHERE id=?",
-                   (request.form["fullname"], request.form["school"], phone, session["uid"]))
+        raw_em = (request.form.get("email") or "").strip()
+        email = MAIL.chuan(raw_em) if raw_em else None
+        if raw_em and not email:
+            flash("Email không hợp lệ. Ví dụ đúng: giaovien@gmail.com", "err")
+            return redirect(url_for("core.cai_dat"))
+        if email:
+            trung = db.execute("SELECT id FROM teacher WHERE lower(email)=? AND id<>?",
+                               (email, session["uid"])).fetchone()
+            if trung:
+                flash("Email này đã dùng cho tài khoản khác.", "err")
+                return redirect(url_for("core.cai_dat"))
+        mail_lich = 1 if request.form.get("mail_lich") else 0
+        if mail_lich and not email:
+            flash("Bật nhận lịch qua email cần có địa chỉ email.", "err")
+            return redirect(url_for("core.cai_dat"))
+        db.execute("UPDATE teacher SET fullname=?,school=?,phone=?,email=?,mail_lich=? WHERE id=?",
+                   (request.form["fullname"], request.form["school"], phone, email,
+                    mail_lich, session["uid"]))
         # (M17) lưu DANH SÁCH môn dạy; môn đầu tiên là môn chính (ghi vào cột subject cũ)
         ds_mon = MD.luu(db, session["uid"], MD.tach_mon(request.form.get("mon_day") or ""))
         flash("Đã lưu thông tin · %s" % MD.tom_tat({"subjects": "\n".join(ds_mon)})
-              + (" · Mã kích hoạt sẽ được nhắn tới " + SMS.mask(phone) if phone else ""), "ok")
+              + (" · Mã kích hoạt sẽ được nhắn tới " + SMS.mask(phone) if phone else "")
+              + (" · Lịch dạy email lúc 6h sáng: đang bật" if mail_lich else " · Lịch dạy email: đang tắt"), "ok")
         return redirect(url_for("core.cai_dat"))
     return render_template("caidat.html")
 
@@ -1003,14 +1227,39 @@ def nang_cap():
         flash(msg, "ok" if ok else "err")
         return redirect(url_for("core.nang_cap"))
     goi = request.args.get("goi", "vip")
-    content = BL.transfer_content(u, goi)
-    gia = BL.PRICE if goi == "vip" else BL.PRICE_LUOT
-    qr = VQ.build_qr(BL.BANK_CODE, BL.BANK_ACC, gia, content, BL.BANK_OWNER)
+    if goi != "luot":
+        goi = "vip"
+    don = SP.tao_hoac_lay(db, u["id"], goi)
+    content = don["ma"]
+    gia = int(don["so_tien"])
+    tk_nhan = SP.so_tk_nhan() or BL.BANK_ACC
+    qr = VQ.build_qr(SP.ma_nh() or BL.BANK_CODE, tk_nhan, gia, content, SP.chu_tk())
     logs = db.execute("SELECT * FROM usage_log WHERE teacher_id=? ORDER BY id DESC LIMIT 20",
                       (u["id"],)).fetchall()
     return render_template("nangcap.html", qr_svg=qr, noi_dung=content, logs=logs,
                            need=request.args.get("need", ""), goi=goi, gia=gia,
-                           tudong=bool(BW.WEBHOOK_TOKEN) and BW.AUTO_ACTIVATE)
+                           don=don, tk_nhan=tk_nhan, tudong=True)
+
+
+@bp.route("/nang-cap/trang-thai")
+@login_required
+def nang_cap_trang_thai():
+    """Trạng thái đơn của CHÍNH người đăng nhập — frontend tự hỏi sau khi chuyển khoản."""
+    u = current_user()
+    goi = request.args.get("goi", "")
+    ma = (request.args.get("ma") or "").strip().upper()
+    don = SP.don_cua_toi(get_db(), u["id"], goi if goi in ("vip", "luot") else None,
+                         ma=ma or None)
+    vip = BL.is_pro(u)
+    out = {"ok": True, "is_pro": vip, "expires": u["expires"] if u else "",
+           "remaining": BL.remaining(u),
+           "don": None}
+    if don:
+        out["don"] = {"ma": don["ma"], "goi": don["goi"], "so_tien": don["so_tien"],
+                      "trang_thai": don["trang_thai"], "het_han": don["het_han"]}
+    resp = jsonify(out)
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 @bp.route("/nang-cap/hoa-don")
@@ -1160,7 +1409,7 @@ def quan_tri():
     stats["treo"] = sum(1 for x in txs if x["trang_thai"] == "cho_doi_soat")
     stats["tudong"] = sum(1 for x in txs if x["trang_thai"] == "da_kich_hoat")
     return render_template("quantri.html", users=users, codes=codes, stats=stats,
-                           txs=txs, smss=smss, SMS=SMS, BW=BW)
+                           txs=txs, smss=smss, SMS=SMS, BW=BW, SP=SP)
 
 
 # ---------------- Lịch nghỉ ----------------
@@ -1280,6 +1529,16 @@ def qt_dashboard():
         viec.append({"muc": "warn", "icon": "📩",
                      "text": f"{smsloi} tin nhắn gửi thất bại",
                      "link": url_for("core.quan_tri"), "nut": "Kiểm tra"})
+    dl = DLG.bao_cao()
+    if dl["muc"] == "danger":
+        viec.insert(0, {"muc": "warn", "icon": "💾",
+                        "text": "Ổ đĩa còn %s trống (%s đã dùng) — nâng cấp ngay."
+                        % (dl["o_con_h"], dl["o_pct"]),
+                        "link": url_for("core.qt_dashboard") + "#dung-luong", "nut": "Xem dung lượng"})
+    elif dl["muc"] == "warn":
+        viec.insert(0, {"muc": "warn", "icon": "💾",
+                        "text": dl["loi_khuyen"] + " Còn %s trống." % dl["o_con_h"],
+                        "link": url_for("core.qt_dashboard") + "#dung-luong", "nut": "Xem dung lượng"})
     for k in CFG.suc_khoe():
         if not k["ok"]:
             viec.append({"muc": "info", "icon": "⚙️", "text": k["thong_diep"],
@@ -1299,7 +1558,7 @@ def qt_dashboard():
             "SELECT COUNT(*) c FROM license WHERE used_by IS NULL").fetchone()["c"],
     }
     return render_template("qt_dashboard.html", stats=stats, bd=bd, chuc_nang=chuc_nang,
-                           top=top, viec=viec, suc_khoe=CFG.suc_khoe(),
+                           top=top, viec=viec, suc_khoe=CFG.suc_khoe(), dung_luong=dl,
                            gd_moi=db.execute("""SELECT b.*, t.fullname FROM bank_tx b
                                LEFT JOIN teacher t ON t.id=b.teacher_id
                                ORDER BY b.id DESC LIMIT 8""").fetchall())
@@ -1315,7 +1574,7 @@ def qt_caidat():
         if act == "sinh_khoa":
             import secrets as _s
             CFG.set_many(db, {"BANK_WEBHOOK_TOKEN": _s.token_urlsafe(32)})
-            flash("Đã sinh khoá bí mật mới. Nhớ dán khoá này sang SePay / Casso.", "ok")
+            flash("Đã sinh khoá webhook cũ (Casso /webhook/bank). SePay không dùng khoá này.", "ok")
         elif act == "mac_dinh":
             CFG.xoa(db, request.form.get("key", ""))
             flash("Đã trả tham số về giá trị mặc định.", "ok")
@@ -1331,6 +1590,16 @@ def qt_caidat():
                 ok, msg = SMS.send(phone, "EduAssist: Tin nhan thu nghiem. Neu nhan duoc tin nay "
                                           "nghia la cau hinh nhan tin da hoat dong.",
                                    db=db, teacher_id=u["id"] if u else None, loai="thu_nghiem")
+                flash(msg, "ok" if ok else "err")
+        elif act == "thu_mail":
+            u = current_user()
+            toi = MAIL.chuan(request.form.get("thu_toi")) or MAIL.chuan(u["email"] if u else "")
+            if not toi:
+                flash("Nhập email để gửi thử.", "err")
+            else:
+                ok, msg = MAIL.send(toi, "EduAssist — thư thử",
+                                    "Nếu thầy/cô nhận được thư này, cấu hình SMTP đã hoạt động.",
+                                    db=db, teacher_id=u["id"] if u else None, loai="thu_nghiem")
                 flash(msg, "ok" if ok else "err")
         else:
             data = {k: v for k, v in request.form.items() if k in CFG.BANG}
@@ -1350,10 +1619,13 @@ def qt_caidat():
     for m in CFG.DINH_NGHIA:
         muc_theo_nhom.setdefault(m.nhom, []).append(
             {"m": m, "gia_tri": CFG.get(m.key), "nguon": CFG.nguon(m.key)})
+    goc = request.url_root.rstrip("/")
     return render_template("qt_caidat.html", NHOM=CFG.NHOM, muc=muc_theo_nhom,
                            CFG=CFG, suc_khoe=CFG.suc_khoe(),
                            google_tt=google_tinh_trang(),
-                           webhook_url=request.url_root.rstrip("/") + "/webhook/bank")
+                           sepay_tt=SP.tinh_trang(),
+                           webhook_url=goc + "/webhook/sepay",
+                           webhook_url_cu=goc + "/webhook/bank")
 
 
 @bp.route("/favicon.ico")
