@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block head %}Nhận xét học sinh bằng AI{% endblock %}
-{% block crumb %}Từ điểm số hoặc mức độ CHT / HT / HTT → sinh nhận xét cá nhân hoá{% endblock %}
+{% block crumb %}Tải Excel / Word bất kỳ — tìm cột điểm &amp; mức đạt, ghi vào cột nhận xét{% endblock %}
 {% block body %}
 <div class="card">
 <form method="post" enctype="multipart/form-data">
  <div class="tabs">
-  <button type="button" class="on" onclick="tab(0,this)">📂 Tải file Excel / CSV</button>
+  <button type="button" class="on" onclick="tab(0,this)">📂 Tải Excel / Word / CSV</button>
   <button type="button" onclick="tab(1,this)">✍️ Nhập tay</button>
  </div>
 
@@ -13,10 +13,14 @@
   <div style="border:2px dashed #cfeafc;background:linear-gradient(135deg,#f8fafc,#ecfdf5);border-radius:14px;
    padding:26px;text-align:center" id="dz">
    <div style="font-size:34px">📊</div>
-   <div style="font-weight:700;margin:6px 0 3px">Chọn bảng điểm hoặc bảng nhận xét</div>
-   <p class="muted" style="margin:0 0 14px">Hỗ trợ .xlsx, .xls, .csv — tự nhận diện cột
-    <b>Họ tên</b>, <b>Điểm</b>, <b>Mức độ</b>, <b>Nhận xét của GV</b>, <b>Lớp</b>, <b>Môn</b></p>
-   <input type="file" name="file" accept=".xlsx,.xls,.csv" onchange="document.getElementById('fn').textContent=this.files[0]?.name||''">
+   <div style="font-weight:700;margin:6px 0 3px">Chọn bảng điểm — bất kỳ file Excel hoặc Word</div>
+   <p class="muted" style="margin:0 0 14px">Hỗ trợ <b>.xlsx</b>, <b>.xls</b>, <b>.docx</b>, <b>.csv</b>.
+    <b>Đọc được bảng điểm xuất từ phần mềm VN.Edu/SMAS</b> (cột <b>KT CK</b>, <b>XL CK</b>,
+    cột <b>Họ</b> | <b>Tên</b> tách riêng — xếp loại T/H/C tự hiểu là Hoàn thành tốt/Hoàn thành/Chưa hoàn thành).
+    Hệ thống tự tìm cột <b>điểm</b> và <b>mức đạt được</b> (dù tên cột khác nhau), rồi ghi nhận xét
+    vào cột <b>Nhận xét</b> (tự thêm cột nếu tệp chưa có). Nhận xét xưng <b>Em</b>, dựa vào điểm và mức đạt —
+    không dùng tên học sinh. Không cần đúng mẫu.</p>
+   <input type="file" name="file" accept=".xlsx,.xls,.xlsm,.csv,.docx" onchange="document.getElementById('fn').textContent=this.files[0]?.name||''">
    <div id="fn" style="margin-top:9px;font-weight:600;color:#0d9488"></div>
    <div style="margin-top:12px"><a class="btn sec sm" href="{{url_for('core.mau_excel', kind='diem')}}">⬇ Tải file mẫu</a></div>
   </div>
@@ -42,7 +46,7 @@
   <label class="f">Kiểu nhận xét<select name="provider">
    {% for k,(lb,_) in PROVIDERS.items() %}<option value="{{k}}">{{lb}}</option>{% endfor %}</select></label>
   <label class="f" style="flex-direction:row;align-items:center;gap:7px;padding-bottom:9px;color:#334155">
-   <input type="checkbox" name="hien_diem" checked style="width:16px;height:16px"> Kèm điểm &amp; xếp loại</label>
+   <input type="checkbox" name="hien_diem" style="width:16px;height:16px"> Kèm điểm vào câu nhận xét</label>
   <button class="ok">✨ Sinh nhận xét (miễn phí)</button>
   {% if is_pro %}
   <span class="muted" style="margin-left:10px">👑 Gói VIP — không giới hạn</span>
@@ -72,11 +76,16 @@
   <div class="row" style="gap:8px">
    <a class="btn sec sm" href="{{url_for('core.lich_su')}}">Sửa nội dung →</a>
    {% if is_pro or remaining > 0 %}
-    <a class="btn sm" href="{{url_for('core.xuat_excel')}}">⬇ Xuất Excel{% if not is_pro %} ({{remaining}} lượt){% endif %}</a>
+    {% if nx_goc %}
+    <a class="btn sm" href="{{url_for('core.tai_tep_nhan_xet')}}">⬇ Tải file gốc đã điền nhận xét{% if not is_pro %} (1 lượt){% endif %}</a>
+    {% endif %}
+    <a class="btn sec sm" href="{{url_for('core.xuat_excel')}}">Xuất bảng Excel mới{% if not is_pro %} (1 lượt){% endif %}</a>
    {% else %}
     <a class="btn sm" href="{{url_for('core.nang_cap', need='excel')}}"
      style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🔒 Nâng cấp để tải</a>
    {% endif %}</div></div>
+ {% if nx_goc %}<p class="sub" style="margin:0 14px 10px">Sẽ ghi nhận xét vào đúng cột trong tệp
+  <b>{{nx_ten}}</b> — các cột điểm / mức đạt / họ tên giữ nguyên.</p>{% endif %}
  {% if result %}
  <div class="tbl-wrap"><table>
   <thead><tr><th style="width:34px">#</th><th>Họ tên</th><th>Điểm</th><th>Mức</th><th>Xếp loại</th><th style="width:46%">Nhận xét</th></tr></thead>
