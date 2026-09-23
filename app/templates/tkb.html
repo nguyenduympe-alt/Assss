@@ -88,11 +88,51 @@
    <button>+ Thêm tiết</button>
   </div>
  </form>
- {% if not kho %}
- <p class="sub">Kho KHDH đang trống — vào <a href="{{url_for('digital.index')}}">KHDH + NLS + AI + STEM</a>
- tạo môn và tải KHDH lên để đối chiếu số tiết mỗi tuần.</p>
+  {% if not kho %}
+  <p class="sub">Kho KHDH đang trống — vào <a href="{{url_for('digital.index')}}">KHDH + NLS + AI + STEM</a>
+  tạo môn và tải KHDH lên để đối chiếu số tiết mỗi tuần.</p>
+  {% endif %}
+ </div>
+
+ <div class="card">
+  <h3>📄 Đọc thời khoá biểu từ Word / PDF / Excel</h3>
+  <p class="sub">Tải <b>Word (.docx)</b>, <b>Excel (.xlsx)</b> hoặc <b>PDF có chữ</b> — hệ thống đọc
+   <b>ngay trên máy chủ, không gửi tệp ra ngoài</b>, tách lớp · môn · khối rồi xếp tiết
+   (vd ô “Tin học 4B2 — P.Trường”, cột Thứ 2…6, sáng/chiều). Không nhận ảnh chụp.
+   Xem bảng trước khi ghi — hệ thống tự thêm môn + khối còn thiếu.
+   Nên tải <b>file mẫu</b> (mỗi dòng một tiết: Thứ · Buổi · Tiết · Lớp · Môn), điền lịch của mình rồi tải lên.</p>
+  <form method="post" enctype="multipart/form-data" class="row" style="align-items:flex-end;gap:8px">
+   <input type="hidden" name="act" value="doc_tkb">
+   <input type="hidden" name="tuan" value="{{tuan}}">
+   <label class="f" style="flex:1;min-width:240px">Tệp thời khoá biểu
+    <input type="file" name="file" accept=".docx,.xlsx,.xls,.csv,.pdf" required></label>
+   <button class="ok">🔍 Đọc và xem trước</button>
+   <a class="btn sec" href="{{url_for('core.mau_excel', kind='tkb')}}">⬇ Tải file mẫu</a>
+  </form>
+ </div>
+
+ {% if xem_truoc %}
+ <div class="card" style="border-color:#a7f3d0">
+  <div class="chead"><h3>👀 Xem trước — {{xem_truoc|length}} tiết đọc được</h3>
+   <span class="chip" style="background:#ecfdf5;color:#0d9488">chưa ghi</span></div>
+  <p class="sub">Kiểm tra lớp / môn / khối. Bấm <b>Ghi vào thời khoá biểu</b> để thêm tiết, tự tạo môn + khối còn thiếu
+   (áp dụng từ tuần {{tuan}}).</p>
+  <div class="tbl-wrap"><table>
+   <thead><tr><th>Thứ</th><th>Buổi</th><th>Tiết</th><th>Lớp</th><th>Môn</th><th>Khối</th><th>Phòng</th></tr></thead>
+   <tbody>{% for r in xem_truoc %}
+    <tr><td>{{THU_NAME[r.thu]}}</td><td>{{r.buoi}}</td><td>{{r.tiet}}</td>
+     <td>{{r.lop}}</td><td>{{r.mon}}</td><td>{{r.khoi}}</td><td class="muted">{{r.phong or ''}}</td></tr>
+   {% endfor %}</tbody>
+  </table></div>
+  <form method="post" style="margin-top:10px">
+   <input type="hidden" name="act" value="nhap_tkb_doc">
+   <input type="hidden" name="tuan" value="{{tuan}}">
+   <input type="hidden" name="ds" value='{{ xem_truoc|tojson }}'>
+   <button class="ok">💾 Ghi {{xem_truoc|length}} tiết vào thời khoá biểu</button>
+   <a class="btn sec" href="?tuan={{tuan}}">Huỷ</a>
+  </form>
+ </div>
  {% endif %}
-</div>
 
 {% if doi_chieu %}
 <div class="card">
@@ -146,6 +186,14 @@
  <div class="chead"><h3>Danh sách chi tiết <span class="muted" style="font-weight:400;font-size:12.5px">— sửa hoặc xoá từng tiết</span></h3>
   <form method="post" onsubmit="return confirm('Xoá phiên bản thời khoá biểu đang xem?')">
    <input type="hidden" name="act" value="clear"><input type="hidden" name="tuan" value="{{tuan}}"><button class="dan">🗑 Xoá phiên bản này</button></form></div>
+ <form method="post" class="row" style="padding:0 0 10px;gap:8px;align-items:flex-end">
+  <input type="hidden" name="act" value="phong_tat_ca">
+  <input type="hidden" name="tuan" value="{{tuan}}">
+  <label class="f">Phòng cho tất cả tiết
+   <input name="phong_tat_ca" maxlength="120" placeholder="vd: P.Trường" style="width:160px"></label>
+  <button class="sec">Áp phòng cho tất cả</button>
+  <span class="muted" style="padding-bottom:8px">Ghi cùng phòng vào mọi tiết — áp dụng từ tuần {{tuan}}.</span>
+ </form>
  <div class="tbl-wrap"><table>
   <thead><tr><th>Thứ</th><th>Buổi</th><th>Tiết</th><th>Lớp dạy</th><th>Môn</th><th>Khối</th><th>Phòng</th><th></th></tr></thead>
   <tbody>{% for r in rows %}<tr><td><b>{{THU_NAME[r['thu']]}}</b></td><td>{{r['buoi']}}</td><td>{{r['tiet']}}</td>

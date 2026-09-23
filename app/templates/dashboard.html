@@ -38,19 +38,15 @@
 
 <!-- ============ CÔNG CỤ ============ -->
 <div class="card">
-  <div class="chead"><div><h3>Công cụ của thầy/cô</h3>
-    <p class="sub" style="margin:2px 0 0">Tất cả tính năng của EduAssist — bấm vào để dùng</p></div>
+  <div class="chead"><h3>Công cụ của thầy/cô</h3>
     <span class="chip">{{ cong_cu|length }} công cụ</span></div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">
     {% for t in cong_cu %}
-    <a href="{{url_for(t.endpoint)}}" style="border:1px solid var(--line);border-radius:14px;padding:13px 15px;
-      background:linear-gradient(135deg,#fbfefd,#fff);display:flex;flex-direction:column;gap:7px;transition:.16s">
-      <div style="display:flex;align-items:center;gap:9px">
-        <span style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:17px;
-          background:color-mix(in srgb,{{t.mau}} 13%,#fff);color:{{t.mau}};flex:0 0 34px">{{t.icon}}</span>
-        <b style="flex:1;font-size:14px">{{t.ten}}</b>
-      </div>
-      {% if t.mo_ta %}<span class="muted" style="font-size:12.3px;line-height:1.45">{{t.mo_ta}}</span>{% endif %}
+    <a href="{{url_for(t.endpoint)}}" style="border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+      background:linear-gradient(135deg,#fbfefd,#fff);display:flex;align-items:center;gap:9px;transition:.16s">
+      <span style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:17px;
+        background:color-mix(in srgb,{{t.mau}} 13%,#fff);color:{{t.mau}};flex:0 0 34px">{{t.icon}}</span>
+      <b style="flex:1;font-size:14px">{{t.ten}}</b>
     </a>
     {% endfor %}
   </div>

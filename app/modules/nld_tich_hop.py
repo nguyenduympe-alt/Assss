@@ -16,10 +16,11 @@ from docx.oxml.ns import qn
 
 from . import ai_giao_duc as AIGD
 from . import nld
+from . import stem_giao_duc as STEM
 from . import thiet_ke_hoat_dong as TKD
-from .giao_an import (DO, MAU_MOI, NHAN_AI, RE_DONG_DO_HE_THONG, RE_HOAT_DONG_HE_THONG, RE_TIEU_DE_AI,
+from .giao_an import (DO, LUC, MAU_MOI, NHAN_AI, RE_DONG_DO_HE_THONG, RE_HOAT_DONG_HE_THONG, RE_TIEU_DE_AI,
                        XANH,
-                       doan_mau, gon, khong_dau, la_tieu_de_ai,
+                       doan_mau, gon, khong_dau, la_tieu_de_ai, la_tieu_de_stem,
                        la_tieu_de_nld, phan_tich, _xoa_muc_nld_cu)
 
 NHAN_QD = "[QUY ĐỊNH]"
@@ -28,7 +29,10 @@ RE_HOAT_DONG_BANG = re.compile(r"^\s*hoat\s*dong\s*tich\s*hop\s*nang\s*luc\s*so\
 # Dòng hoạt động GIÁO DỤC AI do hệ thống chèn (khác dòng hoạt động năng lực số).
 RE_HOAT_DONG_AI_BANG = re.compile(
     r"^\s*hoat\s*dong\s*tich\s*hop\s*giao\s*duc\s*ai\b", re.I)
+RE_HOAT_DONG_STEM_BANG = re.compile(
+    r"^\s*hoat\s*dong\s*tich\s*hop\s*giao\s*duc\s*stem\b", re.I)
 NHAN_AI_TIEU_DE = "Tích hợp giáo dục trí tuệ nhân tạo (AI)"
+NHAN_STEM_TIEU_DE = "Tích hợp giáo dục STEM/STEAM"
 NHAN_DX = "[ĐỀ XUẤT]"
 
 # ---------------------------------------------------------------- ánh xạ nội dung
@@ -843,6 +847,80 @@ def chon_muc_ai(doc, pt, mach_chon=None, toi_da=2, thoi_luong=5, thiet_bi="co"):
     return ds, canh_bao
 
 
+def _nhan_muc_stem(so_truoc):
+    t = gon(so_truoc or "")
+    m = re.match(r"^\s*([a-z])\s*[.)]", t, re.I)
+    if m:
+        sau = chr(ord(m.group(1).lower()) + 1)
+        if sau <= "z":
+            return f"{sau}. {NHAN_STEM_TIEU_DE}"
+    return NHAN_STEM_TIEU_DE
+
+
+def chon_muc_stem(doc, pt, thoi_luong=8):
+    """Đề xuất 1 hình thức STEM/STEAM theo tựa bài (Công văn 909/BGDĐT-GDTH)."""
+    ten_bai = lay_ten_bai(doc) or (pt.get("ten_bai") or "")
+    dx = STEM.goi_y(ten_bai, pt.get("lop"), pt.get("mon"))
+    if not dx:
+        van = noi_dung_bai(doc)
+        dx = STEM.goi_y(van[:240], pt.get("lop"), pt.get("mon"))
+    if not dx:
+        return [], ["Bài này chưa có căn cứ đo/thiết kế/tạo hình/thí nghiệm để đề xuất STEM; "
+                    "thầy/cô tự chọn hình thức STEM-BH hoặc STEAM-BH nếu vẫn muốn tích hợp."]
+    dx["id"] = dx["ma"]
+    dx["thoi_luong"] = thoi_luong
+    return [dx], [dx["ly_do"], "STEM/STEAM không phát sinh môn học mới, đầu điểm hay hồ sơ riêng. "
+                   "Dùng vật liệu sẵn có; không tổ chức theo phong trào."]
+
+
+def chen_muc_stem(doc, pt, chon_stem, ten_bai="", mon="", so_truoc=""):
+    """Chèn mục STEM/STEAM ngay sau mục AI (hoặc sau NLS nếu không có AI). Tô xanh lá."""
+    mt = pt["muc_tieu"]
+    if not mt.get("co") or not chon_stem:
+        return {"da_chen": False, "ly_do": "Không có phần mục tiêu hoặc không chọn STEM."}
+    dx = chon_stem[0]
+    vi_tri_chen = int((mt.get("nang_luc") or {}).get("ket_thuc", mt["ket_thuc"]))
+    vi_tri_chen = max(mt["vi_tri"] + 1, min(vi_tri_chen, len(doc.paragraphs)))
+    mau = doc.paragraphs[vi_tri_chen - 1] if vi_tri_chen > 0 else None
+    neo = None
+    i_ai = next((k for k, p in enumerate(doc.paragraphs) if la_tieu_de_ai(p.text)), None)
+    i_nld = next((k for k, p in enumerate(doc.paragraphs) if la_tieu_de_nld(p.text)), None)
+    i0 = i_ai if i_ai is not None else i_nld
+    if i0 is not None:
+        cuoi = i0
+        for k in range(i0 + 1, len(doc.paragraphs)):
+            p = doc.paragraphs[k]
+            if (p.text or "").strip() and not _het_toan_do(p):
+                break
+            cuoi = k
+        neo = doc.paragraphs[cuoi]
+        tieu = doc.paragraphs[i0].text
+    else:
+        neo, tieu = mau, so_truoc
+    so = _nhan_muc_stem(so_truoc or tieu)
+    ds = [(so, "tieude")] + STEM.soan_muc_tieu(dx, ten_bai=ten_bai, lop=pt.get("lop"), mon=mon)
+    for text, loai in reversed(ds):
+        p = doan_mau(doc, mau, text, do=True, in_dam=(loai == "tieude"), mau_chu=LUC)
+        if neo is not None:
+            neo._p.addnext(p._p)
+    return {"da_chen": True, "so_muc": so, "ma": dx.get("ma"),
+            "diem_chèn": "ngay sau mục AI/NLS, cuối phần Năng lực (trước Phẩm chất)"}
+
+
+def chen_hoat_dong_stem(doc, pt, hd):
+    """Chèn hoạt động STEM vào tiến trình — tô xanh lá 008000."""
+    tt = pt["tien_trinh"]
+    if tt.get("kieu") == "bang":
+        return _chen_vao_bang(doc, tt, hd, mau=None, neo_mau=RE_HOAT_DONG_AI_BANG, mau_chu=LUC)
+    neo = _neo_khoi_hoat_dong(doc)
+    if neo is not None:
+        _chen_doan_sau(doc, neo, hd, ghi_chu=STEM.NGUON, mau_chu=LUC)
+        return {"da_chen": True, "kieu": "doan", "diem_chèn": "ngay sau khối hoạt động AI/NLS"}
+    if tt.get("kieu") == "doan" and tt.get("hoat_dong"):
+        return _chen_sau_doan(doc, tt, hd, mau_chu=LUC)
+    return _chen_duoi_muc_tieu(doc, pt, hd, mau_chu=LUC)
+
+
 def chen_hoat_dong(doc, pt, hd, mau=RE_HOAT_DONG_BANG, mau_chu=DO):
     """Chèn hoạt động vào đúng chỗ trong TIẾN TRÌNH BÀI DẠY, tô đỏ nội dung mới."""
     if not hd:
@@ -1117,6 +1195,7 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
 
     # 2. đã chèn vào đúng chỗ chưa
     _chi_ai = bool(ket_qua.get("chi_ai"))
+    _bo_nls = _chi_ai or (not chon)
     if _chi_ai:
         if chon:
             loi.append("Giáo viên chọn chỉ chèn phần giáo dục AI nhưng hệ thống vẫn chọn "
@@ -1126,11 +1205,13 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
     elif ket_qua.get("muc_tieu", {}).get("da_chen"):
         dat.append("Đã chèn mục “Tích hợp năng lực số” ở %s."
                    % ket_qua["muc_tieu"].get("diem_chèn", "trong phần mục tiêu"))
+    elif _bo_nls:
+        dat.append("Không chèn mục năng lực số (giáo viên chọn phần AI/STEM).")
     else:
         _ten_muc = (pt.get("muc_tieu") or {}).get("nhan") or "mục tiêu"
         loi.append(f"Chưa chèn được mục năng lực số vào phần “{_ten_muc}” ({ket_qua['muc_tieu'].get('ly_do', '')}).")
         cung.append(loi[-1])
-    if not _chi_ai:
+    if not _bo_nls:
         if ket_qua.get("hoat_dong", {}).get("da_chen"):
             dat.append(f"Đã chèn hoạt động: {ket_qua['hoat_dong'].get('diem_chèn', '')}")
             if ket_qua["hoat_dong"].get("kieu") == "du_phong":
@@ -1230,6 +1311,27 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
             dat.append(f"Mục giáo dục AI có ghi {len(_ma_trong_muc)} tiêu chí (mã yêu cầu cần đạt) "
                        f"của đúng lớp do Quyết định 2422/QĐ-BGDĐT quy định.")
 
+    kq_st = (ket_qua or {}).get("stem") or {}
+    if kq_st.get("chon"):
+        st_mt = kq_st.get("muc_tieu") or {}
+        if st_mt.get("da_chen"):
+            dat.append("Đã chèn mục “Tích hợp giáo dục STEM/STEAM” ở %s."
+                       % st_mt.get("diem_chèn", "trong phần mục tiêu"))
+        else:
+            loi.append("Chưa chèn được mục STEM/STEAM: %s." % st_mt.get("ly_do", ""))
+            cung.append(loi[-1])
+        dem_st = sum(1 for p in doc.paragraphs if la_tieu_de_stem(p.text))
+        if dem_st > 1:
+            loi.append(f"Phát hiện {dem_st} tiêu đề STEM/STEAM — bị chèn trùng.")
+            cung.append(loi[-1])
+        elif dem_st == 1:
+            dat.append("Mục STEM/STEAM chèn đúng một lần.")
+        dat.append("Mục STEM/STEAM ghi ngắn việc làm (không in khối căn cứ vào file).")
+        _ma_st = [x.get("ma") for x in kq_st.get("chon") or [] if x.get("ma")]
+        if _ma_st and not all(STEM.la_ma_hop_le(m) for m in _ma_st):
+            loi.append("Mã hình thức STEM không thuộc STEM-BH / STEAM-BH / STEM-TN / STEM-NCKH.")
+            cung.append(loi[-1])
+
     # 2c. thiết kế hoạt động chỉ ghi hoạt động, KHÔNG ghi mã chỉ báo trong dòng hoạt động
     _mau_ma = re.compile(r"\b\d\.\d\.(?:CB|TC|NC)\d[a-z]?\b")
     _dong_hd = [r for t in doc.tables for r in t.rows
@@ -1255,6 +1357,8 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
         if dem:
             loi.append(f"Còn {dem} mục “Tích hợp năng lực số” trong file nhưng giáo viên chọn "
                        f"chỉ chèn phần giáo dục AI — hãy kiểm tra lại.")
+    elif _bo_nls:
+        dat.append("Không chèn mục năng lực số.")
     elif dem > 1:
         loi.append(f"Phát hiện {dem} tiêu đề “Tích hợp năng lực số” — bị chèn trùng, cần xoá bớt.")
         cung.append(loi[-1])
@@ -1262,12 +1366,14 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
         dat.append("Không chèn trùng mục.")
 
     # 4. màu chỉ ở nội dung mới — đỏ cho năng lực số, xanh dương cho giáo dục AI
-    do_moi, xanh_moi, tong = _dem_mau(doc)
-    if do_moi + xanh_moi == 0:
+    do_moi, xanh_moi, luc_moi, tong = _dem_mau(doc)
+    if do_moi + xanh_moi + luc_moi == 0:
         loi.append("Không tìm thấy nội dung mới nào được tô màu (đỏ/xanh)."); cung.append(loi[-1])
     else:
         dat.append(f"Có {do_moi} đoạn chữ đỏ FF0000 (năng lực số) và {xanh_moi} đoạn chữ "
                    f"xanh dương 0000FF (giáo dục AI) trên tổng {tong} đoạn.")
+        if luc_moi:
+            dat.append(f"Có {luc_moi} đoạn chữ xanh lá 008000 (STEM/STEAM).")
     if kq_ai.get("chon"):
         if xanh_moi:
             dat.append("Nội dung giáo dục AI được tô xanh dương 0000FF — phân biệt với phần "
@@ -1284,7 +1390,8 @@ def kiem_tra_dau_ra(doc, pt, chon, ket_qua, goc_doan=None):
 
     # 5. tổng thời lượng
     them = ((ket_qua.get("hoat_dong") or {}).get("thoi_luong", 0)
-            + ((ket_qua.get("ai") or {}).get("hoat_dong") or {}).get("thoi_luong", 0))
+            + ((ket_qua.get("ai") or {}).get("hoat_dong") or {}).get("thoi_luong", 0)
+            + ((ket_qua.get("stem") or {}).get("hoat_dong") or {}).get("thoi_luong", 0))
     tong_phut = pt["thoi_luong"]["tong_phut"]
     if tong_phut:
         if tong_phut + them > 50:
@@ -1378,15 +1485,17 @@ def _dem_mau(doc):
 
     Tính cả chữ trong bảng và trong hộp văn bản.
     """
-    do_moi = xanh_moi = tong = 0
+    do_moi = xanh_moi = luc_moi = tong = 0
     for p in _cac_doan_moi(doc):
-        co_do = co_xanh = False
+        co_do = co_xanh = co_luc = False
         for r in p.runs:
             try:
                 if r.font.color and r.font.color.rgb == DO:
                     co_do = True
                 elif r.font.color and r.font.color.rgb == XANH:
                     co_xanh = True
+                elif r.font.color and r.font.color.rgb == LUC:
+                    co_luc = True
             except (AttributeError, ValueError):
                 pass
         if gon(p.text):
@@ -1395,13 +1504,15 @@ def _dem_mau(doc):
             do_moi += 1
         if co_xanh:
             xanh_moi += 1
-    return do_moi, xanh_moi, tong
+        if co_luc:
+            luc_moi += 1
+    return do_moi, xanh_moi, luc_moi, tong
 
 
 # ------------------------------------------------------------------ pipeline
 def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de="",
           goc_doan=None, chon_ma=None, sua_chinh_ta=None, chon_ai=None, ai_thoi_luong=5,
-          chi_ai=False):
+          chi_ai=False, chon_stem=None, stem_thoi_luong=8):
     # chi_ai=True: giáo viên chọn CHỈ chèn phần giáo dục AI (không chèn mục năng lực số).
     # sua_chinh_ta: {"de_xuat": [...], "chon": [id, ...]} — chỉ áp dụng mục đã duyệt
     """Chạy trọn quy trình trên một tài liệu Word đã đọc sẵn.
@@ -1438,7 +1549,8 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
 
     # dọn DÒNG HOẠT ĐỘNG do lần chạy trước (cả năng lực số lẫn giáo dục AI)
     if pt["tien_trinh"].get("kieu") == "bang":
-        _xoa = _xoa_dong_bang(doc, pt["tien_trinh"], RE_HOAT_DONG_BANG, RE_HOAT_DONG_AI_BANG)
+        _xoa = _xoa_dong_bang(doc, pt["tien_trinh"], RE_HOAT_DONG_BANG, RE_HOAT_DONG_AI_BANG,
+                             RE_HOAT_DONG_STEM_BANG)
         if _xoa:
             bao_cao["buoc"].append(f"Đã xoá {_xoa} dòng hoạt động của lần chạy trước để không trùng.")
 
@@ -1459,10 +1571,11 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
                         "source_location": x["chi_bao"]["source_location"],
                         "hoat_dong": x["ten_hoat_dong"], "san_pham": x["san_pham"],
                         "minh_chung": x["minh_chung"]} for x in chon]
-    if not chon and not (chi_ai and chon_ai):
+    if not chon and not (chi_ai and chon_ai) and not chon_stem:
         bao_cao["thong_diep"] = ("Chưa chọn được tiêu chí nào. Cần bổ sung thông tin: "
                                  "lớp, môn, tên bài và nội dung chính của bài — hoặc tích "
-                                 "“chỉ chèn phần giáo dục AI” và chọn ít nhất một mạch AI.")
+                                 "“chỉ chèn phần giáo dục AI” và chọn ít nhất một mạch AI, "
+                                 "hoặc chọn hình thức STEM/STEAM.")
         bao_cao["kiem_tra"] = {
             "xuat_duoc": False, "dat": [], "loi": list(canh_bao) or [bao_cao["thong_diep"]],
             "loi_cung": ["Chưa có nội dung nào để chèn: chưa chọn được tiêu chí năng lực số "
@@ -1517,6 +1630,24 @@ def xu_ly(doc, thiet_bi="co", toi_da=3, thoi_luong=6, lop_ghi_de="", mon_ghi_de=
                                                                            boi_canh=locals().get("bc_ai"))
                                                        if chon_ai else None)}
 
+    # ---- STEM/STEAM (Công văn 909/BGDĐT-GDTH) ----
+    kq_st_mt = {"da_chen": False, "ly_do": "giáo viên không chọn STEM/STEAM"}
+    kq_st_hd = {"da_chen": False}
+    if chon_stem:
+        pt_st = phan_tich_an_toan(doc)
+        _so_truoc = (kq_ai_mt.get("so_muc") or kq_mt.get("so_muc") or "")
+        kq_st_mt = chen_muc_stem(doc, pt_st, chon_stem, ten_bai=ten_bai, mon=pt["mon"],
+                                 so_truoc=_so_truoc)
+        pt_st2 = phan_tich_an_toan(doc)
+        hd_st = STEM.soan_hoat_dong(chon_stem[0], thoi_luong=stem_thoi_luong)
+        kq_st_hd = chen_hoat_dong_stem(doc, pt_st2, hd_st) if hd_st else {"da_chen": False}
+        kq_st_hd["thoi_luong"] = stem_thoi_luong if kq_st_hd.get("da_chen") else 0
+        bao_cao["buoc"].append("Đã chèn mục “Tích hợp giáo dục STEM/STEAM” và hoạt động 5 bước "
+                               "theo Công văn 909/BGDĐT-GDTH.")
+    bao_cao["ket_qua"]["stem"] = {"chon": [{"ma": x.get("ma"), "hinh_thuc": x.get("hinh_thuc")}
+                                           for x in (chon_stem or [])],
+                                  "muc_tieu": kq_st_mt, "hoat_dong": kq_st_hd}
+
     # Sửa chính tả: CHỈ áp dụng những đề xuất giáo viên đã tích chọn ở trang duyệt.
     if sua_chinh_ta:
         from . import chinh_ta_gd as CTG
@@ -1550,3 +1681,4 @@ def xoa_muc_nld_cu_an_toan(doc, pt):
         return _xoa_muc_nld_cu(doc, pt["muc_tieu"])
     except Exception:  # noqa: BLE001
         return 0
+

@@ -222,7 +222,7 @@ def ket_qua(token):
     db = get_db()
     return render_template('trung_lap_kq.html', h=h, kq=h['kq'], token=token,
                            nguoi=_ten_nguoi(), da_tra=BL.da_tra_luot(db, u['id'], token),
-                           con_lai=BL.remaining(u), la_pro=BL.is_pro(u),
+                           con_lai=BL.remaining(u), la_pro=BL.khong_gioi_han(u),
                            che_do=TL.CHE_DO, nguon_api=TL.nguon_api())
 
 

@@ -74,7 +74,7 @@ def qr_svg(text, box=7, border=2, dark="#0f172a", light="#ffffff"):
     return "".join(parts)
 
 
-def build_qr(bank="agribank", account="7614215002756", amount=100000,
+def build_qr(bank="mbbank", account="0939286896", amount=100000,
              content="EDUASSIST", receiver=""):
     bin_ = BANK_BIN.get(bank.lower(), bank)
     return qr_svg(vietqr_payload(bin_, account, amount, content, receiver))

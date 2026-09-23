@@ -79,11 +79,96 @@ def _la_excel(ten_tep, data):
 
 def _so(v, toi_da=300):
     """Lấy số đầu tiên trong một ô (vd “4 tiết” → 4). Trả '' nếu không có."""
-    m = re.search(r"\d{1,3}", str(v or ""))
-    if not m:
-        return ""
-    n = int(m.group(0))
-    return str(n) if 0 < n <= toi_da else ""
+    ds = ds_so(v, toi_da)
+    return str(ds[0]) if ds else ""
+
+
+def ds_so(v, toi_da=60):
+    """Tách ô tuần/tiết: “1-2” “1,2” “1_2” “1;2” “1+2” “1–2” → [1, 2]. “4 tiết” → [4].
+
+    Dấu + / & là liệt kê (1+3 → 1 và 3), không phải khoảng 1…3.
+    """
+    s = "" if v is None else str(v).strip()
+    if not s or s.lower() == "nan":
+        return []
+    s = (s.replace("–", "-").replace("—", "-").replace("−", "-")
+           .replace("_", "-").replace("\\", ",").replace(";", ",")
+           .replace("/", ",").replace("+", ",").replace("＋", ",").replace("&", ","))
+    s = re.sub(r"(?i)\s*(và|va|tới|toi|đến|den)\s*", "-", s)
+    ra = []
+    for part in re.split(r"[,]+", s):
+        part = part.strip()
+        if not part:
+            continue
+        m = re.match(r"^(\d{1,2})\s*[-~]\s*(\d{1,2})\D*$", part)
+        if not m:
+            m = re.match(r"^(\d{1,2})\s*[-~]\s*(\d{1,2})$", part)
+        if m:
+            a, b = int(m.group(1)), int(m.group(2))
+            if a > b:
+                a, b = b, a
+            if b - a > 15:
+                ra.extend([n for n in (a, b) if 0 < n <= toi_da])
+            else:
+                ra.extend([n for n in range(a, b + 1) if 0 < n <= toi_da])
+            continue
+        m = re.search(r"\d{1,3}", part)
+        if m:
+            n = int(m.group(0))
+            if 0 < n <= toi_da:
+                ra.append(n)
+    seen, out = set(), []
+    for n in ra:
+        if n not in seen:
+            seen.add(n)
+            out.append(n)
+    return out
+
+
+def no_rong_tuan_tiet(rows, toi_tuan=60, toi_tiet=300):
+    """Mỗi dòng có tuần/tiết dạng 1-2, 1,2, 1_2, 1+2 → tách thành từng tuần hoặc từng tiết.
+
+    Tuần 1-2 / 1+2 + một tiết → hai dòng (tuần 1 và tuần 2). Tiết 1-2 / 1+2 + một tuần → hai dòng tiết.
+    Tuần 1-2 và tiết 1-2 cùng độ dài → ghép đôi (tuần 1/tiết 1, tuần 2/tiết 2).
+    """
+    ra = []
+    for r in rows or []:
+        if not isinstance(r, dict):
+            continue
+        d = dict(r)
+        tuans = ds_so(d.get("tuan"), toi_tuan)
+        tiets = ds_so(d.get("tiet_pp"), toi_tiet)
+        if len(tuans) <= 1 and len(tiets) <= 1:
+            if tuans:
+                d["tuan"] = str(tuans[0])
+            if tiets:
+                d["tiet_pp"] = str(tiets[0])
+            ra.append(d)
+            continue
+        if not tuans:
+            try:
+                tuans = [int(d.get("tuan") or 1)]
+            except Exception:
+                tuans = [1]
+        cap = []
+        if len(tuans) > 1 and len(tiets) > 1:
+            if len(tuans) == len(tiets):
+                cap = list(zip(tuans, tiets))
+            else:
+                cap = [(t, i) for t in tuans for i in tiets]
+        elif len(tuans) > 1:
+            tiet0 = tiets[0] if tiets else d.get("tiet_pp")
+            cap = [(t, tiet0) for t in tuans]
+        else:
+            cap = [(tuans[0], i) for i in tiets]
+        for tuan, tiet in cap:
+            x = dict(d)
+            x["tuan"] = str(tuan)
+            x["tiet_pp"] = "" if tiet in (None, "") else str(tiet)
+            ra.append(x)
+            if len(ra) >= TOI_DA_DONG:
+                return ra
+    return ra
 
 
 def _sach_mon(ten):
@@ -174,7 +259,7 @@ def _doc_bang(bang, ds_mon=()):
         ten_bai = lay("ten_bai")
         if not ten_bai or MD.bo_dau(ten_bai) in ("ten bai", "ten bai day", "bai hoc"):
             continue
-        dong = {"ten_bai": ten_bai, "tuan": _so(lay("tuan"), 60), "tiet_pp": _so(lay("tiet_pp")),
+        dong = {"ten_bai": ten_bai, "tuan": lay("tuan"), "tiet_pp": lay("tiet_pp"),
                 "ghi_chu": lay("ghi_chu"), "digital": lay("digital"), "ai": lay("ai"),
                 "stem": lay("stem"), "mon": "", "khoi": ""}
         if lay("mon") or lay("khoi"):
@@ -266,8 +351,8 @@ def _tach_bang_tinh(data, ten_tep, ds_mon):
         cach = "cột trong bảng" if (lay("mon") or lay("khoi")) else "tên tệp"
         key = (MD.bo_dau(m), str(k))
         nhom.setdefault(key, {"mon": m, "khoi": str(k), "rows": [], "cach": cach})
-        nhom[key]["rows"].append({"ten_bai": ten_bai, "tuan": _so(lay("tuan"), 60),
-                                  "tiet_pp": _so(lay("tiet_pp")), "ghi_chu": lay("ghi_chu"),
+        nhom[key]["rows"].append({"ten_bai": ten_bai, "tuan": lay("tuan"),
+                                  "tiet_pp": lay("tiet_pp"), "ghi_chu": lay("ghi_chu"),
                                   "digital": lay("digital"), "ai": lay("ai"), "stem": lay("stem"),
                                   "mon": m, "khoi": str(k)})
     phan = []
@@ -323,7 +408,7 @@ def tach(data, ten_tep="", ds_mon=(), mac_dinh_mon="", mac_dinh_khoi="", toi_da_
         p["nguon"] = ten_tep
     gop = gop[:toi_da_phan]
     for p in gop:
-        p["rows"] = p["rows"][:TOI_DA_DONG]
+        p["rows"] = no_rong_tuan_tiet(p["rows"])[:TOI_DA_DONG]
         p["so_dong"] = len(p["rows"])
     return gop
 

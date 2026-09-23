@@ -30,15 +30,15 @@
  <form method="post" class="row">
   <input type="hidden" name="act" value="gen">
   <label class="f">Loại gói<select name="loai" id="loai" onchange="tg()">
-   <option value="vip">👑 VIP — {{ '{:,}'.format(BL.PRICE).replace(',','.') }}đ / 1 năm</option>
-   <option value="luot">🎫 Gói lẻ — {{ '{:,}'.format(BL.PRICE_LUOT).replace(',','.') }}đ / {{BL.LUOT_MOI_GOI}} lượt</option>
+   <option value="vip">👑 VIP — {{ '{:,}'.format(gia_vip.gia).replace(',','.') }}đ / 1 năm</option>
+   <option value="luot">🎫 Gói lẻ — {{ '{:,}'.format(gia_luot.gia).replace(',','.') }}đ / {{BL.LUOT_MOI_GOI}} lượt</option>
   </select></label>
   <label class="f" id="wmonths">Thời hạn<select name="months"><option value="12">12 tháng (1 năm)</option>
    <option value="6">6 tháng</option><option value="3">3 tháng</option><option value="1">1 tháng</option></select></label>
   <label class="f" id="wluot" style="display:none">Số lượt
    <input type="number" name="luot" value="{{BL.LUOT_MOI_GOI}}" min="1" max="100" style="width:96px"></label>
   <label class="f">Số lượng mã<input type="number" name="n" value="1" min="1" max="50" style="width:96px"></label>
-  <label class="f" style="flex:1;min-width:200px">Ghi chú (tên GV, mã giao dịch…)<input name="note" placeholder="Cô Lan - CK 12/09 - EDU0007"></label>
+  <label class="f" style="flex:1;min-width:200px">Ghi chú (tên GV, mã giao dịch…)<input name="note" placeholder="Cô Lan - CK 12/09 - EGV12345678"></label>
   <button class="ok">+ Tạo mã</button>
  </form>
 </div>
@@ -75,12 +75,14 @@
     color:{{ '#047857' if BW.AUTO_ACTIVATE else '#b45309' }}">
     {{ 'Tự kích hoạt' if BW.AUTO_ACTIVATE else 'Chỉ tạo mã' }}</span>
   </div></div>
- {% if not BW.WEBHOOK_TOKEN %}
- <div class="flash err" style="margin:0 0 12px">⚠️ Chưa đặt <b>BANK_WEBHOOK_TOKEN</b> — cổng nhận
-  giao dịch đang bị khoá. <a href="{{url_for('core.qt_caidat')}}#tu_dong"><b>Bấm vào đây để bật ngay</b></a>.</div>
+ {% if not SP.da_bat() %}
+ <div class="flash err" style="margin:0 0 12px">⚠️ Chưa đặt <b>SEPAY_API_KEY</b> trên máy chủ — webhook SePay
+  chưa nhận giao dịch thật. <a href="{{url_for('core.qt_caidat')}}#tu_dong"><b>Xem cấu hình SePay</b></a>.</div>
  {% endif %}
- <p class="sub">Địa chỉ khai báo với SePay / Casso:
-  <code style="background:#f1f5f9;padding:3px 7px;border-radius:6px">{{ request.url_root }}webhook/bank</code></p>
+ <p class="sub">URL khai báo với SePay:
+  <code style="background:#f1f5f9;padding:3px 7px;border-radius:6px">{{ request.url_root }}webhook/sepay</code>
+  · tiền tố đơn <b>{{ SP.tien_to() }}</b>
+  · Casso/cũ: <code>{{ request.url_root }}webhook/bank</code></p>
 
  {% if txs %}
  <div class="tbl-wrap"><table>

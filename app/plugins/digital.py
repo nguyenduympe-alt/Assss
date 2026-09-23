@@ -66,6 +66,7 @@ def index():
         so_bai = (request.form.get('so_bai') or '').strip()
         # (M9) số bài cần tích hợp AI riêng + tùy chọn tích hợp năng lực số và AI cùng bài
         so_bai_ai = (request.form.get('so_bai_ai') or '').strip()
+        so_bai_stem = (request.form.get('so_bai_stem') or '').strip()
         cung_bai = ('1' in request.form.getlist('cung_bai')) or ('cung_bai' not in request.form)
         # Giáo viên chọn nội dung cần tích hợp: năng lực số / giáo dục AI / STEM — có thể chọn riêng hoặc cả hai
         chon = tuple('digital' if k == 'nls' else k
@@ -78,6 +79,8 @@ def index():
             flash('Số bài cần tích hợp năng lực số phải là số từ 1 đến 180, hoặc để trống.', 'err')
         elif so_bai_ai and (not so_bai_ai.isdigit() or not 1 <= int(so_bai_ai) <= 180):
             flash('Số bài cần tích hợp AI phải là số từ 1 đến 180, hoặc để trống.', 'err')
+        elif so_bai_stem and (not so_bai_stem.isdigit() or not 1 <= int(so_bai_stem) <= 180):
+            flash('Số bài cần tích hợp STEM/STEAM phải là số từ 1 đến 180, hoặc để trống.', 'err')
         elif not chon:
             flash('Hãy chọn ít nhất một nội dung cần tích hợp: năng lực số, giáo dục AI hoặc STEM.', 'err')
         else:
@@ -86,9 +89,10 @@ def index():
                 rows = DP.preview(data, mode, grade, subject, chon=chon,
                                   so_bai=int(so_bai) if so_bai else None,
                                   so_bai_ai=int(so_bai_ai) if so_bai_ai else None,
-                                  cung_bai=cung_bai)
+                                  cung_bai=cung_bai,
+                                  so_bai_stem=int(so_bai_stem) if so_bai_stem else None)
                 token = luu_phien(data, rows, mode, grade, subject, file.filename[:200], chon,
-                                  so_bai, so_bai_ai, cung_bai)
+                                  so_bai, so_bai_ai, cung_bai, so_bai_stem)
                 # (M14) chưa trừ lượt: thầy/cô xem và sửa bản xem trước trước đã
                 return redirect(url_for('digital.review', token=token))
             except ValueError as exc:
@@ -101,7 +105,8 @@ def index():
                            khoi=KHO.KHOI, kho_moi=request.args.get('kho', type=int))
 
 
-def luu_phien(data, rows, mode, grade, subject, name, chon, so_bai, so_bai_ai, cung_bai):
+def luu_phien(data, rows, mode, grade, subject, name, chon, so_bai, so_bai_ai, cung_bai,
+             so_bai_stem=None):
     """Lưu tệp + bản xem trước vào thư mục tạm, trả về token dùng ở bước rà soát."""
     token = uuid.uuid4().hex
     root = folder()
@@ -110,14 +115,17 @@ def luu_phien(data, rows, mode, grade, subject, name, chon, so_bai, so_bai_ai, c
                name=name, chon=list(chon),
                so_bai=int(so_bai) if so_bai else None,
                so_bai_ai=int(so_bai_ai) if so_bai_ai else None,
+               so_bai_stem=int(so_bai_stem) if so_bai_stem else None,
                cung_bai=cung_bai,
                tom_tat=dict(so_dong=len(rows),
                             so_de_xuat=sum(1 for r in rows if r.get('de_xuat_tich_hop')),
                             so_de_xuat_nls=sum(1 for r in rows if r.get('chon_nls')),
                             so_de_xuat_ai=sum(1 for r in rows if r.get('chon_ai')),
+                            so_de_xuat_stem=sum(1 for r in rows if r.get('chon_stem')),
                             so_phu_hop=sum(1 for r in rows if (r.get('diem_phu_hop') or 0) > 0),
                             so_bai=int(so_bai) if so_bai else None,
                             so_bai_ai=int(so_bai_ai) if so_bai_ai else None,
+                            so_bai_stem=int(so_bai_stem) if so_bai_stem else None,
                             cung_bai=bool(cung_bai),
                             tin_hoc=DP.la_tin_hoc(subject)))
     (root / (token + '.json')).write_text(json.dumps(ctx, ensure_ascii=False), encoding='utf-8')
@@ -158,8 +166,9 @@ def _doc_chon():
                  for k in ('nls', 'ai', 'stem') if request.form.get('chon_' + k))
     so_bai = (request.form.get('so_bai') or '').strip()
     so_bai_ai = (request.form.get('so_bai_ai') or '').strip()
+    so_bai_stem = (request.form.get('so_bai_stem') or '').strip()
     cung_bai = ('1' in request.form.getlist('cung_bai')) or ('cung_bai' not in request.form)
-    return chon, so_bai, so_bai_ai, cung_bai
+    return chon, so_bai, so_bai_ai, cung_bai, so_bai_stem
 
 
 def _loi_so_bai(so_bai, so_bai_ai):
@@ -362,8 +371,8 @@ def kho_tich_hop(kid):
     if not row:
         flash('Không tìm thấy môn này trong kho KHDH.', 'err')
         return redirect(url_for('digital.index'))
-    chon, so_bai, so_bai_ai, cung_bai = _doc_chon()
-    loi = _loi_so_bai(so_bai, so_bai_ai)
+    chon, so_bai, so_bai_ai, cung_bai, so_bai_stem = _doc_chon()
+    loi = _loi_so_bai(so_bai, so_bai_ai, so_bai_stem)
     data = KHO.doc_tep(uid, row)
     if not chon:
         flash('Hãy chọn ít nhất một nội dung cần tích hợp: năng lực số, giáo dục AI hoặc STEM.', 'err')
@@ -375,7 +384,8 @@ def kho_tich_hop(kid):
         try:
             rows = DP.preview(data, row['loai'] or 'ppct', row['khoi'], row['mon'], chon=chon,
                               so_bai=int(so_bai) if so_bai else None,
-                              so_bai_ai=int(so_bai_ai) if so_bai_ai else None, cung_bai=cung_bai)
+                              so_bai_ai=int(so_bai_ai) if so_bai_ai else None, cung_bai=cung_bai,
+                              so_bai_stem=int(so_bai_stem) if so_bai_stem else None)
         except ValueError as exc:
             flash(str(exc), 'err')
         except Exception:
@@ -383,7 +393,7 @@ def kho_tich_hop(kid):
         else:
             ten = (row['ten_file'] or 'KHDH')[:200]
             token = luu_phien(data, rows, row['loai'] or 'ppct', row['khoi'], row['mon'], ten,
-                              chon, so_bai, so_bai_ai, cung_bai)
+                              chon, so_bai, so_bai_ai, cung_bai, so_bai_stem)
             # (M14) tạo bản xem trước từ kho cũng miễn phí — lượt trừ khi tải tệp Word về
             return redirect(url_for('digital.review', token=token))
     return redirect(url_for('digital.index', kho=kid))

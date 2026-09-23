@@ -29,7 +29,8 @@ from docx.shared import RGBColor
 
 DO = RGBColor(0xFF, 0x00, 0x00)          # đỏ FF0000: nội dung TÍCH HỢP NĂNG LỰC SỐ
 XANH = RGBColor(0x00, 0x00, 0xFF)        # xanh dương 0000FF: nội dung TÍCH HỢP GIÁO DỤC AI
-MAU_MOI = (DO, XANH)                     # mọi màu dùng cho nội dung hệ thống chèn
+LUC = RGBColor(0x00, 0x80, 0x00)         # xanh lá 008000: nội dung TÍCH HỢP STEM/STEAM
+MAU_MOI = (DO, XANH, LUC)                # mọi màu dùng cho nội dung hệ thống chèn
 NHAN_AI = "[AI đề xuất – cần giáo viên duyệt]"
 
 # ------------------------------------------------------------------ tiện ích
@@ -424,17 +425,29 @@ def la_tieu_de_ai(text):
     return bool(RE_TIEU_DE_AI.match(khong_dau(gon(text))))
 
 
+# Mục STEM/STEAM do hệ thống chèn (Công văn 909/BGDĐT-GDTH).
+RE_TIEU_DE_STEM = re.compile(
+    r"^(?:\s*(?:\d+|[ivx]+|[a-z])\s*[.)]\s*)?"
+    r"tich hop giao duc stem(?:/steam)?\s*:?\s*$", re.I)
+
+
+def la_tieu_de_stem(text):
+    """Đúng là TIÊU ĐỀ mục 'Tích hợp giáo dục STEM/STEAM'."""
+    return bool(RE_TIEU_DE_STEM.match(khong_dau(gon(text))))
+
+
 # Các dòng con hệ thống sinh ra trong mục "Tích hợp năng lực số"
 # và trong khối hoạt động dự phòng — dùng để dọn khi chạy lại.
 RE_HOAT_DONG_HE_THONG = re.compile(
-    r"^\s*Hoạt động tích hợp (?:năng lực số|giáo dục AI)\b", re.I)
+    r"^\s*Hoạt động tích hợp (?:năng lực số|giáo dục AI|giáo dục STEM)\b", re.I)
 
 RE_DONG_DO_HE_THONG = re.compile(
-    r"^\s*(?:\d+\s*\.\s*(?:Tiêu chí|Mạch)|·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
+    r"^\s*(?:\d+\s*\.\s*(?:Tiêu chí|Mạch|Hình thức)|STEM-BH|STEAM-BH|STEM-TN|STEM-NCKH|"
+    r"·\s*\[QUY ĐỊNH\]|·\s*\[ĐỀ XUẤT\]|"
     r"·\s*(?:Mục tiêu|Tiêu chí|Mã|Mạch|Minh chứng đánh giá|Căn cứ chọn mạch|Hoạt động gợi ý|"
-    r"Nội dung lớp|CẦN GIÁO VIÊN DUYỆT)|"
-    r"Nguồn:\s*(?:Khung nội dung|Thông tư 02/2025|Công văn 3456|Quyết định 2422|Công văn 5588)|"
-    r"Hoạt động tích hợp (?:năng lực số|giáo dục AI)|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
+    r"Nội dung lớp|CẦN GIÁO VIÊN DUYỆT|Quy trình|Lĩnh vực|Vấn đề|Sản phẩm|Vật liệu|Nguồn)|"
+    r"Nguồn:\s*(?:Khung nội dung|Thông tư 02/2025|Công văn 3456|Quyết định 2422|Công văn 5588|Công văn 909)|"
+    r"Hoạt động tích hợp (?:năng lực số|giáo dục AI|giáo dục STEM)|Mục tiêu:|Thời lượng:|Công cụ:|Các bước:|"
     r"Nhiệm vụ của giáo viên:|Nhiệm vụ của học sinh:|Sản phẩm học tập:|"
     r"Tiêu chí đánh giá:|\()")
 
@@ -475,7 +488,8 @@ def _xoa_muc_nld_cu(doc, mt):
             if not t:
                 _xoa_doan(doc.paragraphs[j]); xoa += 1; continue
             kd = khong_dau(t)
-            if (la_tieu_de_nld(t) or la_tieu_de_ai(t) or _la_tieu_de_khac(t)
+            if (la_tieu_de_nld(t) or la_tieu_de_ai(t) or la_tieu_de_stem(t)
+                    or _la_tieu_de_khac(t)
                     or re.match(r"^\s*hoat\s*dong\s*\d", kd)):
                 break
             # Chỉ xoá dòng ĐÚNG do hệ thống sinh ra (tiêu chí, [QUY ĐỊNH]/[ĐỀ XUẤT], các dòng

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Lịch báo giảng tuần {{meta.tuan}} — xem trực tuyến</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#e8eef2;color:#0f172a;
+ font-family:"Times New Roman",Times,serif}
+.bar{position:sticky;top:0;z-index:20;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+ padding:10px 16px;background:#0f766e;color:#fff;font-family:system-ui,sans-serif;font-size:13.5px}
+.bar b{font-size:14.5px}
+.bar .muted{opacity:.85;font-weight:400}
+.bar a{font:inherit;cursor:pointer;border:0;border-radius:9px;padding:7px 12px;
+ text-decoration:none;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.45);font-weight:700}
+.wrap{padding:18px 14px 40px;position:relative;z-index:1}
+.sheet{width:min(1120px,100%);margin:0 auto;background:#fff;padding:16px 18px 22px;
+ box-shadow:0 8px 28px -16px #0f172a66;position:relative}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;text-align:center}
+.head .l{width:26%;font-size:12.5px;font-weight:700;letter-spacing:.04em}
+.head .r{flex:1}
+.head h1{margin:0;font-size:22px;letter-spacing:.6px}
+.head .tuan{margin:4px 0 0;font-size:13.5px}
+.gv{margin:10px 0 12px;font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border:1px solid #111;padding:5px 6px;vertical-align:middle}
+th{background:rgba(214,239,230,.78);font-size:12px}
+td.c{text-align:center}
+tr.nghi td{background:rgba(255,233,236,.78)}
+tr.nghi .bai{color:#be123c;font-weight:700}
+.note{margin-top:10px;font-size:13px}
+.sign{display:flex;margin-top:22px}
+.sign>div{width:50%;text-align:center;font-size:13px}
+.sign .ten{margin-top:48px;font-weight:700}
+.wm{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.wm-in{position:absolute;inset:-35%;
+ background-image:url("{{ url_for('static', filename='logo/ea-mark-b.svg') }}");
+ background-repeat:repeat;background-size:168px 168px;
+ opacity:.10;transform:rotate(-18deg);filter:grayscale(.15)}
+.cam-in{display:none}
+@media print{
+ html,body{height:100%!important}
+ body *{visibility:hidden!important}
+ .cam-in{display:flex!important;visibility:visible!important;position:fixed!important;
+  inset:0!important;align-items:center;justify-content:center;background:#fff;
+  font:700 22px system-ui,sans-serif;color:#be123c;text-align:center;padding:40px}
+}
+</style>
+</head>
+<body>
+<div class="cam-in">Không cho phép in lịch báo giảng xem trực tuyến.<br>Cần bản in / tệp thì tải file Word (tính lượt).</div>
+<div class="wm" aria-hidden="true"><div class="wm-in"></div></div>
+<div class="bar">
+ <b>Xem lịch báo giảng tuần {{meta.tuan}}</b>
+ <span class="muted">— trên trình duyệt, miễn phí, không tải tệp PDF, không in</span>
+ <span style="margin-left:auto"></span>
+ <a href="{{url_for('core.bao_giang', tuan=meta.tuan)}}">← Đóng</a>
+</div>
+<div class="wrap">
+ <div class="sheet">
+  <div class="head">
+   <div class="l">{{(meta.truong or '')|upper}}<div style="font-weight:400;margin-top:4px">Tổ: {{meta.to or ''}}</div></div>
+   <div class="r">
+    <h1>LỊCH BÁO GIẢNG</h1>
+    <div class="tuan">TUẦN {{meta.tuan}} (Từ ngày {{meta.tu_ngay}} đến ngày {{meta.den_ngay}})
+     {% if meta.ap_dung_tu_tuan %} · TKB áp dụng từ tuần {{meta.ap_dung_tu_tuan}}{% endif %}</div>
+   </div>
+  </div>
+  <div class="gv">Họ và tên giáo viên: <b>{{meta.giao_vien}}</b>
+   {% if meta.mon %}&nbsp;&nbsp;&nbsp;&nbsp;Môn dạy: <b>{{meta.mon}}</b>{% endif %}</div>
+  <table>
+   <thead><tr>
+    <th>Thứ/Ngày</th><th>Buổi</th><th>Tiết</th><th>Lớp</th><th>Môn</th>
+    <th>Tiết PPCT</th><th>Tên bài dạy</th><th>Đồ dùng / Ghi chú</th>
+   </tr></thead>
+   <tbody>
+   {% if not rows %}
+    <tr><td colspan="8" class="c" style="font-style:italic">(Chưa có dữ liệu thời khoá biểu)</td></tr>
+   {% else %}
+    {% for r in rows %}
+     <tr class="{{'nghi' if r.nghi}}">
+      {% if r.rowspan_thu %}<td class="c" rowspan="{{r.rowspan_thu}}"><b>{{THU_NAME[r.thu]}}</b>{% if r.ngay %}<div>{{r.ngay}}</div>{% endif %}</td>{% endif %}
+      {% if r.rowspan_buoi %}<td class="c" rowspan="{{r.rowspan_buoi}}">{{r.buoi}}</td>{% endif %}
+      <td class="c">{{r.tiet}}</td>
+      <td class="c">{{r.lop}}</td>
+      <td>{{r.mon}}</td>
+      <td class="c">{{r.tiet_pp or ''}}</td>
+      <td class="bai">{{r.ten_bai or ''}}</td>
+      <td>{{r.ghi_in or ''}}</td>
+     </tr>
+    {% endfor %}
+   {% endif %}
+   </tbody>
+  </table>
+  {% if meta.nghi %}<div class="note"><b>Ghi chú:</b> Tuần này trùng kỳ nghỉ - {{meta.nghi}}</div>{% endif %}
+  {% if meta.noi_dung_khac %}<div class="note"><b>Nội dung công tác khác:</b> {{meta.noi_dung_khac}}</div>{% endif %}
+  <div class="sign">
+   <div><b>DUYỆT CỦA TỔ TRƯỞNG CM</b></div>
+   <div>{{meta.dia_danh or 'Sóc Trăng'}}, ngày {{meta.ngay_ky or '....'}} tháng {{meta.thang_ky or '....'}} năm {{meta.nam_ky or '......'}}
+    <div style="margin-top:6px"><b>GIÁO VIÊN</b></div>
+    <div class="ten">{{meta.giao_vien}}</div>
+   </div>
+  </div>
+ </div>
+</div>
+<script>
+window.print = function(){};
+document.addEventListener("keydown", function(e){
+  if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "P")) {
+    e.preventDefault(); e.stopPropagation();
+  }
+}, true);
+window.addEventListener("beforeprint", function(){
+  document.body.setAttribute("data-cam-in", "1");
+});
+</script>
+</body>
+</html>

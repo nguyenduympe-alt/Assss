@@ -164,20 +164,21 @@ def tach_ma(noi_dung):
 
 
 def doan_goi_theo_tien(so_tien):
-    """Không ghi rõ gói thì suy ra từ số tiền."""
+    """Không ghi rõ gói thì suy ra từ số tiền đang bán (gốc hoặc KM)."""
     sai_so = CFG.get_int("BANK_SAI_SO", 0)
-    if so_tien >= BL.PRICE - sai_so:
+    if so_tien >= BL.gia_hien("vip")["gia"] - sai_so:
         return "vip"
-    if so_tien >= BL.PRICE_LUOT - sai_so:
+    if so_tien >= BL.gia_hien("luot")["gia"] - sai_so:
         return "luot"
     return None
 
 
 def so_goi_le(so_tien):
     """Chuyển 30.000đ thành 3 gói lẻ = 9 lượt."""
-    if BL.PRICE_LUOT <= 0:
+    gia = int(BL.gia_hien("luot")["gia"] or 0) or BL.PRICE_LUOT
+    if gia <= 0:
         return 1
-    return max(1, so_tien // BL.PRICE_LUOT)
+    return max(1, so_tien // gia)
 
 
 # ---------------- Xử lý 1 giao dịch ----------------
@@ -189,6 +190,12 @@ def xu_ly(db, gd):
 
     if gd["loai"] != "in":
         kq["ghi_chu"] = "Giao dịch tiền ra, bỏ qua"
+        return _ghi(db, kq, gd, now)
+
+    from .sepay import la_ma_don
+    if la_ma_don(gd.get("noi_dung") or ""):
+        kq["trang_thai"] = "bo_qua"
+        kq["ghi_chu"] = "Mã đơn SePay — không xử lý ở webhook cũ"
         return _ghi(db, kq, gd, now)
 
     # chống xử lý trùng (dịch vụ có thể gọi lại webhook nhiều lần)
@@ -213,15 +220,15 @@ def xu_ly(db, gd):
     goi = goi or doan_goi_theo_tien(gd["so_tien"])
     if not goi:
         kq["ghi_chu"] = (f"Số tiền {gd['so_tien']:,}đ nhỏ hơn gói rẻ nhất "
-                         f"({BL.PRICE_LUOT:,}đ) — cần đối soát tay")
+                         f"({BL.gia_hien('luot')['gia']:,}đ) — cần đối soát tay")
         kq["trang_thai"] = "cho_doi_soat"
         return _ghi(db, kq, gd, now)
 
     # đối chiếu số tiền với gói ghi trong nội dung
-    can = BL.PRICE if goi == "vip" else BL.PRICE_LUOT
+    can = BL.gia_hien(goi)["gia"]
     if gd["so_tien"] + CFG.get_int("BANK_SAI_SO", 0) < can:
         # chuyển thiếu: hạ xuống gói thấp hơn nếu đủ, không thì chờ đối soát
-        if goi == "vip" and gd["so_tien"] + CFG.get_int("BANK_SAI_SO", 0) >= BL.PRICE_LUOT:
+        if goi == "vip" and gd["so_tien"] + CFG.get_int("BANK_SAI_SO", 0) >= BL.gia_hien("luot")["gia"]:
             goi = "luot"
         else:
             kq["ghi_chu"] = (f"Chuyển thiếu: nhận {gd['so_tien']:,}đ, gói yêu cầu {can:,}đ")

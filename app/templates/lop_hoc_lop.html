@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% block head %}Lớp {{lop.ten}}{% endblock %}
+{% block crumb %}<a href="{{url_for('lop_hoc.index')}}">Lớp học</a> · Lớp {{lop.ten}}{% endblock %}
+{% block body %}
+<div class="card">
+ <div class="chead"><h3>📝 Tạo bài kiểm tra — lớp {{lop.ten}}</h3></div>
+ <p class="sub">Soạn tay (trắc nghiệm, đúng/sai, điền khuyết, tự luận, ghép cột — có thể chèn hình) hoặc tải file Word/PDF.</p>
+
+ <div class="tabs" id="tab-tao">
+  <button type="button" class="on" data-tab="tay">Soạn tay</button>
+  <button type="button" data-tab="file">Từ file</button>
+ </div>
+
+ <div id="pane-tay">
+  <form method="post" enctype="multipart/form-data" id="frm-tay">
+   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+   <input type="hidden" name="act" value="soan_tay">
+   <input type="hidden" name="so_cau_tay" id="so_cau_tay" value="0">
+   <div class="row">
+    <label class="f">Tiêu đề bài<input name="tieu_de" placeholder="Kiểm tra 15 phút — bài 3" style="min-width:240px"></label>
+    <label class="f">Môn<input name="mon" list="goi_y_mon" placeholder="Toán" style="width:140px"></label>
+   </div>
+   <div class="row" style="margin-top:12px;align-items:flex-end">
+    <label class="f">Loại câu
+     <select id="loai-moi" style="min-width:180px">
+      <option value="tn">Trắc nghiệm</option>
+      <option value="ds">Đúng / Sai</option>
+      <option value="dk">Điền khuyết</option>
+      <option value="tl">Tự luận</option>
+      <option value="gc">Ghép cột</option>
+     </select></label>
+    <button type="button" class="sec" id="them-cau">Tạo câu</button>
+   </div>
+   <p class="muted" id="chua-cau" style="margin:10px 0 0">Chọn loại câu rồi bấm <b>Tạo câu</b> — form câu hỏi và đáp án sẽ hiện ra.</p>
+   <div id="ds-cau"></div>
+   <div class="row" style="margin-top:12px">
+    <button class="ok" id="xem-truoc">Xem trước đề soạn tay</button>
+   </div>
+  </form>
+ </div>
+
+ <div id="pane-file" style="display:none">
+  <form method="post" enctype="multipart/form-data">
+   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+   <p class="sub">Tải <b>file câu hỏi</b> (.docx): đáp án đúng <b>in đậm</b> hoặc <u>gạch chân</u>.
+    Hoặc tải <b>tài liệu bài học</b> — máy sinh đề trên máy chủ, không gửi file ra ngoài.</p>
+   <div class="row">
+    <label class="f">Tiêu đề bài<input name="tieu_de" placeholder="Kiểm tra 15 phút — bài 3" style="min-width:240px"></label>
+    <label class="f">Môn<input name="mon" list="goi_y_mon" placeholder="Toán" style="width:140px"></label>
+    <label class="f">Số câu
+     <input name="so_cau" type="number" min="1" max="40" value="10" style="width:80px"></label>
+    <label class="f">Số đáp án / câu
+     <select name="so_dap_an" style="width:90px">
+      {% for n in [2,3,4,5,6] %}<option value="{{n}}" {{'selected' if n==4}}>{{n}}</option>{% endfor %}
+     </select></label>
+    <label class="f">File Word / PDF<input type="file" name="file" accept=".docx,.pdf" required></label>
+    <button>Đọc file → xem đề</button>
+   </div>
+  </form>
+ </div>
+</div>
+
+{% if preview %}
+<div class="card">
+ <div class="chead"><h3>Xem trước {{preview.so}} câu
+  {% if preview.nguon=='file_cau_hoi' %}<span class="chip">Từ file câu hỏi</span>
+  {% elif preview.nguon=='soan_tay' %}<span class="chip" style="background:#fef3c7;color:#b45309">Soạn tay</span>
+  {% else %}<span class="chip" style="background:#e0f2fe;color:#075985">AI sinh từ tài liệu</span>{% endif %}</h3>
+ </div>
+ <ol style="padding-left:20px;line-height:1.55">
+  {% for q in preview.cau %}
+  <li style="margin-bottom:14px">
+   <span class="chip">{{ {'tn':'Trắc nghiệm','ds':'Đúng / Sai','dk':'Điền khuyết','tl':'Tự luận','gc':'Ghép cột'}.get(q.loai or 'tn') }}</span>
+   <b>{{q.cau}}</b>
+   {% if q.anh %}<div style="margin:8px 0"><img src="{{url_for('lop_hoc.anh', ten=q.anh)}}" alt=""
+     style="max-width:100%;max-height:240px;border-radius:10px;border:1px solid var(--line)"></div>{% endif %}
+   <div class="muted" style="margin-top:4px">
+    {% if (q.loai or 'tn')=='tn' %}
+     {% for k,v in q.lua_chon.items() %}
+      <div>{{k}}. {{v}}{% if q.dap_an==k %} <b style="color:#047857">✓ đáp án</b>{% endif %}
+       {% if (q.anh_pa or {}).get(k) %}<div style="margin:4px 0"><img src="{{url_for('lop_hoc.anh', ten=q.anh_pa[k])}}" alt=""
+         style="max-height:110px;border-radius:8px;border:1px solid var(--line)"></div>{% endif %}</div>
+     {% endfor %}
+    {% elif (q.loai)=='ds' %}
+     Đáp án: <b>{{ 'Đúng' if q.dap_an=='D' else 'Sai' }}</b>
+    {% elif (q.loai)=='dk' %}
+     Đáp án: <b>{{q.dap_an}}</b>
+    {% elif q.loai=='gc' %}
+     <div class="row" style="align-items:flex-start;margin-top:6px">
+      <div style="flex:1;min-width:140px"><b>Cột A</b>
+       {% for a in q.cot_a %}<div>{{loop.index}}. {{a}}
+        {% if q.anh_a and q.anh_a[loop.index0] %}<div><img src="{{url_for('lop_hoc.anh', ten=q.anh_a[loop.index0])}}" alt=""
+          style="max-height:90px;border-radius:8px"></div>{% endif %}</div>{% endfor %}</div>
+      <div style="flex:1;min-width:140px"><b>Cột B</b>
+       {% for b in q.cot_b %}<div>{{'abcdefgh'[loop.index0]}}. {{b}}
+        {% if q.anh_b and q.anh_b[loop.index0] %}<div><img src="{{url_for('lop_hoc.anh', ten=q.anh_b[loop.index0])}}" alt=""
+          style="max-height:90px;border-radius:8px"></div>{% endif %}</div>{% endfor %}</div>
+     </div>
+     Đáp án: <b>{{q.dap_an}}</b>
+    {% elif q.dap_an %}
+     Gợi ý chấm: {{q.dap_an}}
+    {% else %}
+     Tự luận — giáo viên xem bài nộp
+    {% endif %}
+   </div>
+  </li>
+  {% endfor %}
+ </ol>
+ <form method="post" id="frm-luu">
+  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+  <input type="hidden" name="act" id="act-luu" value="luu">
+  <input type="hidden" name="tieu_de" value="{{preview.tieu_de}}">
+  <input type="hidden" name="mon" value="{{preview.mon}}">
+  <p class="sub">Khi học sinh vào làm bài, hệ thống tự trộn câu hỏi và đáp án riêng cho từng em. Có thể trộn thêm bản gốc trước khi lưu nếu muốn.</p>
+  <div class="row" style="align-items:center;margin:8px 0">
+   <label class="f" style="flex-direction:row;gap:8px;align-items:center;font-weight:600">
+    <input type="checkbox" name="tron_cau" value="1"> Trộn thứ tự câu hỏi</label>
+   <label class="f" style="flex-direction:row;gap:8px;align-items:center;font-weight:600">
+    <input type="checkbox" name="tron_dap" value="1"> Trộn đáp án (trắc nghiệm, ghép cột)</label>
+  </div>
+  <div class="row">
+   <button type="submit" class="sec" id="btn-tron">Trộn và xem lại</button>
+   <button type="submit" class="ok" id="btn-luu">Lưu bài và lấy link cho học sinh</button>
+  </div>
+ </form>
+ <script>
+ (function(){
+   var frm=document.getElementById('frm-luu'), act=document.getElementById('act-luu');
+   if(!frm) return;
+   document.getElementById('btn-tron').addEventListener('click', function(){ act.value='tron'; });
+   document.getElementById('btn-luu').addEventListener('click', function(){ act.value='luu'; });
+ })();
+ </script>
+</div>
+{% endif %}
+
+<div class="card">
+ <div class="chead"><h3>Bài đã tạo</h3><span class="chip">{{de|length}}</span></div>
+ {% if not de %}
+ <div class="empty"><span class="e">📄</span>Chưa có bài kiểm tra cho lớp này.</div>
+ {% else %}
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>Bài</th><th>Môn</th><th>Đã nộp</th><th>Trạng thái</th><th></th></tr></thead>
+  <tbody>
+  {% for b in de %}
+  <tr>
+   <td><b>{{b.tieu_de}}</b><div class="muted">{{b.created}}</div></td>
+   <td>{{b.mon or '—'}}</td>
+   <td>{{b.so_nop}}</td>
+   <td>{% if b.dang_mo %}<span class="badge HT">Đang mở</span>{% else %}<span class="badge CHT">Đã đóng</span>{% endif %}</td>
+   <td><a class="btn sm" href="{{url_for('lop_hoc.de', de_id=b.id)}}">Kết quả &amp; link</a></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+ </table></div>
+ {% endif %}
+</div>
+
+<script>
+(function(){
+  var tabs=document.querySelectorAll('#tab-tao button');
+  tabs.forEach(function(b){
+    b.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');
+      document.getElementById('pane-tay').style.display=b.getAttribute('data-tab')==='tay'?'block':'none';
+      document.getElementById('pane-file').style.display=b.getAttribute('data-tab')==='file'?'block':'none';
+    });
+  });
+  var box=document.getElementById('ds-cau'), n=0, hid=document.getElementById('so_cau_tay');
+  function inpAnh(name){
+    return '<input type="file" name="'+name+'" accept="image/jpeg,image/png,image/webp,image/gif">';
+  }
+  function hangPa(i){
+    var s='';
+    'ABCD'.split('').forEach(function(k){
+      s+='<div class="f" style="flex:1;min-width:160px">'+k+
+         '<input name="pa_'+i+'_'+k+'" placeholder="Chữ phương án '+k+' (có thể để trống nếu có ảnh)">'+
+         '<span class="muted" style="font-weight:500;margin-top:4px">Ảnh đáp án '+k+'</span>'+
+         inpAnh('anh_pa_'+i+'_'+k)+'</div>';
+    });
+    return s;
+  }
+  function optsGhep(nB){
+    var s='<option value="">—</option>', chu='abcdefgh';
+    for(var k=0;k<nB;k++) s+='<option value="'+chu[k]+'">'+chu[k]+'</option>';
+    return s;
+  }
+  function hangA(i,j,nB){
+    return '<div class="hang-a" style="margin-top:8px">'+
+      '<div class="row" style="align-items:center">'+
+      '<span class="muted" style="width:18px">'+j+'</span>'+
+      '<input name="cotA_'+i+'_'+j+'" placeholder="Ý cột A" style="flex:1;min-width:100px">'+
+      '<select name="da_gc_'+i+'_'+j+'" style="width:72px">'+optsGhep(nB)+'</select></div>'+
+      inpAnh('anhA_'+i+'_'+j)+'</div>';
+  }
+  function hangB(i,j){
+    return '<div class="hang-b" style="margin-top:8px">'+
+      '<div class="row" style="align-items:center">'+
+      '<span class="muted" style="width:18px">'+'abcdefgh'[j-1]+'</span>'+
+      '<input name="cotB_'+i+'_'+j+'" placeholder="Ý cột B" style="flex:1;min-width:100px"></div>'+
+      inpAnh('anhB_'+i+'_'+j)+'</div>';
+  }
+  function khungGc(i){
+    var a='', b='';
+    for(var j=1;j<=4;j++){ a+=hangA(i,j,4); b+=hangB(i,j); }
+    return '<div class="kieu gc" style="display:none;margin-top:8px" data-na="4" data-nb="4">'+
+      '<p class="muted" style="margin:0 0 6px">Mỗi ý cột A ghép một chữ cột B khác nhau. Cột B có thể nhiều ý nhiễu hơn. Cả câu 1 điểm.</p>'+
+      '<div class="row" style="align-items:flex-start;gap:16px">'+
+      '<div class="cot-a" style="flex:1;min-width:200px"><b>Cột A</b>'+a+
+      '<button type="button" class="sec them-a" style="margin-top:8px">+ Ý A</button></div>'+
+      '<div class="cot-b" style="flex:1;min-width:200px"><b>Cột B</b>'+b+
+      '<button type="button" class="sec them-b" style="margin-top:8px">+ Ý B</button></div>'+
+      '</div></div>';
+  }
+  var NHAN={tn:'Trắc nghiệm',ds:'Đúng / Sai',dk:'Điền khuyết',tl:'Tự luận',gc:'Ghép cột'};
+  function capNhatRong(){
+    var e=document.getElementById('chua-cau');
+    if(e) e.style.display=box.children.length?'none':'block';
+  }
+  function ve(i, loai){
+    loai=loai||'tn';
+    var el=document.createElement('div');
+    el.className='q-soan';
+    el.setAttribute('data-i', i);
+    el.style.cssText='border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;background:#fbfefd';
+    el.innerHTML='<div class="row" style="justify-content:space-between;align-items:center">'+
+      '<div><b>Câu '+i+'</b> <span class="chip">'+ (NHAN[loai]||loai) +'</span></div>'+
+      '<button type="button" class="dan xoa-cau">Xoá</button></div>'+
+      '<input type="hidden" name="loai_'+i+'" value="'+loai+'">'+
+      '<div class="row" style="margin-top:8px">'+
+      '<label class="f" style="flex:1;min-width:220px">Ảnh câu hỏi (không bắt buộc)'+
+      inpAnh('anh_'+i)+'</label></div>'+
+      '<label class="f" style="margin-top:8px">Nội dung câu hỏi'+
+      '<textarea name="cau_'+i+'" rows="2" placeholder="Nhập câu hỏi… (ghép cột có thể để trống)"></textarea></label>'+
+      '<div class="kieu tn">'+
+      '<div class="row" style="margin-top:8px;flex-wrap:wrap">'+hangPa(i)+'</div>'+
+      '<label class="f" style="margin-top:8px;width:120px">Đáp án đúng'+
+      '<select name="da_'+i+'"><option value="A">A</option><option value="B">B</option>'+
+      '<option value="C">C</option><option value="D">D</option></select></label></div>'+
+      '<div class="kieu ds" style="display:none;margin-top:8px">'+
+      '<label class="f" style="width:160px">Đáp án'+
+      '<select name="da_'+i+'_ds"><option value="D">Đúng</option><option value="S">Sai</option></select></label></div>'+
+      '<div class="kieu dk" style="display:none;margin-top:8px">'+
+      '<label class="f">Đáp án điền (nhiều đáp án cách nhau bởi | )'+
+      '<input name="da_'+i+'_dk" placeholder="Hà Nội | Ha Noi"></label></div>'+
+      '<div class="kieu tl" style="display:none;margin-top:8px">'+
+      '<label class="f">Gợi ý chấm (không bắt buộc — để trống thì chỉ lưu bài nộp)'+
+      '<input name="da_'+i+'_tl" placeholder="Từ khoá / đáp án mẫu"></label></div>'+
+      khungGc(i);
+    box.appendChild(el);
+    el.querySelectorAll('.kieu').forEach(function(k){k.style.display='none'});
+    var kieu=el.querySelector('.kieu.'+loai);
+    if(kieu) kieu.style.display='block';
+    el.querySelector('.xoa-cau').addEventListener('click', function(){
+      el.remove();
+      capNhatRong();
+    });
+    var kgc=el.querySelector('.kieu.gc');
+    el.querySelector('.them-a').addEventListener('click', function(){
+      var na=parseInt(kgc.getAttribute('data-na')||'4',10);
+      if(na>=8) return;
+      na+=1; kgc.setAttribute('data-na', String(na));
+      var nb=parseInt(kgc.getAttribute('data-nb')||'4',10);
+      el.querySelector('.them-a').insertAdjacentHTML('beforebegin', hangA(i,na,nb));
+    });
+    el.querySelector('.them-b').addEventListener('click', function(){
+      var nb=parseInt(kgc.getAttribute('data-nb')||'4',10);
+      if(nb>=8) return;
+      nb+=1; kgc.setAttribute('data-nb', String(nb));
+      el.querySelector('.them-b').insertAdjacentHTML('beforebegin', hangB(i,nb));
+      el.querySelectorAll('select[name^="da_gc_'+i+'_"]').forEach(function(s){
+        var cur=s.value; s.innerHTML=optsGhep(nb); s.value=cur;
+      });
+    });
+  }
+  function them(){
+    var loai=(document.getElementById('loai-moi')||{}).value||'tn';
+    n+=1; ve(n, loai); hid.value=String(n); capNhatRong();
+  }
+  document.getElementById('them-cau').addEventListener('click', them);
+  document.getElementById('frm-tay').addEventListener('submit', function(){
+    hid.value=String(n);
+    if(!box.children.length){
+      alert('Hãy chọn loại câu rồi bấm Tạo câu.');
+      return false;
+    }
+    box.querySelectorAll('.q-soan').forEach(function(wrap){
+      var i=wrap.getAttribute('data-i');
+      var loai=(wrap.querySelector('[name="loai_'+i+'"]')||{}).value||'tn';
+      var daTn=wrap.querySelector('select[name="da_'+i+'"]');
+      if(loai!=='tn' && daTn) daTn.disabled=true;
+      var src=null;
+      if(loai==='ds') src=wrap.querySelector('[name="da_'+i+'_ds"]');
+      if(loai==='dk') src=wrap.querySelector('[name="da_'+i+'_dk"]');
+      if(loai==='tl') src=wrap.querySelector('[name="da_'+i+'_tl"]');
+      if(src){
+        var h=document.createElement('input');
+        h.type='hidden'; h.name='da_'+i; h.value=src.value;
+        wrap.appendChild(h);
+      }
+    });
+  });
+  capNhatRong();
+})();
+</script>
+{% endblock %}

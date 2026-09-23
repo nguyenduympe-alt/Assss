@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block head %}{{de.tieu_de}}{% endblock %}
+{% block crumb %}<a href="{{url_for('lop_hoc.index')}}">Lớp học</a> ·
+ <a href="{{url_for('lop_hoc.chi_tiet', lop_id=lop.id)}}">Lớp {{lop.ten}}</a>{% endblock %}
+{% block body %}
+<div class="card">
+ <div class="chead"><h3>{{de.tieu_de}}</h3>
+  <span class="chip">{{cau|length}} câu · lớp {{lop.ten}}</span></div>
+ <p class="sub">Gửi link này cho học sinh. Em chỉ cần ghi họ tên rồi làm bài — không cần tài khoản.</p>
+ <div class="row" style="align-items:center">
+  <input id="lnk" value="{{link}}" readonly style="flex:1;min-width:220px">
+  <button type="button" class="sec" onclick="navigator.clipboard.writeText(document.getElementById('lnk').value);this.textContent='Đã chép'">Chép link</button>
+ </div>
+ <form method="post" class="row" style="margin-top:12px">
+  {% if de.dang_mo %}
+  <button name="act" value="dong" class="sec">Đóng bài</button>
+  {% else %}
+  <button name="act" value="mo" class="ok">Mở lại</button>
+  {% endif %}
+  <button name="act" value="xoa" class="dan" onclick="return confirm('Xoá bài và mọi bài nộp?')">Xoá</button>
+  <a class="btn" href="{{url_for('lop_hoc.excel', de_id=de.id)}}">⬇ Xuất Excel</a>
+ </form>
+</div>
+
+<div class="card">
+ <div class="chead"><h3>Kết quả — sắp theo tên, tên lót, họ</h3>
+  <span class="chip">{{nop|length}} bài nộp</span></div>
+ {% if not nop %}
+ <div class="empty"><span class="e">🧑‍🎓</span>Chưa có học sinh nộp.</div>
+ {% else %}
+ <div class="tbl-wrap"><table>
+  <thead><tr><th>STT</th><th>Họ</th><th>Tên lót</th><th>Tên</th><th>Họ và tên</th><th>Điểm</th><th>Mức</th><th>Nhận xét AI</th><th>Nộp</th></tr></thead>
+  <tbody>
+  {% for r in nop %}
+  <tr>
+   <td>{{loop.index}}</td>
+   <td>{{r.ho}}</td><td>{{r.lot}}</td><td><b>{{r.ten}}</b></td>
+   <td>{{r.ho_ten}}</td>
+   <td><b>{{r.diem}}</b></td>
+   <td>{% if r.muc_do %}<span class="badge {{r.muc_do}}">{{r.muc_do}}</span>{% endif %}</td>
+   <td class="muted">{{r.nhan_xet}}</td>
+   <td class="muted">{{r.created}}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+ </table></div>
+ {% endif %}
+</div>
+
+<details class="card">
+ <summary style="cursor:pointer;font-weight:700">Đáp án (chỉ giáo viên)</summary>
+ <ol style="padding-left:20px;margin-top:10px">
+  {% for q in cau %}
+  <li style="margin-bottom:10px">{{q.cau}}
+   {% if q.anh %}<div style="margin:6px 0"><img src="{{url_for('lop_hoc.anh', ten=q.anh)}}" alt=""
+     style="max-width:280px;max-height:160px;border-radius:8px"></div>{% endif %}
+   <div class="muted">
+    {% if (q.loai or 'tn')=='ds' %}Đáp án: <b>{{ 'Đúng' if q.dap_an=='D' else 'Sai' }}</b>
+    {% elif q.loai=='dk' %}Điền: <b>{{q.dap_an}}</b>
+    {% elif q.loai=='tl' %}{% if q.dap_an %}Gợi ý: {{q.dap_an}}{% else %}Tự luận{% endif %}
+    {% elif q.loai=='gc' %}
+     <div class="row" style="align-items:flex-start;margin-top:4px">
+      <div style="flex:1"><b>Cột A</b>{% for a in q.cot_a %}<div>{{loop.index}}. {{a}}</div>{% endfor %}</div>
+      <div style="flex:1"><b>Cột B</b>{% for b in q.cot_b %}<div>{{'abcdefgh'[loop.index0]}}. {{b}}</div>{% endfor %}</div>
+     </div>
+     Ghép: <b>{{q.dap_an}}</b>
+    {% else %}{% for k,v in q.lua_chon.items() %}{{k}}. {{v}}{% if q.dap_an==k %} ✓{% endif %}
+      {% if (q.anh_pa or {}).get(k) %}<div><img src="{{url_for('lop_hoc.anh', ten=q.anh_pa[k])}}" alt=""
+        style="max-height:80px;border-radius:6px"></div>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}
+    {% endif %}
+   </div>
+  </li>
+  {% endfor %}
+ </ol>
+</details>
+{% endblock %}

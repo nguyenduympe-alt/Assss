@@ -15,7 +15,7 @@
  <div style="flex:1;min-width:220px"><b>Đang dùng thử — còn {{remaining}} lượt</b>
   <div class="muted">Số lượt này tính chung cho <b>tất cả chức năng</b> — mỗi <b>tệp tải về</b> tính 1 lượt,
    tạo và xem trực tuyến không tính lượt · Nâng cấp
-   {{ '{:,}'.format(BL.PRICE).replace(',','.') }}đ/năm để dùng không giới hạn</div></div>
+   {% if gia_vip.km %}<s>{{ '{:,}'.format(gia_vip.goc).replace(',','.') }}đ</s> {% endif %}{{ '{:,}'.format(gia_vip.gia).replace(',','.') }}đ/năm để dùng không giới hạn</div></div>
  <a class="btn" href="{{url_for('core.nang_cap')}}">🚀 Nâng cấp ngay</a></div>
 {% endif %}
 
@@ -49,10 +49,32 @@
     <label class="f" style="width:190px">📱 Số điện thoại
      <input name="phone" value="{{user['phone'] or ''}}" placeholder="0912345678"></label>
    </div>
+   <div class="row" style="margin-top:11px">
+    <label class="f" style="flex:1;min-width:220px">✉️ Email nhận lịch dạy
+     <input type="email" name="email" value="{{user['email'] or ''}}" placeholder="giaovien@gmail.com"></label>
+   </div>
    <p class="muted" style="margin:8px 0 0;font-size:12.5px">
-    Nhập số điện thoại để hệ thống <b>tự nhắn tin mã kích hoạt</b> ngay khi nhận được chuyển khoản.
-    Không bắt buộc — nếu bỏ trống, mã vẫn hiện trên website sau khi thanh toán.</p>
+    Số điện thoại: hệ thống <b>nhắn mã kích hoạt</b> khi nhận chuyển khoản.
+    Email: (nếu bật bên dưới) nhận lịch dạy lúc 6h sáng.</p>
+   <label style="display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:12px 14px;
+    border:1px solid var(--line);border-radius:12px;background:#f7fdfb;cursor:pointer">
+    <input type="checkbox" name="mail_lich" value="1" style="margin-top:3px"
+     {{ 'checked' if user['mail_lich'] }}>
+    <span>
+     <b>Nhận lịch dạy qua email lúc 6h sáng</b>
+     <div class="muted" style="font-size:12.5px;margin-top:4px;line-height:1.5">
+      Mỗi ngày <b>một lần</b>, gửi tới email ở trên. <b>Mặc định tắt.</b>
+      Nội dung: các tiết hôm nay (buổi, tiết, lớp, môn, phòng).
+     </div>
+    </span>
+   </label>
    <div class="row" style="margin-top:11px"><button>💾 Lưu thay đổi</button></div>
+  </form>
+  <form method="post" style="margin-top:8px">
+   <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+   <input type="hidden" name="act" value="thu_mail_lich">
+   <button class="sec" type="submit">📤 Gửi thử lịch hôm nay</button>
+   <span class="muted" style="font-size:12.5px">Không tính vào lần gửi 6h sáng.</span>
   </form>
   <hr class="s">
   <div style="display:flex;align-items:center;gap:12px">

@@ -23,7 +23,8 @@ def nam_hoc_tu_ngay(d):
 def dam_bao_cot(db):
     """Thêm cột tuan_bd + nam_hoc cho DB cũ (an toàn gọi nhiều lần)."""
     cols = {r[1] for r in db.execute("PRAGMA table_info(tkb)")}
-    for ten, ddl in (("tuan_bd", "INTEGER DEFAULT 1"), ("nam_hoc", "TEXT")):
+    for ten, ddl in (("tuan_bd", "INTEGER DEFAULT 1"), ("nam_hoc", "TEXT"),
+                      ("ghi_chu", "TEXT")):
         if ten not in cols:
             try:
                 db.execute("ALTER TABLE tkb ADD COLUMN %s %s" % (ten, ddl))
@@ -85,14 +86,14 @@ def ds_lop(db, uid, nam=""):
 
 def _chep(db, uid, nam, tu_tuan, sang_tuan):
     """Sao chép toàn bộ tiết của mốc tu_tuan thành mốc mới sang_tuan."""
-    rows = db.execute("SELECT thu,buoi,tiet,lop,mon,khoi,phong FROM tkb"
+    rows = db.execute("SELECT thu,buoi,tiet,lop,mon,khoi,phong,COALESCE(ghi_chu,'') ghi_chu FROM tkb"
                       " WHERE teacher_id=? AND COALESCE(nam_hoc,'')=? AND COALESCE(tuan_bd,1)=?",
                       (uid, nam, tu_tuan)).fetchall()
     for r in rows:
-        db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong,tuan_bd,nam_hoc)"
-                   " VALUES(?,?,?,?,?,?,?,?,?,?)",
+        db.execute("INSERT INTO tkb(teacher_id,thu,buoi,tiet,lop,mon,khoi,phong,ghi_chu,tuan_bd,nam_hoc)"
+                   " VALUES(?,?,?,?,?,?,?,?,?,?,?)",
                    (uid, r["thu"], r["buoi"], r["tiet"], r["lop"], r["mon"], r["khoi"], r["phong"],
-                    sang_tuan, nam))
+                    r["ghi_chu"], sang_tuan, nam))
     return len(rows)
 
 
@@ -112,20 +113,30 @@ def dam_bao_phien(db, uid, nam, tuan):
     return tuan
 
 
+def _o_tkb(r):
+    try:
+        gc = (r["ghi_chu"] or "").strip()
+    except Exception:
+        gc = ""
+    return {"lop": (r["lop"] or "").strip(), "phong": (r["phong"] or "").strip()[:120],
+            "ghi_chu": gc[:300]}
+
+
 def luu_lop(db, uid, nam, tuan, ds_doi):
-    """Cập nhật lớp theo danh sách {khoa: 'thu|buoi|tiet', lop: '6A'}.
+    """Cập nhật lớp / phòng / ghi chú theo {khoa, lop, phong?, ghi_chu?}.
 
     Chỉ ghi khi có thay đổi thật. Cùng mốc → cập nhật tại chỗ; mốc mới → sao
     chép rồi sửa (giữ nguyên lịch sử + các mốc về sau).
     Trả về (ok, thong_bao, so_doi).
     """
     tuan = max(1, int(tuan or 1))
+    dam_bao_cot(db)
     hien = dong(db, uid, nam, tuan)
     if not hien:
-        return False, "Chưa có thời khoá biểu để sửa lớp — thầy/cô nhập TKB trước.", 0
+        return False, "Chưa có thời khoá biểu để sửa — thầy/cô nhập TKB trước.", 0
     bang = {}
     for r in hien:
-        bang["%s|%s|%s" % (r["thu"], r["buoi"], r["tiet"])] = (r["lop"] or "").strip()
+        bang["%s|%s|%s" % (r["thu"], r["buoi"], r["tiet"])] = _o_tkb(r)
     doi = []
     for d in ds_doi:
         k = (d.get("khoa") or "").strip()
@@ -134,19 +145,53 @@ def luu_lop(db, uid, nam, tuan, ds_doi):
             continue
         if not lop:
             return False, "Vui lòng chọn lớp cho mọi tiết (tiết %s còn trống)." % k, 0
-        if lop != bang[k]:
-            doi.append((k, lop))
+        moi = {"lop": lop}
+        if "phong" in d:
+            moi["phong"] = (d.get("phong") or "").strip()[:120]
+        if "ghi_chu" in d:
+            moi["ghi_chu"] = (d.get("ghi_chu") or "").strip()[:300]
+        cu = bang[k]
+        if (moi["lop"] != cu["lop"]
+                or ("phong" in moi and moi["phong"] != cu["phong"])
+                or ("ghi_chu" in moi and moi["ghi_chu"] != cu["ghi_chu"])):
+            doi.append((k, moi))
     if not doi:
-        return True, "Không có thay đổi lớp — thời khoá biểu giữ nguyên.", 0
+        return True, "Không có thay đổi — thời khoá biểu giữ nguyên.", 0
     v = dam_bao_phien(db, uid, nam, tuan)
-    for k, lop in doi:
+    for k, moi in doi:
         thu, buoi, tiet = k.split("|", 2)
-        db.execute("UPDATE tkb SET lop=? WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
-                   " AND COALESCE(tuan_bd,1)=? AND thu=? AND buoi=? AND tiet=?",
-                   (lop, uid, nam, v, thu, buoi, tiet))
+        sets, args = ["lop=?"], [moi["lop"]]
+        if "phong" in moi:
+            sets.append("phong=?")
+            args.append(moi["phong"])
+        if "ghi_chu" in moi:
+            sets.append("ghi_chu=?")
+            args.append(moi["ghi_chu"])
+        args.extend((uid, nam, v, thu, buoi, tiet))
+        db.execute("UPDATE tkb SET %s WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
+                   " AND COALESCE(tuan_bd,1)=? AND thu=? AND buoi=? AND tiet=?" % ",".join(sets),
+                   args)
     db.commit()
-    return True, ("Đã lưu thời khoá biểu — áp dụng từ tuần %d (%d tiết đổi lớp). "
+    return True, ("Đã lưu thời khoá biểu — áp dụng từ tuần %d (%d tiết đổi). "
                   "Các tuần trước mốc này giữ nguyên bản cũ." % (v, len(doi))), len(doi)
+
+
+def dat_phong_tat_ca(db, uid, nam, tuan, phong):
+    """Ghi cùng một phòng cho mọi tiết của phiên bản hiệu lực tại `tuan`."""
+    phong = (phong or "").strip()[:120]
+    tuan = max(1, int(tuan or 1))
+    dam_bao_cot(db)
+    hien = dong(db, uid, nam, tuan)
+    if not hien:
+        return False, "Chưa có thời khoá biểu để ghi phòng — thầy/cô nhập TKB trước.", 0
+    if all((r["phong"] or "").strip() == phong for r in hien):
+        return True, "Mọi tiết đã cùng phòng này — không cần ghi lại.", 0
+    v = dam_bao_phien(db, uid, nam, tuan)
+    db.execute("UPDATE tkb SET phong=? WHERE teacher_id=? AND COALESCE(nam_hoc,'')=?"
+               " AND COALESCE(tuan_bd,1)=?", (phong, uid, nam, v))
+    db.commit()
+    return True, ("Đã ghi phòng “%s” cho %d tiết — áp dụng từ tuần %d."
+                  % (phong or "(trống)", len(hien), v)), len(hien)
 
 
 def lich_su(db, uid, nam, ngay=None):

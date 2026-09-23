@@ -47,9 +47,18 @@
     <div class="muted" style="font-size:12.5px">Dùng thêm khi cần</div></div>
    {% if goi=='luot' %}<span class="chip" style="background:#d1fae5;color:#047857">Đang chọn</span>{% endif %}
   </div>
+  {% if gia_luot.km %}
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+   <span class="chip" style="background:#fef3c7;color:#b45309">KM -{{gia_luot.phan_tram}}%</span>
+   <s style="font-size:15px;color:#94a3b8;font-weight:650">{{ '{:,}'.format(gia_luot.goc).replace(',','.') }}đ</s>
+  </div>
+  {% endif %}
   <div style="font-size:30px;font-weight:800;color:#0d9488;letter-spacing:-1px">
-   {{ '{:,}'.format(BL.PRICE_LUOT).replace(',','.') }}đ
+   {{ '{:,}'.format(gia_luot.gia).replace(',','.') }}đ
    <span style="font-size:14px;font-weight:600;color:#64748b">/ {{BL.LUOT_MOI_GOI}} lượt</span></div>
+  {% if gia_luot.km %}
+  <div class="dem-km" data-giay="{{gia_luot.con_giay}}">⏰ Kết thúc KM còn <b class="dem-so">…</b></div>
+  {% endif %}
   <div style="margin:12px 0;display:flex;flex-direction:column;gap:7px;font-size:13px">
    {% for t in ['Lịch báo giảng PDF / Word','Xuất Excel nhận xét học sinh','Sửa lỗi chính tả &amp; tải file Word','Giáo án tích hợp năng lực số &amp; AI','Kế hoạch giáo dục / phân phối chương trình','Dò dấu hiệu văn bản AI','Tạo nhận xét học sinh'] %}
    <div style="display:flex;gap:8px;align-items:center">
@@ -69,9 +78,18 @@
     <div class="muted" style="font-size:12.5px">Thoải mái dùng cả năm học</div></div>
    {% if goi=='vip' %}<span class="chip" style="background:#d1fae5;color:#047857">Đang chọn</span>{% endif %}
   </div>
+  {% if gia_vip.km %}
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+   <span class="chip" style="background:#fef3c7;color:#b45309">KM -{{gia_vip.phan_tram}}%</span>
+   <s style="font-size:15px;color:#94a3b8;font-weight:650">{{ '{:,}'.format(gia_vip.goc).replace(',','.') }}đ</s>
+  </div>
+  {% endif %}
   <div style="font-size:30px;font-weight:800;color:#059669;letter-spacing:-1px">
-   {{ '{:,}'.format(BL.PRICE).replace(',','.') }}đ
+   {{ '{:,}'.format(gia_vip.gia).replace(',','.') }}đ
    <span style="font-size:14px;font-weight:600;color:#64748b">/ năm</span></div>
+  {% if gia_vip.km %}
+  <div class="dem-km" data-giay="{{gia_vip.con_giay}}">⏰ KM đến {{ gia_vip.den.strftime('%H:%M %d/%m/%Y') }} — còn <b class="dem-so">…</b></div>
+  {% endif %}
   <div style="margin:12px 0;display:flex;flex-direction:column;gap:7px;font-size:13px">
    {% for t in ['<b>Không giới hạn</b> mọi chức năng','Xuất báo giảng cả 35 tuần thoải mái','Nhận xét AI &amp; sửa chính tả không giới hạn','Được cập nhật tính năng mới miễn phí'] %}
    <div style="display:flex;gap:8px;align-items:center">
@@ -114,7 +132,8 @@
    <div class="qrbox">{{ qr_svg|safe }}</div>
    <div class="qrinfo">
     {% for lb, val, cp in [('Ngân hàng', BL.BANK_NAME, false),
-                            ('Số tài khoản', BL.BANK_ACC, true),
+                            ('Chủ tài khoản', BL.BANK_OWNER, true),
+                            ('Số tài khoản', tk_nhan or BL.BANK_ACC, true),
                             ('Số tiền', '{:,}'.format(gia).replace(',','.') ~ ' đ', false),
                             ('Nội dung CK', noi_dung, true)] %}
     <div class="qrrow">
@@ -128,9 +147,10 @@
   <div class="flash ok" style="margin:12px 0 0;align-items:flex-start">
    <span>⚡</span><div style="font-weight:400">Ghi <b>đúng nội dung</b>
    <code style="background:#fff;padding:2px 7px;border-radius:6px;font-weight:700">{{noi_dung}}</code>
-   để hệ thống tự kích hoạt tài khoản
-   {{ 'trong vài giây' if tudong else 'sau khi quản trị viên xác nhận' }}.</div>
+   (mã đơn duy nhất) và <b>đúng số tiền</b> — hệ thống tự kích hoạt khi ngân hàng báo có tiền.</div>
   </div>
+  <div id="sepay-tt" data-url="{{url_for('core.nang_cap_trang_thai', goi=goi, ma=noi_dung)}}" data-ma="{{noi_dung}}"
+   class="muted" style="margin-top:10px;font-size:13px">⏳ Đang chờ xác nhận chuyển khoản…</div>
 
   <form method="post" action="{{url_for('core.luu_sdt')}}" class="row"
    style="margin-top:12px;padding:12px 13px;border:1px dashed var(--line);border-radius:12px;background:#f7fdfb">
@@ -180,8 +200,58 @@
  {% else %}<div class="empty"><span class="e">📥</span>Bạn chưa tải file nào.</div>{% endif %}
 </div>
 
+<style>
+.dem-km{margin-top:8px;padding:8px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;
+ color:#9a3412;font-size:13px;font-weight:600}
+.dem-km .dem-so{font-variant-numeric:tabular-nums;font-weight:800}
+</style>
 <script>
 function cp(b,t){navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='✓ Đã chép';
- setTimeout(()=>b.textContent=o,1400)});}
+ setTimeout(()=>b.textContent=o,1400)});}</script>
+<script>
+(function(){
+  function pad(n){return n<10?'0'+n:''+n}
+  function fmt(s){
+    s=Math.max(0,Math.floor(s));
+    var d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    if(d>0) return d+' ngày '+pad(h)+':'+pad(m)+':'+pad(sec);
+    return pad(h)+':'+pad(m)+':'+pad(sec);
+  }
+  var ds=document.querySelectorAll('.dem-km');
+  if(!ds.length) return;
+  ds.forEach(function(el){
+    var left=parseInt(el.getAttribute('data-giay')||'0',10);
+    var so=el.querySelector('.dem-so');
+    function tick(){
+      if(so) so.textContent=fmt(left);
+      if(left<=0){ location.reload(); return; }
+      left--; setTimeout(tick,1000);
+    }
+    tick();
+  });
+})();
 </script>
+{% if not is_pro %}
+<script>
+(function(){
+  var el=document.getElementById('sepay-tt');
+  if(!el) return;
+  var url=el.getAttribute('data-url'), n=0;
+  var ma=el.getAttribute('data-ma')||'';
+  function tick(){
+    fetch(url,{headers:{'Accept':'application/json'},credentials:'same-origin'}).then(function(r){return r.json()}).then(function(d){
+      if(!d || !d.don) return;
+      if(ma && d.don.ma!==ma) return;
+      if(d.don.trang_thai==='da_thanh_toan'){
+        el.textContent='✅ Thanh toán đã xác nhận — tài khoản VIP/gói đã kích hoạt.';
+        setTimeout(function(){location.reload()},700);
+      }
+    }).catch(function(){});
+    n++;
+    if(n<100) setTimeout(tick,3000);
+  }
+  setTimeout(tick,2500);
+})();
+</script>
+{% endif %}
 {% endblock %}

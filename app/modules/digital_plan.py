@@ -9,12 +9,14 @@ from docx import Document
 from docx.shared import Pt, RGBColor
 
 from . import ai_giao_duc as AIGD
+from . import stem_giao_duc as STEM
 
 SOURCE = 'https://congbao.chinhphu.vn/van-ban/thong-tu-so-02-2025-tt-bgddt-44148.htm'
-# Màu phân biệt nội dung hệ thống đề xuất: năng lực số đỏ FF0000, giáo dục AI xanh dương 0000FF
+# Màu phân biệt nội dung hệ thống đề xuất: năng lực số đỏ, giáo dục AI xanh dương, STEM/STEAM xanh lá
 DO = RGBColor(0xFF, 0x00, 0x00)
 XANH = RGBColor(0x00, 0x00, 0xFF)
-MAU_COT = {'digital': DO, 'ai': XANH}
+LUC = RGBColor(0x00, 0x80, 0x00)
+MAU_COT = {'digital': DO, 'ai': XANH, 'stem': LUC}
 
 
 def _to_mau(cell, key, item):
@@ -357,15 +359,15 @@ def goi_y_ma_ai(title, grade, subject, topic='', hits=None):
             return ds, cb, 'mã cốt lõi gần bài nhất (không có mã sát bài)'
     return [], cb, ''
 
-def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, cung_bai=True):
+def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, cung_bai=True,
+            so_bai_stem=None):
     """chon: tập nội dung cần đề xuất — 'digital' (năng lực số), 'ai' (giáo dục AI), 'stem'.
 
-    so_bai / so_bai_ai (M7, M9): số bài cần tích hợp năng lực số và số bài cần tích hợp AI. Để trống
-    thì cột đó chỉ đề xuất cho những bài đọc tựa bài thấy có căn cứ (môn Tin học: cả file như trước).
-    cung_bai (M9): chọn một bộ bài chung — mỗi bài trong bộ được ghi CẢ mã năng lực số và mã AI;
-    tắt thì hai cột chọn bài riêng, có thể khác nhau. Trước khi chọn, hệ thống đọc tựa bài từng dòng để
-    suy luận bài đó có khả năng tích hợp mã tiêu chí nào (năng lực số theo Thông tư 02/2025 + CV 3456,
-    AI theo Quyết định 2422 + CV 5588) — chỉ dùng mã có thật trong kho của Bộ, không tự đặt mã.
+    so_bai / so_bai_ai / so_bai_stem: số bài cần tích hợp từng cột. Để trống thì cột đó chỉ đề xuất
+    cho những bài đọc tựa bài thấy có căn cứ (môn Tin học: NLS/AI cả file như trước; STEM vẫn theo
+    tựa bài — không gán STEM cho bài không có căn cứ đo/thiết kế/tạo hình).
+    cung_bai (M9): chọn một bộ bài chung cho NLS + AI. STEM chọn bài riêng theo căn cứ STEM/STEAM
+    (Công văn 909/BGDĐT-GDTH — 3 hình thức; không có hệ mã tiêu chí nên cột STEM chỉ ghi mã hình thức).
     """
     chon = set(chon or ('digital', 'ai', 'stem'))
     tin_hoc = la_tin_hoc(subject)
@@ -399,17 +401,20 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
         else:
             _ds_ai, _cb_ai, _cach_ai = [], [], ''
         row['_ds_ai'], row['_cb_ai'], row['_cach_ai'] = _ds_ai, _cb_ai, _cach_ai
+        row['_stem'] = STEM.goi_y(_title, grade, subject) if 'stem' in chon else {}
         row['diem_nls'] = g['diem'] + (3 if (row['references'] and 'digital' in chon) else 0)
         row['diem_ai'] = sum((x.get('diem') or 1.0) for x in _ds_ai)
         if _ds_ai and _la_chu_de_ai_ro(_title):
             row['diem_ai'] += 6.0          # (M13) bài nói rõ về AI được ưu tiên chọn cho cột AI
+        row['diem_stem'] = (row['_stem'] or {}).get('diem') or 0
         row['_diem_tong'] = row['diem_nls'] + row['diem_ai']
 
     # ---- 2) CHỌN BÀI: theo số bài thầy/cô đặt (riêng từng cột hoặc cùng bài) ----
     n1 = int(so_bai) if so_bai else None
     n2 = int(so_bai_ai) if so_bai_ai else None
+    n3 = int(so_bai_stem) if so_bai_stem else None
     if mode == 'lesson':
-        set_nls, set_ai = {0}, {0}
+        set_nls, set_ai, set_stem = {0}, {0}, {0}
     elif cung_bai:
         _cand = [i for i, r in enumerate(rows)
                  if (r['references'] and 'digital' in chon) or r['_ds_ai'] or tin_hoc]
@@ -421,6 +426,10 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
         _co_ai = [i for i, r in enumerate(rows) if r['_ds_ai'] or ('ai' in chon and tin_hoc)]
         set_nls = set(sorted(_co_nls, key=lambda i: (-rows[i]['diem_nls'], i))[:n1] if n1 else _co_nls)
         set_ai = set(sorted(_co_ai, key=lambda i: (-rows[i]['diem_ai'], i))[:n2] if n2 else _co_ai)
+    if mode != 'lesson':
+        _co_stem = [i for i, r in enumerate(rows) if r.get('_stem')]
+        set_stem = set(sorted(_co_stem, key=lambda i: (-rows[i].get('diem_stem', 0), i))[:n3]
+                       if n3 else _co_stem)
 
     # ---- 3) GHI MÃ + GHI RÕ CĂN CỨ CHO TỪNG DÒNG ----
     for i, row in enumerate(rows):
@@ -428,7 +437,12 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
         # chỉ nhận “đề xuất” khi thật sự suy luận được mã (môn Tin học giữ cách cũ: cả file)
         row['chon_nls'] = ('digital' in chon) and i in set_nls and (bool(row['references']) or tin_hoc)
         row['chon_ai'] = ('ai' in chon) and i in set_ai and (bool(row['_ds_ai']) or tin_hoc)
-        row['de_xuat_tich_hop'] = row['chon_nls'] or row['chon_ai'] or ('stem' in chon and i in set_nls)
+        row['chon_stem'] = ('stem' in chon) and i in set_stem and bool(row.get('_stem'))
+        # Khi thầy/cô cũng chọn NLS/AI: không mở thêm dòng chỉ vì STEM — STEM ghi vào đúng bài đã đề xuất.
+        if row['chon_stem'] and ('digital' in chon or 'ai' in chon) and not (row['chon_nls'] or row['chon_ai']):
+            row['chon_stem'] = False
+        row['de_xuat_tich_hop'] = row['chon_nls'] or row['chon_ai'] or row['chon_stem']
+        row['stem_chi_tiet'] = {}
         row['ma_ai'] = []
         row['canh_bao_ai'] = []
         row['chon'] = sorted(chon)
@@ -439,10 +453,8 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
                                   'thấy phù hợp với lớp mình.' % row['title'][:80]]
             continue
         proposal = suggestions(row['title'], grade, subject)
-        _goi_y = (proposal.get('digital') or '').strip()
-        _goi_y_ai = (proposal.get('ai') or '').strip()
-        _notes, _phan_can_cu = [], []
-        # --- cột năng lực số: chỉ ghi mã tiêu chí ---
+        _phan_can_cu = []
+        # --- cột năng lực số: CHỈ ghi mã tiêu chí ---
         if row['chon_nls']:
             if not row['original']['digital']:
                 references = list(row['references'])
@@ -461,12 +473,6 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
                 row['references'] = references
                 if references:
                     row['digital'] = '\n'.join(x['code'] for x in references)
-                    _notes += [x for x in dict.fromkeys(y['activity'] for y in references if y.get('activity'))]
-                else:
-                    _notes.append('Chưa có mã chỉ báo năng lực số nào thật sát bài này trong khung — '
-                                  'thầy/cô tự chọn mã của lớp; hệ thống không tự đặt mã.')
-                if _goi_y:
-                    _notes.append('Nội dung gợi ý: ' + _goi_y)
             if row['_khop']:
                 _phan_can_cu.append(ly_do_chon(row['title'], {'khop': row['_khop'], 'hien': row['_khop_hien'],
                                                              'nhom': row['nhom_noi_dung'], 'tin_hoc': tin_hoc}))
@@ -477,9 +483,16 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
                 _phan_can_cu.append('Căn cứ: môn Tin học nên mọi bài đều có thể tích hợp năng lực số.')
             else:
                 _phan_can_cu.append('Chưa có căn cứ rõ cho năng lực số ở bài này; để trống cho thầy/cô tự quyết định.')
-        if 'stem' in chon and i in set_nls and not row['original']['stem']:
-            row['stem'] = proposal.get('stem', '')
-        # --- cột AI: chỉ ghi mã tiêu chí AI (Quyết định 2422/QĐ-BGDĐT) ---
+        # --- cột STEM/STEAM: CHỈ ghi mã hình thức (Công văn 909/BGDĐT-GDTH) ---
+        if row.get('chon_stem'):
+            _st = row.get('_stem') or {}
+            if not row['original']['stem'] and _st.get('ma'):
+                row['stem'] = _st['ma']
+                row['stem_chi_tiet'] = {k: _st.get(k) for k in
+                    ('ma', 'hinh_thuc', 'quy_trinh', 'quy_trinh_ten', 'linh_vuc', 'lam_gi',
+                     'san_pham', 'van_de', 'vat_lieu', 'nhom', 'khop', 'ly_do', 'buoc', 'nguon')}
+                _phan_can_cu.append(_st.get('ly_do') or ('STEM: hình thức %s.' % _st['ma']))
+        # --- cột AI: CHỈ ghi mã tiêu chí AI (Quyết định 2422/QĐ-BGDĐT) ---
         if row['chon_ai']:
             _ds_ai = row['_ds_ai']
             if not row['original']['ai']:
@@ -489,28 +502,13 @@ def preview(data, mode, grade, subject, chon=None, so_bai=None, so_bai_ai=None, 
                                  'mo_rong': x['mo_rong'], 'khop': x.get('khop', []),
                                  'nguon': AIGD.NGUON_MA} for x in _ds_ai]
                 if _ds_ai:
-                    _notes.append('Mã giáo dục AI lớp %s (%s) — Quyết định 2422/QĐ-BGDĐT + Công văn '
-                                  '5588/BGDĐT-GDPT: ' % (grade, row['_cach_ai']) +
-                                  '; '.join(x['yccd'][:110] for x in _ds_ai) +
-                                  '\nGiáo viên rà soát mã và nội dung AI trước khi dùng.')
                     _phan_can_cu.append('AI: %s (mã %s).' % (row['_cach_ai'],
                                                              ', '.join(x['ma'] for x in _ds_ai)))
-                    if any(x.get('gan_bai') for x in _ds_ai):
-                        # (M13) bài không có mã sát bài → dùng mã cốt lõi gần bài nhất, phải cảnh báo rõ
-                        _notes.append('⚠️ ' + (row['_cb_ai'][0] if row['_cb_ai'] else
-                                               'Đây là mã cốt lõi gần nhất — thầy/cô kiểm lại trước khi dùng.'))
-                else:
-                    _notes.append('Bài này chưa suy luận được mã tiêu chí AI nào thật sát trong kho lớp %s — '
-                                  'thầy/cô tự chọn mã của lớp; hệ thống không tự đặt mã.' % grade)
-                    if _goi_y_ai:
-                        _notes.append('Hoạt động gợi ý (AI): ' + _goi_y_ai)
             row['canh_bao_ai'] = row['_cb_ai']
         row['ly_do'] = (' '.join(_phan_can_cu) or
                         'Chưa đủ căn cứ để suy luận mã; thầy/cô tự chọn mã phù hợp với lớp.')
-        row['notes'] = '\n'.join(([_goc_notes] if _goc_notes else []) +
-                                  ([row['ly_do']] if row['ly_do'] else []) + _notes +
-                                  (['Đề xuất tự động theo khung; giáo viên rà soát trước khi sử dụng.']
-                                   if _notes else []))
+        # Cột ghi chú GIỮ NGUYÊN file gốc — không ghi gợi ý / căn cứ / diễn giải.
+        row['notes'] = _goc_notes
     return rows
 
 
@@ -563,7 +561,13 @@ def export(data, mode, rows, grade, subject):
                     mau = MAU_COT.get(key)
                     if mau is not None and item.get('_themmoi', {}).get(key):
                         run.font.color.rgb = mau
-    doc.add_paragraph('Tham chiếu Thông tư 02/2025/TT-BGDĐT và hướng dẫn theo khối lớp tại Công văn 3456/BGDĐT-GDPT (mã năng lực số). Mã giáo dục AI lấy theo Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026 (Khung nội dung giáo dục AI cho học sinh phổ thông; quy ước mã [Lớp].[Mã chủ đề].[Số thứ tự], nội dung mở rộng thêm tiền tố “MR”) và hướng dẫn triển khai tại Công văn 5588/BGDĐT-GDPT ngày 19/8/2026. Các mã và hoạt động tích hợp cần được giáo viên rà soát theo thực tế lớp học.')
+            _st = item.get('stem_chi_tiet') or {}
+            if _st.get('lam_gi'):
+                p = doc.add_paragraph()
+                r = p.add_run(_st['lam_gi'])
+                if item.get('_themmoi', {}).get('stem'):
+                    r.font.color.rgb = LUC
+    doc.add_paragraph('Tham chiếu Thông tư 02/2025/TT-BGDĐT và hướng dẫn theo khối lớp tại Công văn 3456/BGDĐT-GDPT (mã năng lực số). Mã giáo dục AI lấy theo Quyết định 2422/QĐ-BGDĐT ngày 18/8/2026 (Khung nội dung giáo dục AI cho học sinh phổ thông; quy ước mã [Lớp].[Mã chủ đề].[Số thứ tự], nội dung mở rộng thêm tiền tố “MR”) và hướng dẫn triển khai tại Công văn 5588/BGDĐT-GDPT ngày 19/8/2026. Giáo dục STEM/STEAM theo Công văn 909/BGDĐT-GDTH ngày 08/3/2023 (ba hình thức: bài học STEM, trải nghiệm STEM, làm quen nghiên cứu KHKT) — cột STEM chỉ ghi mã hình thức (STEM-BH, STEAM-BH, STEM-TN, STEM-NCKH). Các mã và hoạt động tích hợp cần được giáo viên rà soát theo thực tế lớp học.')
     # (LOGO-B) in dòng thương hiệu EduAssist ở đầu/chân trang tệp Word xuất ra
     try:
         from . import thuong_hieu as T_HIEU

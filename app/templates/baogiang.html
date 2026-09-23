@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block head %}Lịch báo giảng{% endblock %}
-{% block crumb %}Tự động ghép Thời khoá biểu × PPCT → xuất PDF đúng mẫu{% endblock %}
+{% block crumb %}Tự động ghép Thời khoá biểu × PPCT — xem trên trình duyệt, không tải PDF{% endblock %}
 {% block body %}
 <div class="card">
  <div class="chead">
@@ -132,12 +132,12 @@
  </form>
  <hr class="s">
  <div class="row" style="gap:9px">
-   <form method="post" style="display:inline">
+   <form method="post" style="display:inline" target="_blank">
     {% for k,v in request.args.items() %}<input type="hidden" name="{{k}}" value="{{v}}">{% endfor %}
     {% if 'tuan' not in request.args %}<input type="hidden" name="tuan" value="{{tuan}}">{% endif %}
     <input type="hidden" name="tu_ngay" value="{{monday}}">
     <input type="hidden" name="act" value="pdf">
-    <button class="ok">📄 PDF tuần {{tuan}} — xem trực tuyến miễn phí</button>
+    <button class="ok">📄 Xem tuần {{tuan}} trên trình duyệt (miễn phí, không tải / không in)</button>
    </form>
    <form method="post" style="display:inline">
     {% for k,v in request.args.items() %}<input type="hidden" name="{{k}}" value="{{v}}">{% endfor %}
@@ -151,16 +151,16 @@
     <span class="muted">👑 Gói không giới hạn · còn {{days_left}} ngày</span>
    {% elif remaining and remaining > 0 %}
     <span class="muted">A4 ngang · font tiếng Việt — <b>còn {{remaining}} lượt tải tệp về</b> ·
-     📄 PDF xem trực tuyến miễn phí, 📝 file Word tính 1 lượt</span>
+     📄 xem trực tuyến miễn phí (không tải, không in), 📝 file Word tính 1 lượt</span>
    {% else %}
-    <span class="muted">📄 PDF xem trực tuyến <b>miễn phí</b> ·
+    <span class="muted">📄 xem trực tuyến <b>miễn phí</b> (không tải, không in) ·
      <a href="{{url_for('core.nang_cap', need='word')}}">🔒 nâng VIP</a> để tải file Word</span>
    {% endif %}
 
  </div>
  <p class="muted" style="margin:10px 0 0">
-  📄 <b>PDF</b> — in nộp ngay, giữ nguyên định dạng &nbsp;·&nbsp;
-  📝 <b>Word</b> — mở bằng Word/WPS để chỉnh sửa thêm trước khi nộp tổ</p>
+  📄 <b>Xem trên trình duyệt</b> — miễn phí, logo chìm, <b>không tải PDF, không in</b> &nbsp;·&nbsp;
+  📝 <b>Word</b> — tải file về (1 lượt) để in / chỉnh sửa trước khi nộp tổ</p>
 </div>
 
 <div class="card" style="padding:0;overflow:hidden">
@@ -172,7 +172,7 @@
    · TKB áp dụng từ tuần {{ap_dung_tu}}</div>
   <div style="margin-top:10px">
    {% if sua %}
-   <span class="chip" style="background:#fff7ed;color:#c2410c">Đang sửa lớp — chỉ ghi khi bấm Lưu</span>
+   <span class="chip" style="background:#fff7ed;color:#c2410c">Đang sửa lớp / ghi chú / phòng — chỉ ghi khi bấm Lưu</span>
    {% else %}
    <a class="btn sm" href="?tuan={{tuan}}&amp;sua=1">✏️ Sửa lớp</a>
    {% endif %}
@@ -184,34 +184,48 @@
  {% if sua %}<form method="post">
   <input type="hidden" name="act" value="luu_lop">
   <input type="hidden" name="tuan" value="{{tuan}}">
-  <div class="row" style="padding:10px 14px;gap:8px;align-items:center">
+  <div class="row" style="padding:10px 14px;gap:8px;align-items:flex-end;flex-wrap:wrap">
    <button class="ok">💾 Lưu (áp dụng từ tuần {{tuan}})</button>
    <a class="btn sec" href="?tuan={{tuan}}">Huỷ</a>
-   <span class="muted">Chọn lại lớp rồi Lưu — tuần {{tuan}} trở đi dùng bản mới, các tuần trước giữ nguyên.</span>
+   <label class="f">Ghi chú cho tất cả
+    <input id="gc_tat_ca" maxlength="300" placeholder="vd: SGK, máy chiếu" style="min-width:180px"></label>
+   <button type="button" class="sec" onclick="apTatCa('ghi_chu','gc_tat_ca')">Áp ghi chú</button>
+   <label class="f">Phòng cho tất cả
+    <input id="ph_tat_ca" maxlength="120" placeholder="vd: P.Trường" style="min-width:140px"></label>
+   <button type="button" class="sec" onclick="apTatCa('phong','ph_tat_ca')">Áp phòng</button>
+   <span class="muted">Áp vào mọi ô rồi bấm Lưu — tuần {{tuan}} trở đi dùng bản mới, các tuần trước giữ nguyên.</span>
   </div>
  {% endif %}
  <table>
   <thead><tr><th>Thứ / Ngày</th><th>Buổi</th><th>Tiết</th><th>Lớp</th><th>Môn</th><th>Tiết PPCT</th>
-   <th style="width:32%">Tên bài dạy</th><th>Đồ dùng / Ghi chú</th></tr></thead>
+   <th style="width:28%">Tên bài dạy</th><th>Phòng</th><th>Đồ dùng / Ghi chú</th></tr></thead>
   <tbody>{% for r in rows %}
-   {% set newday = loop.first or rows[loop.index0-1].thu != r.thu %}
+   {% set newday = r.rowspan_thu %}
    <tr style="{% if newday and not loop.first %}border-top:2px solid #e2e8f0;{% endif %}{% if r.nghi %}background:#fff5f6{% endif %}">
-   <td>{% if newday %}<b>{{THU_NAME[r.thu]}}</b><div class="muted">{{r.ngay}}</div>{% endif %}</td>
-   <td><span class="chip" style="background:{{'#ecfdf5' if r.buoi=='Sáng' else '#fff7ed'}};
-     color:{{'#0d9488' if r.buoi=='Sáng' else '#ea580c'}}">{{r.buoi}}</span></td>
+   {% if r.rowspan_thu %}<td rowspan="{{r.rowspan_thu}}" style="vertical-align:middle"><b>{{THU_NAME[r.thu]}}</b><div class="muted">{{r.ngay}}</div></td>{% endif %}
+   {% if r.rowspan_buoi %}<td rowspan="{{r.rowspan_buoi}}" style="vertical-align:middle"><span class="chip" style="background:{{'#ecfdf5' if r.buoi=='Sáng' else '#fff7ed'}};
+     color:{{'#0d9488' if r.buoi=='Sáng' else '#ea580c'}}">{{r.buoi}}</span></td>{% endif %}
    <td><b>{{r.tiet}}</b></td>
-   <td>{% if sua and not r.nghi %}
+   <td>{% if sua %}
      <input type="hidden" name="khoa" value="{{r.khoa}}">
-     <select name="lop" required>
+     {% if r.nghi %}<input type="hidden" name="lop" value="{{r.lop}}"><span class="chip">{{r.lop}}</span>
+     {% else %}<select name="lop" required>
       {% for l in ds_lop %}<option {{'selected' if l==r.lop}}>{{l}}</option>{% endfor %}
       {% if r.lop and r.lop not in ds_lop %}<option selected>{{r.lop}}</option>{% endif %}
-     </select>
+     </select>{% endif %}
      {% else %}<span class="chip">{{r.lop}}</span>{% endif %}</td>
    <td>{{r.mon}}</td>
    <td>{{r.tiet_pp or '—'}}</td>
    <td>{% if r.nghi %}<b style="color:#be123c">🏖️ {{r.ten_bai}}</b>
        {% elif r.ten_bai %}{{r.ten_bai}}{% else %}<span style="color:#cbd5e1">— chưa có trong PPCT —</span>{% endif %}</td>
-   <td class="muted"{% if r.canh_bao_tiet %} style="color:#c2410c;font-weight:600"{% endif %}>{{r.ghi_chu or ''}}</td></tr>{% endfor %}</tbody>
+   <td>{% if sua %}
+     {% if r.nghi %}<input type="hidden" name="phong" value="{{r.phong or ''}}"><span class="muted">{{r.phong or '—'}}</span>
+     {% else %}<input name="phong" value="{{r.phong or ''}}" maxlength="120" placeholder="P.…" style="width:92px">{% endif %}
+     {% else %}<span class="muted">{{r.phong or '—'}}</span>{% endif %}</td>
+   <td{% if r.canh_bao_tiet %} style="color:#c2410c;font-weight:600"{% endif %}>{% if sua %}
+     {% if r.nghi %}<input type="hidden" name="ghi_chu" value="{{r.ghi_chu_tkb or ''}}"><span class="muted">{{r.ghi_chu or ''}}</span>
+     {% else %}<input name="ghi_chu" value="{{r.ghi_chu_tkb or ''}}" maxlength="300" placeholder="Đồ dùng / ghi chú" style="width:100%;min-width:120px">{% endif %}
+     {% else %}<span class="muted">{{r.ghi_chu or ''}}</span>{% endif %}</td></tr>{% endfor %}</tbody>
  </table>
  {% if sua %}</form>{% endif %}
  {% if meta.noi_dung_khac %}<div style="padding:14px 18px;border-top:1px solid var(--line)">
@@ -221,6 +235,12 @@
 </div>
 <style>.btn.dis{pointer-events:none;opacity:.4}</style>
 <script>
+function apTatCa(ten, idNguon){
+  var el = document.getElementById(idNguon);
+  if (!el) return;
+  var v = el.value;
+  document.querySelectorAll('input[name="'+ten+'"]').forEach(function(i){ i.value = v; });
+}
 (function(){
   var dau = {{ (dau_ppct or '')|tojson }};
   var url = {{ url_for('core.bao_giang_ppct_rev')|tojson }};

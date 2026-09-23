@@ -58,12 +58,35 @@
   <span class="muted" style="font-size:12.5px">{{mota}}</span></div>
 
  {% if ma == 'tu_dong' %}
- <div class="flash ok" style="margin:0 0 14px;align-items:flex-start;font-weight:400">
-  <span>🔗</span><div>Dán địa chỉ này vào SePay / Casso:
-   <code style="background:#fff;padding:3px 8px;border-radius:6px;font-weight:700;
-    display:inline-block;margin-top:3px">{{webhook_url}}</code>
-   <button type="button" class="sec sm" style="margin-left:6px"
-    onclick="cpx(this,'{{webhook_url}}')">Sao chép</button></div>
+ <div style="border:1px solid {{ '#a7f3d0' if sepay_tt.bat else '#fed7aa' }};border-radius:13px;
+   padding:14px 16px;background:{{ '#f0fdf9' if sepay_tt.bat else '#fffbf5' }};margin:0 0 14px">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+   <span style="font-size:20px">{{ '✅' if sepay_tt.bat else '⚠️' }}</span>
+   <b style="font-size:14.5px;color:{{ '#065f46' if sepay_tt.bat else '#b45309' }}">
+    {{ 'SePay đang sẵn sàng nhận giao dịch' if sepay_tt.bat else 'SePay chưa bật nhận giao dịch thật' }}</b>
+  </div>
+  <div style="display:grid;gap:7px;font-size:13px">
+   <div>{{ '✅' if sepay_tt.bat else '❌' }} Khoá
+    <code>SEPAY_API_KEY</code> trên máy chủ
+    {% if not sepay_tt.bat %}<span class="muted">— đặt biến môi trường, không nhập vào form này</span>{% endif %}</div>
+   <div>✅ Tiền tố mã đơn <code style="font-weight:800">{{ sepay_tt.tien_to }}</code>
+    · mẫu <code>{{ sepay_tt.mau }}</code></div>
+   <div>{{ '✅' if sepay_tt.tk else '❌' }} Tài khoản nhận
+    {% if sepay_tt.tk %}<code>{{ sepay_tt.nh }} · {{ sepay_tt.tk }}
+     {% if sepay_tt.chu %}· {{ sepay_tt.chu }}{% endif %}</code>{% endif %}</div>
+  </div>
+  <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #cbd5e1">
+   <div style="font-size:12.5px;font-weight:650;color:#334155;margin-bottom:5px">
+    ① URL webhook — dán vào SePay (Webhooks):</div>
+   <code style="background:#fff;border:1px solid #e2e8f0;padding:7px 10px;border-radius:8px;
+     display:inline-block;font-size:12.5px;word-break:break-all">{{ webhook_url }}</code>
+   <button type="button" class="sec sm" onclick="cpx(this,'{{ webhook_url }}')">Sao chép</button>
+   <div class="muted" style="margin-top:8px;font-size:12.5px;line-height:1.7">
+    Header: <code>Authorization: Apikey &lt;SEPAY_API_KEY&gt;</code>.
+    ② Trên SePay → <b>Cấu hình mã thanh toán</b>: tiền tố <b>{{ sepay_tt.tien_to }}</b>, hậu tố <b>8 chữ số</b>.
+    ③ Tài khoản ngân hàng trên SePay phải trùng STK nhận tiền ở trên.
+    Đường Casso/cũ (không dùng cho đơn EGV): <code>{{ webhook_url_cu }}</code></div>
+  </div>
  </div>
  {% endif %}
 
@@ -100,6 +123,10 @@
       {% if m.don_vi %}<span class="muted" style="font-size:13px;font-weight:600">{{m.don_vi}}</span>{% endif %}
      </div>
 
+    {% elif m.kieu == 'datetime' %}
+     <input type="datetime-local" name="{{m.key}}" id="f_{{m.key}}"
+      value="{{ ((x.gia_tri or '')|replace(' ','T'))[:16] }}">
+
     {% else %}
      <input name="{{m.key}}" id="f_{{m.key}}" value="{{x.gia_tri}}">
     {% endif %}
@@ -124,16 +151,24 @@
     <input name="phone" placeholder="0912345678" style="width:150px">
     <button class="sec" name="act" value="thu_sms">📩 Gửi tin thử</button>
    {% endif %}
+   {% if ma == 'thu_dien' %}
+    <span class="muted" style="font-size:12.5px">Gửi thử tới</span>
+    <input name="thu_toi" placeholder="email@gmail.com" style="width:200px">
+    <button class="sec" name="act" value="thu_mail">✉️ Gửi thư thử</button>
+   {% endif %}
   </div>
  </form>
 
  {% if ma == 'goi_cuoc' %}
  <hr class="s">
- <p class="muted" style="font-size:12.5px">📌 Ví dụ hiện tại: giáo viên mới được
-  <b>{{CFG.get_int('FREE_QUOTA',3)}} lượt</b> miễn phí ·
-  trả <b>{{ '{:,}'.format(CFG.get_int('PRICE_LUOT',10000)).replace(',','.') }}đ</b> được thêm
-  <b>{{CFG.get_int('LUOT_MOI_GOI',3)}} lượt</b> ·
-  trả <b>{{ '{:,}'.format(CFG.get_int('PRICE',100000)).replace(',','.') }}đ</b> dùng không giới hạn 1 năm.</p>
+ <p class="muted" style="font-size:12.5px">📌 Đang bán:
+  gói lẻ <b>{{ '{:,}'.format(gia_luot.gia).replace(',','.') }}đ</b>
+  {%- if gia_luot.km %} (gốc {{ '{:,}'.format(gia_luot.goc).replace(',','.') }}đ, KM -{{gia_luot.phan_tram}}%){% endif %}
+  / {{CFG.get_int('LUOT_MOI_GOI',3)}} lượt ·
+  VIP <b>{{ '{:,}'.format(gia_vip.gia).replace(',','.') }}đ</b>
+  {%- if gia_vip.km %} (gốc {{ '{:,}'.format(gia_vip.goc).replace(',','.') }}đ, KM -{{gia_vip.phan_tram}}%){% endif %}
+  / năm. Hết hạn KM tự về giá gốc. QR chuyển khoản luôn khớp số tiền đang bán.
+  Giáo viên mới được <b>{{CFG.get_int('FREE_QUOTA',3)}} lượt</b> miễn phí.</p>
  {% endif %}
  {% if ma == 'dang_nhap' %}
  <hr class="s">

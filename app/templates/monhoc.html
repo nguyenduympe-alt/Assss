@@ -7,8 +7,9 @@
   <h3>📚 Môn học của thầy/cô</h3>
   <span class="chip">{{tk.so_mon}} môn + khối</span>
  </div>
- <p class="sub">Đây là nơi <b>thống nhất</b> để đưa phân phối chương trình cho từng môn: tải tệp lên hoặc
-  thêm từng bài ngay dưới môn đó — hệ thống tự gắn đúng môn + khối, không phải chọn lại.
+  <p class="sub">Đây là nơi <b>thống nhất</b> để đưa phân phối chương trình cho từng môn: tải tệp
+  Word/Excel/PDF/ảnh lên hoặc thêm từng bài ngay dưới môn đó — PDF/ảnh được <b>đọc chữ ngay trên máy chủ</b>
+  (không gửi ra ngoài). Hệ thống tự gắn đúng môn + khối, không phải chọn lại.
   Môn chính hiện là <b>{{mon_chinh or 'chưa chọn'}}</b>. Mỗi giáo viên tối đa {{TOI_DA_MON}} môn.</p>
  <div class="row" style="gap:6px;flex-wrap:wrap">
   <span class="chip" style="background:#ecfdf5;color:#0d9488">{{tk.co_ppct}} môn đã có PPCT</span>
@@ -87,7 +88,7 @@
   <input type="hidden" name="slug" value="{{d.slug}}">
   <input type="hidden" name="thay_cu" value="1">
   <label class="f" style="flex:1;min-width:230px">📥 Tải tệp PPCT cho môn này
-   <input type="file" name="files" accept=".docx,.xlsx,.xls,.csv" multiple required></label>
+   <input type="file" name="files" accept=".docx,.xlsx,.xls,.csv,.pdf,.png,.jpg,.jpeg,.webp" multiple required></label>
   {% if not d.khoi %}
   <label class="f">Khối của môn này<select name="khoi_moi" required style="width:130px">
    <option value="">Chọn khối</option>{% for k in KHOI %}<option>{{k}}</option>{% endfor %}</select></label>
@@ -95,8 +96,11 @@
   <button class="ok">Nhập PPCT</button>
   <a class="btn sec" href="{{url_for('core.mau_excel', kind='ppct')}}">⬇ File mẫu</a>
  </form>
- <p class="muted" style="font-size:12px;margin:6px 0 0">Tệp chỉ cần cột <b>Tuần · Tiết PPCT · Tên bài · Ghi chú</b> —
-  không cần lớp/khối vì đang nhập đúng môn{% if d.khoi %} khối {{d.khoi}}{% endif %}.
+ <p class="muted" style="font-size:12px;margin:6px 0 0">Tệp Word/Excel: cột <b>Tuần · Tiết PPCT · Tên bài · Ghi chú</b>
+  (đã có tuần thì giữ nguyên). Ô tuần/tiết dạng <b>1-2</b>, <b>1,2</b>, <b>1_2</b>, <b>1+2</b> tự tách thành tuần 1 và tuần 2
+  (hoặc tiết 1 và tiết 2). PDF/ảnh hoặc tệp chỉ có tên bài: hệ thống <b>đọc chữ trên máy chủ</b>
+  rồi <b>chia đều tổng số tiết cho 35 tuần</b>. Bấm <b>Sửa phân phối</b> để chỉnh lại từng ô.
+  Không cần lớp/khối vì đang nhập đúng môn{% if d.khoi %} khối {{d.khoi}}{% endif %}.
   {% if d.so_ppct %}Đã có PPCT: hệ thống <b>hỏi trước</b> rồi mới xoá cái cũ, nhập bản mới.{% endif %}</p>
  {% if d.co_kho and d.ten_file %}
  <div class="muted" style="font-size:12px;margin-top:6px">KHDH trong kho: {{d.ten_file}}</div>
@@ -107,17 +111,21 @@
    <h3 style="font-size:14px">📘 Phân phối chương trình của môn này
     <span class="chip">{{d.ppct|length}} dòng</span></h3>
    {% if d.ppct %}
-   <form method="post" onsubmit="return confirm('Xoá hết {{d.so_ppct}} dòng PPCT của môn {{d.mon}}{% if d.khoi %} khối {{d.khoi}}{% endif %}?')">
-    <input type="hidden" name="act" value="xoa_ppct">
-    <input type="hidden" name="mon" value="{{d.mon}}">
-    <input type="hidden" name="khoi" value="{{d.khoi}}">
-    <input type="hidden" name="slug" value="{{d.slug}}">
-    <button class="dan">🗑 Xoá hết PPCT của môn này</button>
-   </form>
+   <div class="row" style="gap:8px">
+    <button class="btn sec" type="button"
+     onclick="document.getElementById('xem-{{d.slug}}').style.display='none';document.getElementById('sua-{{d.slug}}').style.display='block'">✏️ Sửa phân phối</button>
+    <form method="post" onsubmit="return confirm('Xoá hết {{d.so_ppct}} dòng PPCT của môn {{d.mon}}{% if d.khoi %} khối {{d.khoi}}{% endif %}?')">
+     <input type="hidden" name="act" value="xoa_ppct">
+     <input type="hidden" name="mon" value="{{d.mon}}">
+     <input type="hidden" name="khoi" value="{{d.khoi}}">
+     <input type="hidden" name="slug" value="{{d.slug}}">
+     <button class="dan">🗑 Xoá hết PPCT của môn này</button>
+    </form>
+   </div>
    {% endif %}
   </div>
   {% if d.ppct %}
-  <div class="tbl-wrap" style="max-height:320px;overflow-y:auto"><table>
+  <div id="xem-{{d.slug}}" class="tbl-wrap" style="max-height:320px;overflow-y:auto"><table>
    <thead><tr><th>Tuần</th><th>Tiết</th><th>Tên bài dạy</th><th>Ghi chú</th><th></th></tr></thead>
    <tbody>
    {% for r in d.ppct %}
@@ -127,8 +135,6 @@
     <td>{{r.ten_bai}}</td>
     <td class="muted">{{r.ghi_chu or ''}}</td>
     <td style="text-align:right;white-space:nowrap">
-     <button class="btn sec sm" type="button"
-      onclick="var f=document.getElementById('pp{{r.id}}');f.style.display=(f.style.display=='table-row'?'none':'table-row')">✏️ Sửa</button>
      <form method="post" style="display:inline" onsubmit="return confirm('Xoá bài này?')">
       <input type="hidden" name="act" value="xoa_dong">
       <input type="hidden" name="id" value="{{r.id}}">
@@ -136,24 +142,47 @@
       <button class="dan">Xoá</button></form>
     </td>
    </tr>
-   <tr id="pp{{r.id}}" style="display:none;background:#f8fbfa">
-    <td colspan="5">
-     <form method="post" class="row" style="gap:8px">
-      <input type="hidden" name="act" value="sua_dong">
-      <input type="hidden" name="id" value="{{r.id}}">
-      <input type="hidden" name="slug" value="{{d.slug}}">
-      <label class="f">Tuần<input name="tuan" type="number" min="1" max="60" value="{{r.tuan}}" style="width:82px" required></label>
-      <label class="f">Tiết PPCT<input name="tiet_pp" type="number" value="{{r.tiet_pp or ''}}" style="width:92px"></label>
-      <label class="f" style="flex:1;min-width:180px">Tên bài dạy<input name="ten_bai" value="{{r.ten_bai or ''}}" required></label>
-      <label class="f" style="flex:1;min-width:140px">Ghi chú<input name="ghi_chu" value="{{r.ghi_chu or ''}}"></label>
-      <button class="ok">💾 Lưu bài</button>
-      <button class="btn sec" type="button" onclick="document.getElementById('pp{{r.id}}').style.display='none'">Huỷ</button>
-     </form>
-    </td>
-   </tr>
    {% endfor %}
    </tbody>
   </table></div>
+  <div id="sua-{{d.slug}}" style="display:none">
+   <p class="sub">Mỗi dòng một bài — sửa tuần / tiết / tên bài / ghi chú rồi <b>Lưu tất cả</b>.
+    Xoá hết chữ ở tên bài = xoá dòng đó. Ba dòng trống cuối để thêm bài mới.</p>
+   <form method="post">
+    <input type="hidden" name="act" value="sua_ppct">
+    <input type="hidden" name="mon" value="{{d.mon}}">
+    <input type="hidden" name="khoi" value="{{d.khoi}}">
+    <input type="hidden" name="slug" value="{{d.slug}}">
+    <div class="tbl-wrap" style="max-height:70vh;overflow-y:auto"><table>
+     <thead><tr><th style="width:72px">Tuần</th><th style="width:72px">Tiết</th><th>Tên bài dạy</th><th>Ghi chú</th></tr></thead>
+     <tbody>
+     {% for r in d.ppct %}
+     <tr>
+      <td><input type="hidden" name="id" value="{{r.id}}">
+          <input name="tuan" value="{{r.tuan}}" required placeholder="1+2" style="width:64px"></td>
+      <td><input name="tiet_pp" value="{{r.tiet_pp or ''}}" placeholder="1+2" style="width:64px"></td>
+      <td><input name="ten_bai" value="{{r.ten_bai or ''}}" style="width:100%"></td>
+      <td><input name="ghi_chu" value="{{r.ghi_chu or ''}}" style="width:100%"></td>
+     </tr>
+     {% endfor %}
+     {% for _ in [1,2,3] %}
+     <tr style="background:#f8fbfa">
+      <td><input type="hidden" name="id" value="">
+          <input name="tuan" value="" placeholder="1-2" style="width:64px"></td>
+      <td><input name="tiet_pp" value="" placeholder="1-2" style="width:64px"></td>
+      <td><input name="ten_bai" value="" placeholder="Thêm bài mới…" style="width:100%"></td>
+      <td><input name="ghi_chu" value="" style="width:100%"></td>
+     </tr>
+     {% endfor %}
+     </tbody>
+    </table></div>
+    <div class="row" style="gap:8px;margin-top:10px">
+     <button class="ok">💾 Lưu tất cả phân phối</button>
+     <button class="btn sec" type="button"
+      onclick="document.getElementById('sua-{{d.slug}}').style.display='none';document.getElementById('xem-{{d.slug}}').style.display='block'">Huỷ</button>
+    </div>
+   </form>
+  </div>
   {% else %}
   <div class="empty" style="padding:18px"><span class="e">📘</span>Chưa có PPCT cho môn này — tải tệp ở trên hoặc thêm từng bài ở dưới.</div>
   {% endif %}
@@ -163,12 +192,12 @@
    <input type="hidden" name="mon" value="{{d.mon}}">
    <input type="hidden" name="khoi" value="{{d.khoi}}">
    <input type="hidden" name="slug" value="{{d.slug}}">
-   <label class="f">Tuần<input name="tuan" type="number" min="1" max="60" value="1" style="width:82px" required></label>
+   <label class="f">Tuần<input name="tuan" value="1" placeholder="1 hoặc 1+2" style="width:92px" required></label>
    {% if not d.khoi %}
    <label class="f">Khối<select name="khoi_moi" required style="width:110px">
     <option value="">Chọn khối</option>{% for k in KHOI %}<option>{{k}}</option>{% endfor %}</select></label>
    {% endif %}
-   <label class="f">Tiết PPCT<input name="tiet_pp" type="number" style="width:92px"></label>
+   <label class="f">Tiết PPCT<input name="tiet_pp" placeholder="1 hoặc 1+2" style="width:92px"></label>
    <label class="f" style="flex:1;min-width:180px">Tên bài dạy<input name="ten_bai" required placeholder="Thêm trực tiếp một bài"></label>
    <label class="f" style="flex:1;min-width:140px">Ghi chú<input name="ghi_chu"></label>
    <button class="sec">+ Thêm bài</button>

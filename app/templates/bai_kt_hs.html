@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{de.tieu_de}} — Bài kiểm tra</title>
+{% include '_head_icon.html' %}
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Inter",system-ui,Arial,sans-serif;background:#f3f8f6;color:#0f172a;font-size:15px}
+.wrap{max-width:720px;margin:0 auto;padding:22px 16px 60px}
+.hd{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.hd img{width:36px;height:36px;border-radius:10px}
+.card{background:#fff;border:1px solid #e4eeea;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px -12px rgba(16,24,40,.12)}
+h1{font-size:20px;margin:0 0 6px}
+.muted{color:#64748b;font-size:13px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#475569}
+input,button,select,textarea{font:inherit}
+input[type=text],select{padding:11px 12px;border:1px solid #d8e6e1;border-radius:10px}
+button{padding:11px 16px;border:0;border-radius:10px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;font-weight:650;cursor:pointer}
+.err{background:#fff1f2;color:#9f1239;padding:10px 12px;border-radius:10px;margin-bottom:12px;border:1px solid #fecdd3}
+.ok{background:#ecfdf5;color:#065f46;padding:12px;border-radius:12px;border:1px solid #a7f3d0}
+.q{padding:12px 0;border-top:1px solid #eef5f2}
+.q:first-child{border-top:0}
+.pa{display:block;margin:6px 0;padding:8px 10px;border:1px solid #e4eeea;border-radius:10px;cursor:pointer}
+.pa:has(input:checked){border-color:#0d9488;background:#ecfdf5}
+.diem{font-size:36px;font-weight:800;color:#0d9488}
+</style></head>
+<body>
+<div class="wrap">
+ <div class="hd"><img src="{{url_for('static', filename='logo/ea-mark-b.svg')}}?v=logo1" alt=""><div>
+  <b>{{de.tieu_de}}</b>
+  <div class="muted">Lớp {{lop.ten if lop else ''}}{% if de.mon %} · {{de.mon}}{% endif %} · {{cau|length}} câu</div>
+ </div></div>
+
+ {% if loi %}<div class="err">{{loi}}</div>{% endif %}
+
+ {% if buoc=='ten' %}
+ <div class="card">
+  <h1>Em ghi họ và tên</h1>
+  <p class="muted">Ví dụ: Nguyễn Văn An. Mỗi em chỉ nộp một lần.</p>
+  {% if not de.dang_mo %}<div class="err">Bài kiểm tra đã đóng.</div>
+  {% else %}
+  <form method="post">
+   <label class="f">Họ và tên
+    <input type="text" name="ho_ten" required maxlength="80" placeholder="Nguyễn Văn An" autofocus></label>
+   <button style="margin-top:12px">Bắt đầu làm bài</button>
+  </form>
+  {% endif %}
+ </div>
+ {% elif buoc=='lam' %}
+ <form method="post" class="card">
+  <input type="hidden" name="act" value="nop">
+  <input type="hidden" name="ho_ten" value="{{ho_ten}}">
+  <p class="muted">Em: <b>{{ho_ten}}</b> — làm hết các câu rồi nộp.</p>
+  {% for q in cau %}
+  <div class="q">
+   <b>Câu {{q.id}}.</b> {{q.cau}}
+   {% if q.anh %}<div style="margin:8px 0"><img src="{{url_for('lop_hoc.anh', ten=q.anh)}}" alt=""
+     style="max-width:100%;max-height:260px;border-radius:10px"></div>{% endif %}
+   {% if (q.loai or 'tn')=='ds' %}
+    <label class="pa"><input type="radio" name="c{{q.id}}" value="D" required> Đúng</label>
+    <label class="pa"><input type="radio" name="c{{q.id}}" value="S" required> Sai</label>
+   {% elif q.loai=='dk' %}
+    <input type="text" name="c{{q.id}}" maxlength="300" placeholder="Em điền đáp án" style="width:100%;margin-top:8px">
+   {% elif q.loai=='tl' %}
+    <textarea name="c{{q.id}}" rows="4" maxlength="500" placeholder="Em viết câu trả lời" style="width:100%;margin-top:8px;padding:10px;border:1px solid #d8e6e1;border-radius:10px"></textarea>
+   {% elif q.loai=='gc' %}
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+     <div style="flex:1;min-width:200px">
+      <b>Cột A</b>
+      {% for a in q.cot_a %}
+      <div style="margin:8px 0;display:flex;gap:8px;align-items:center">
+       <span>{{loop.index}}.</span>
+       <span style="flex:1">{{a}}
+        {% if q.anh_a and q.anh_a[loop.index0] %}<img src="{{url_for('lop_hoc.anh', ten=q.anh_a[loop.index0])}}" alt=""
+          style="max-height:90px;display:block;margin-top:4px;border-radius:8px">{% endif %}</span>
+       <select name="c{{q.id}}_{{loop.index}}" style="width:72px;padding:8px">
+        <option value="">—</option>
+        {% for b in q.cot_b %}<option value="{{'abcdefgh'[loop.index0]}}">{{'abcdefgh'[loop.index0]}}</option>{% endfor %}
+       </select>
+      </div>
+      {% endfor %}
+     </div>
+     <div style="flex:1;min-width:200px">
+      <b>Cột B</b>
+      {% for b in q.cot_b %}
+      <div style="margin:8px 0"><b>{{'abcdefgh'[loop.index0]}}.</b> {{b}}
+       {% if q.anh_b and q.anh_b[loop.index0] %}<img src="{{url_for('lop_hoc.anh', ten=q.anh_b[loop.index0])}}" alt=""
+         style="max-height:90px;display:block;margin-top:4px;border-radius:8px">{% endif %}</div>
+      {% endfor %}
+     </div>
+    </div>
+   {% else %}
+    {% for k,v in q.lua_chon.items() %}
+    <label class="pa"><input type="radio" name="c{{q.id}}" value="{{k}}" required> {{k}}. {{v}}
+     {% if (q.anh_pa or {}).get(k) %}<img src="{{url_for('lop_hoc.anh', ten=q.anh_pa[k])}}" alt=""
+       style="max-width:100%;max-height:140px;display:block;margin-top:6px;border-radius:8px">{% endif %}</label>
+    {% endfor %}
+   {% endif %}
+  </div>
+  {% endfor %}
+  <button>Nộp bài</button>
+ </form>
+ {% elif buoc=='xong' %}
+ <div class="card">
+  {% if kq %}
+  <div class="ok">
+   <div class="muted">Điểm của em</div>
+   {% if kq.diem is not none %}
+   <div class="diem">{{kq.diem}}</div>
+   <div>{{kq.dung}}/{{kq.n}} câu đúng{% if kq.muc_do %} · {{kq.muc_do}}{% endif %}</div>
+   {% else %}
+   <div class="muted">Phần tự luận — thầy/cô sẽ xem bài của em.</div>
+   {% endif %}
+   <p style="margin:10px 0 0">{{kq.nhan_xet}}</p>
+  </div>
+  {% else %}
+  <p>Em đã nộp bài này rồi. Chờ thầy/cô xem kết quả.</p>
+  {% endif %}
+ </div>
+ {% endif %}
+</div>
+</body></html>

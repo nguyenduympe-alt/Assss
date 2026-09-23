@@ -131,9 +131,8 @@ def build_docx(meta, rows):
     hdr = ["Thứ/Ngày", "Buổi", "Tiết", "Lớp", "Môn", "Tiết PPCT", "Tên bài dạy", "Đồ dùng / Ghi chú"]
     widths = [Cm(2.7), Cm(1.7), Cm(1.2), Cm(1.8), Cm(3.0), Cm(1.8), Cm(9.0), Cm(6.1)]
 
-    ordered = sorted(rows, key=lambda r: (int(r.get("thu") or 9),
-                                          0 if (r.get("buoi") or "Sáng").startswith("S") else 1,
-                                          int(r.get("tiet") or 0)))
+    from .pdf_bao_giang import gop_hang
+    ordered = gop_hang(rows)
     table = doc.add_table(rows=1 + max(len(ordered), 1), cols=len(hdr))
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
@@ -154,8 +153,12 @@ def build_docx(meta, rows):
             if r.get("ngay"):
                 label += "\n" + r["ngay"]
             is_nghi = bool(r.get("nghi"))
+            ph = (r.get("phong") or "").strip()
+            gc = (r.get("ghi_chu") or "").strip()
+            if ph and ph not in gc:
+                gc = (ph + " · " + gc) if gc else ph
             vals = [label, r.get("buoi", ""), r.get("tiet", ""), r.get("lop", ""), r.get("mon", ""),
-                    r.get("tiet_pp", ""), r.get("ten_bai", ""), r.get("ghi_chu", "")]
+                    r.get("tiet_pp", ""), r.get("ten_bai", ""), gc]
             aligns = [C, C, C, C, L, C, L, L]
             for ci, (v, al) in enumerate(zip(vals, aligns)):
                 bold = (ci == 0) or (is_nghi and ci == 6)
@@ -165,15 +168,15 @@ def build_docx(meta, rows):
                 for ci in range(1, len(hdr)):
                     _shade(table.cell(ri, ci), NGHI_BG)
 
-        # gộp ô cột "Thứ/Ngày" cho các tiết cùng ngày
-        start = 1
-        for ri in range(2, len(ordered) + 2):
-            same = ri <= len(ordered) and \
-                int(ordered[ri - 1].get("thu") or 9) == int(ordered[start - 1].get("thu") or 9)
-            if not same:
-                if ri - 1 > start:
-                    table.cell(start, 0).merge(table.cell(ri - 1, 0))
-                start = ri
+        # gộp ô cột Thứ/Ngày (cùng ngày) và cột Buổi (cùng Sáng / Chiều)
+        for idx, r in enumerate(ordered):
+            ri = idx + 1
+            rs = int(r.get("rowspan_thu") or 0)
+            if rs > 1:
+                table.cell(ri, 0).merge(table.cell(ri + rs - 1, 0))
+            rb = int(r.get("rowspan_buoi") or 0)
+            if rb > 1:
+                table.cell(ri, 1).merge(table.cell(ri + rb - 1, 1))
 
     for row in table.rows:
         for i, w in enumerate(widths):

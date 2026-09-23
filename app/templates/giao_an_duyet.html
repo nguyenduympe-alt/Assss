@@ -18,12 +18,14 @@
  <p>Tên bài: <b>{{ctx.ten_bai or 'chưa nhận diện được'}}</b></p>
  {% if ctx.pt_canh_bao %}<ul style="color:#a16207">{% for c in ctx.pt_canh_bao %}<li>{{c}}</li>{% endfor %}</ul>{% endif %}
  <p class="muted">Bản gốc được giữ nguyên; kết quả tải về là một BẢN SAO .docx.</p>
- <p class="muted">Công cụ này làm hai phần: <b>tích hợp năng lực số</b> (Thông tư 02/2025/TT-BGDĐT) và
-  <b>tích hợp giáo dục trí tuệ nhân tạo (AI)</b> (Quyết định 2422/QĐ-BGDĐT). Nếu thầy/cô cũng muốn dò chính tả,
+ <p class="muted">Công cụ này làm ba phần: <b>tích hợp năng lực số</b> (Thông tư 02/2025/TT-BGDĐT),
+  <b>tích hợp giáo dục trí tuệ nhân tạo (AI)</b> (Quyết định 2422/QĐ-BGDĐT) và
+  <b>tích hợp giáo dục STEM/STEAM</b> (Công văn 909/BGDĐT-GDTH). Nếu thầy/cô cũng muốn dò chính tả,
   hãy dùng công cụ riêng <a href="{{url_for('chinh_ta.index')}}">Kiểm tra chính tả</a> — chỉ chạy khi thầy/cô cần.</p>
  <p class="muted">Trong file Word tải về: nội dung <b style="color:#c00">tích hợp năng lực số tô ĐỎ</b>,
-  nội dung <b style="color:#00f">tích hợp giáo dục AI tô XANH DƯƠNG</b> — thầy/cô nhìn màu là biết phần nào
-  do hệ thống thêm vào. Phần chèn vào file chỉ gồm mã/mạch, mục tiêu, minh chứng và hoạt động —
+  nội dung <b style="color:#00f">tích hợp giáo dục AI tô XANH DƯƠNG</b>,
+  nội dung <b style="color:#080">tích hợp STEM/STEAM tô XANH LÁ</b> — thầy/cô nhìn màu là biết phần nào
+  do hệ thống thêm vào. Phần chèn vào file chỉ gồm mã/mạch/hình thức, mục tiêu, minh chứng và hoạt động —
   <b>không</b> kèm khối trích dẫn quy định hay phần đề xuất dài dòng.</p>
 </div>
 
@@ -123,6 +125,28 @@
     Ô này chỉ có tác dụng khi thầy/cô đã tích ít nhất một mạch AI ở trên.</span>
   </label>
   {% endif %}
+ </div>
+
+ <div class="card">
+  <h3>Tích hợp giáo dục STEM/STEAM</h3>
+  <p class="sub">Căn cứ: Công văn 909/BGDĐT-GDTH ngày 08/3/2023 (ba hình thức: bài học STEM,
+   trải nghiệm STEM, làm quen nghiên cứu khoa học–kỹ thuật) và hướng dẫn nhiệm vụ năm học
+   (STEM/STEAM thực chất, không phong trào, không phát sinh môn học mới). Cột/mục chỉ ghi
+   <b>mã hình thức</b> <code>STEM-BH</code> / <code>STEAM-BH</code> / <code>STEM-TN</code> /
+   <code>STEM-NCKH</code>. Tiến trình 5 hoạt động (thiết kế kỹ thuật hoặc khám phá khoa học)
+   dùng vật liệu sẵn có, không phát sinh đóng góp bắt buộc.</p>
+  {% if not ctx.chon_stem %}
+   <p style="color:#a16207">Chưa đề xuất được STEM/STEAM. {% for c in ctx.canh_bao_stem %}{{c}} {% endfor %}</p>
+  {% endif %}
+  {% for x in ctx.chon_stem %}
+  <div style="border:1px solid #e2e8e6;border-radius:12px;padding:14px;margin:12px 0">
+   <label style="display:flex;gap:10px;align-items:flex-start">
+    <input type="checkbox" name="ma_stem" value="{{x.ma}}" checked style="width:18px;margin-top:3px">
+    <span><b>{{x.ma}}</b> — {{x.lam_gi or x.hinh_thuc}}</span>
+   </label>
+  </div>
+  {% endfor %}
+  {% for c in ctx.canh_bao_stem %}<p style="color:#a16207">{{c}}</p>{% endfor %}
  </div>
 
  <div class="card">

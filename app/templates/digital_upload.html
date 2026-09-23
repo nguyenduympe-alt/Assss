@@ -70,6 +70,7 @@
        <div class="row" style="margin-top:4px">
         <label class="f">Số bài NLS<input name="so_bai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="trống: tự chọn" style="width:110px"></label>
         <label class="f">Số bài AI<input name="so_bai_ai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="trống: tự chọn" style="width:110px"></label>
+        <label class="f">Số bài STEM<input name="so_bai_stem" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="trống: tự chọn" style="width:110px"></label>
        </div>
        <label style="display:flex;gap:8px;align-items:flex-start"><input type="hidden" name="cung_bai" value="0">
         <input type="checkbox" name="cung_bai" value="1" checked style="width:18px;margin-top:3px"><span>Tích hợp năng lực số và AI <b>cùng bài</b></span></label>
@@ -132,6 +133,9 @@
    <label class="f" style="flex:1;min-width:260px">Số bài cần tích hợp <b>AI</b> (phân phối chương trình)
     <input name="so_bai_ai" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Ví dụ: 3 — để trống: tự chọn bài có tiêu chí AI phù hợp">
     <span class="sub">App đọc tựa bài và suy luận bài nào có khả năng tích hợp <b>tiêu chí AI</b> nào.</span></label>
+   <label class="f" style="flex:1;min-width:260px">Số bài cần tích hợp <b>STEM/STEAM</b>
+    <input name="so_bai_stem" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Ví dụ: 4 — để trống: bài có căn cứ đo/thiết kế/tạo hình">
+    <span class="sub">Cột STEM chỉ ghi <b>mã hình thức</b> (STEM-BH, STEAM-BH, STEM-TN, STEM-NCKH) theo Công văn 909/BGDĐT-GDTH.</span></label>
   </div>
   <label style="display:flex;gap:8px;align-items:flex-start;margin-left:2px">
    <input type="hidden" name="cung_bai" value="0">
@@ -157,9 +161,14 @@
  <h3>Kết quả sẽ ra sao</h3>
  <p class="sub">Cột năng lực số và cột AI được đề xuất theo đúng lớp của tài liệu. Bài nào chưa đủ căn cứ thì
  để trống để thầy/cô tự chọn; nội dung đã có sẵn trong file được giữ nguyên. Mã AI là mã do văn bản của Bộ
- quy định (ví dụ <b>3.A3.2</b>, phần mở rộng có thêm <b>MR</b>) — hệ thống <b>không tự đặt mã</b>.</p>
- <p class="sub">Trong file Word tải về: ô <b>NLS</b> (năng lực số) <b style="color:#c00">tô đỏ</b>, ô <b>AI</b>
- <b style="color:#00f">tô xanh dương</b>; cột STEM giữ gợi ý hoạt động. Với <b>KHDH</b> (phân phối chương trình),
- nhớ kiểm lại tuần, tiết và các ô gộp ở bước rà soát; với giáo án, phần tích hợp được thêm ở cuối tài liệu.</p>
+ quy định (ví dụ <b>3.A3.2</b>, phần mở rộng có thêm <b>MR</b>) — hệ thống <b>không tự đặt mã</b>.
+ Cột STEM/STEAM ghi <b>mã hình thức</b> theo Công văn 909/BGDĐT-GDTH: <b>STEM-BH</b> (bài học STEM),
+ <b>STEAM-BH</b> (có nghệ thuật), <b>STEM-TN</b> (trải nghiệm), <b>STEM-NCKH</b> (nghiên cứu KHKT) —
+ không phát sinh môn học mới, dùng vật liệu sẵn có.</p>
+ <p class="sub">Trong file Word tải về: ô <b>NLS</b> <b style="color:#c00">tô đỏ</b> chỉ mã năng lực số, ô <b>AI</b>
+ <b style="color:#00f">tô xanh dương</b> chỉ mã AI, ô <b>STEM</b> <b style="color:#080">tô xanh lá</b> chỉ mã hình thức;
+ <b>cột ghi chú không bị ghi thêm</b> (giữ nguyên nội dung gốc).
+ Với <b>KHDH</b> (phân phối chương trình), nhớ kiểm lại tuần, tiết và các ô gộp
+ ở bước rà soát; với giáo án, phần tích hợp (kèm 5 bước STEM) được thêm ở cuối tài liệu.</p>
 </div>
 {% endblock %}

@@ -62,6 +62,38 @@
  <div style="font-weight:400"><b>Mọi thứ đang chạy tốt.</b> Không có việc gì cần xử lý.</div></div>
 {% endif %}
 
+{% set dl = dung_luong %}
+<div class="card" id="dung-luong" style="border-color:{{'#fecdd3' if dl.muc=='danger' else ('#fed7aa' if dl.muc=='warn' else 'var(--line)')}}">
+ <div class="chead"><h3>💾 Dung lượng máy chủ (VPS)</h3>
+  <span class="badge {{'CHT' if dl.muc=='danger' else ('HT' if dl.muc=='warn' else 'HTT')}}">
+   {{ 'Nâng cấp ngay' if dl.muc=='danger' else ('Nên nâng cấp' if dl.muc=='warn' else 'Còn chỗ') }}</span></div>
+ <p class="sub" style="margin-top:0">{{dl.loi_khuyen}} Thư mục dữ liệu: <code>{{dl.thu_muc_du_lieu}}</code></p>
+ <div class="big" style="margin-bottom:12px">
+  <div class="c" style="--c:#0d9488"><div class="lb">Ổ đĩa đã dùng</div>
+   <div class="vl">{{dl.o_dung_h}}</div>
+   <div class="sub">{{dl.o_pct}}% / tổng {{dl.o_tong_h}}</div></div>
+  <div class="c" style="--c:{{'#f43f5e' if dl.muc=='danger' else ('#f59e0b' if dl.muc=='warn' else '#059669')}}"><div class="lb">Ổ đĩa còn trống</div>
+   <div class="vl">{{dl.o_con_h}}</div>
+   <div class="sub">{{dl.loi_khuyen}}</div></div>
+  <div class="c" style="--c:#8b5cf6"><div class="lb">Dữ liệu website</div>
+   <div class="vl">{{dl.du_lieu_h}}</div>
+   <div class="sub">CSDL + kho KHDH + tệp tạm</div></div>
+  <div class="c" style="--c:#06b6d4"><div class="lb">RAM đang dùng</div>
+   <div class="vl">{{dl.ram_dung_h}}</div>
+   <div class="sub">còn {{dl.ram_con_h}} / {{dl.ram_tong_h}} ({{dl.ram_pct}}%)</div></div>
+ </div>
+ <div class="bar" style="height:12px;margin-bottom:10px">
+  <i style="width:{{dl.o_pct}}%;background:{{'#f43f5e' if dl.muc=='danger' else ('#f59e0b' if dl.muc=='warn' else '#10b981')}}"></i>
+ </div>
+ {% for h in dl.hang %}
+ <div class="hrow">
+  <div style="flex:1;font-size:13px">{{h.ten}}
+   <span class="muted">{% if h.so_tep %} · {{h.so_tep}} tệp{% endif %}</span></div>
+  <b style="font-size:13px">{{h.hien}}</b>
+ </div>
+ {% endfor %}
+</div>
+
 <div class="big">
  <div class="c" style="--c:#0d9488"><div class="lb">👥 Giáo viên</div>
   <div class="vl">{{stats.users}}</div>

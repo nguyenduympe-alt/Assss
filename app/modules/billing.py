@@ -1,5 +1,5 @@
 """Quản lý hạn mức dùng thử và kích hoạt gói trả phí."""
-import datetime, secrets, string, os
+import datetime, secrets, string, os, re
 from . import config as CFG
 
 
@@ -10,10 +10,10 @@ _DONG = {
     "PRICE": ("get_int", 100000),
     "PRICE_LUOT": ("get_int", 10000),
     "LUOT_MOI_GOI": ("get_int", 3),
-    "BANK_NAME": ("get", "Agribank"),
-    "BANK_CODE": ("get", "agribank"),
-    "BANK_ACC": ("get", "7614215002756"),
-    "BANK_OWNER": ("get", ""),
+    "BANK_NAME": ("get", "MBBank"),
+    "BANK_CODE": ("get", "mbbank"),
+    "BANK_ACC": ("get", "0939286896"),
+    "BANK_OWNER": ("get", "DUY-MP"),
 }
 
 
@@ -22,6 +22,55 @@ def __getattr__(name):
         ham, md = _DONG[name]
         return getattr(CFG, ham)(name, md)
     raise AttributeError(name)
+
+
+def parse_den(s):
+    """Chuỗi hạn KM → datetime local. Không hợp lệ → None."""
+    s = (s or "").strip().replace("T", " ")
+    if not s:
+        return None
+    s = re.sub(r"\s+", " ", s)
+    for fmt, cuoi_ngay in (
+            ("%Y-%m-%d %H:%M:%S", False),
+            ("%Y-%m-%d %H:%M", False),
+            ("%Y-%m-%d", True),
+            ("%d/%m/%Y %H:%M:%S", False),
+            ("%d/%m/%Y %H:%M", False),
+            ("%d/%m/%Y", True)):
+        try:
+            dt = datetime.datetime.strptime(s[:19] if len(s) >= 16 else s, fmt)
+            if cuoi_ngay:
+                dt = dt.replace(hour=23, minute=59, second=59)
+            return dt
+        except ValueError:
+            continue
+    return None
+
+
+def gia_hien(goi="vip", now=None):
+    """Giá đang bán: KM nếu còn hạn, không thì giá gốc.
+
+    Trả dict: gia, goc, km (bool), den, den_iso, con_giay, phan_tram.
+    """
+    goi = "luot" if goi == "luot" else "vip"
+    now = now or datetime.datetime.now()
+    if goi == "luot":
+        goc = max(0, CFG.get_int("PRICE_LUOT", 10000))
+        km = CFG.get_int("PRICE_LUOT_KM", 0)
+        den = parse_den(CFG.get("PRICE_LUOT_KM_DEN", ""))
+    else:
+        goc = max(0, CFG.get_int("PRICE", 100000))
+        km = CFG.get_int("PRICE_KM", 0)
+        den = parse_den(CFG.get("PRICE_KM_DEN", ""))
+    hop = km > 0 and km < goc and den is not None and now < den
+    gia = km if hop else goc
+    con = int((den - now).total_seconds()) if hop else 0
+    pt = int(round((goc - gia) * 100.0 / goc)) if hop and goc else 0
+    return {
+        "goi": goi, "goc": goc, "gia": gia, "km": hop, "km_gia": km if hop else 0,
+        "den": den, "den_iso": den.isoformat(timespec="seconds") if hop else "",
+        "con_giay": max(0, con), "phan_tram": pt,
+    }
 
 
 def today():
@@ -42,6 +91,21 @@ def is_pro(user):
         return datetime.date.fromisoformat(exp) >= today()
     except Exception:
         return False
+
+
+def is_admin(user):
+    """Tài khoản quản trị — không giới hạn lượt tải."""
+    if not user:
+        return False
+    try:
+        return (user["role"] or "") == "admin"
+    except (KeyError, IndexError, TypeError):
+        return False
+
+
+def khong_gioi_han(user):
+    """VIP còn hạn hoặc admin: tải tệp không trừ lượt."""
+    return is_pro(user) or is_admin(user)
 
 
 def days_left(user):
@@ -67,13 +131,13 @@ def bought_count(user):
 
 def remaining(user):
     """Số lượt còn lại (miễn phí + đã mua). None = không giới hạn."""
-    if is_pro(user):
+    if khong_gioi_han(user):
         return None
     return max(0, CFG.get_int("FREE_QUOTA", 3) + bought_count(user) - used_count(user))
 
 
 def can_use(user):
-    return is_pro(user) or remaining(user) > 0
+    return khong_gioi_han(user) or remaining(user) > 0
 
 
 # ---------------- (M10) hạn mức dùng chung cho TẤT CẢ chức năng ----------------
@@ -110,7 +174,7 @@ def chan_het(user):
 
 def consume(db, user, kind, detail=""):
     """Trừ 1 lượt. Trả về True nếu được phép thực hiện."""
-    if is_pro(user):
+    if khong_gioi_han(user):
         db.execute("INSERT INTO usage_log(teacher_id,kind,detail,created) VALUES(?,?,?,?)",
                    (user["id"], kind, detail, datetime.datetime.now().isoformat(timespec="seconds")))
         db.commit()
@@ -143,7 +207,7 @@ def tra_luot_tai(db, user, kind, token, detail=""):
     Trả về True nếu được phép tải, False nếu đã hết lượt.
     """
     _chi = ("%s #%s" % (detail, token))[:300] if token else (detail or "")[:300]
-    if is_pro(user):
+    if khong_gioi_han(user):
         db.execute("INSERT INTO usage_log(teacher_id,kind,detail,created) VALUES(?,?,?,?)",
                    (user["id"], kind, _chi, datetime.datetime.now().isoformat(timespec="seconds")))
         db.commit()
@@ -179,8 +243,11 @@ def gen_code():
     return f"{raw[:4]}-{raw[4:8]}-{raw[8:]}"
 
 
-def create_codes(db, n=1, months=12, note="", loai="vip", luot=0):
-    """loai='vip' -> mở khoá theo tháng; loai='luot' -> cộng thêm N lượt."""
+def create_codes(db, n=1, months=12, note="", loai="vip", luot=0, commit=True):
+    """loai='vip' -> mở khoá theo tháng; loai='luot' -> cộng thêm N lượt.
+
+    commit=False: không db.commit() — dùng khi nằm trong giao dịch webhook.
+    """
     out = []
     now = datetime.datetime.now().isoformat(timespec="seconds")
     for _ in range(n):
@@ -191,12 +258,13 @@ def create_codes(db, n=1, months=12, note="", loai="vip", luot=0):
         db.execute("INSERT INTO license(code,months,note,created,loai,luot) VALUES(?,?,?,?,?,?)",
                    (c, months, note, now, loai, luot or CFG.get_int("LUOT_MOI_GOI", 3)))
         out.append(c)
-    db.commit()
+    if commit:
+        db.commit()
     return out
 
 
-def redeem(db, user, code):
-    """Đổi mã kích hoạt. Trả về (ok, thông_báo)."""
+def redeem(db, user, code, commit=True):
+    """Đổi mã kích hoạt. Trả về (ok, thông_báo). commit=False: không tự commit."""
     code = (code or "").strip().upper().replace(" ", "")
     if len(code) == 12 and "-" not in code:
         code = f"{code[:4]}-{code[4:8]}-{code[8:]}"
@@ -220,7 +288,8 @@ def redeem(db, user, code):
             them = CFG.get_int("LUOT_MOI_GOI", 3)
         db.execute("UPDATE license SET used_by=?, used_at=? WHERE id=?", (user["id"], now, row["id"]))
         db.execute("UPDATE teacher SET bought = COALESCE(bought,0) + ? WHERE id=?", (them, user["id"]))
-        db.commit()
+        if commit:
+            db.commit()
         con_lai = CFG.get_int("FREE_QUOTA", 3) + bought_count(user) + them - used_count(user)
         return True, f"Đã cộng thêm {them} lượt! Bạn còn {max(0, con_lai)} lượt sử dụng."
 
@@ -231,5 +300,6 @@ def redeem(db, user, code):
     new_exp = base + datetime.timedelta(days=30 * months if months != 12 else 365)
     db.execute("UPDATE license SET used_by=?, used_at=? WHERE id=?", (user["id"], now, row["id"]))
     db.execute("UPDATE teacher SET expires=? WHERE id=?", (new_exp.isoformat(), user["id"]))
-    db.commit()
+    if commit:
+        db.commit()
     return True, f"Kích hoạt VIP thành công! Dùng không giới hạn đến ngày {new_exp.strftime('%d/%m/%Y')}."

@@ -23,10 +23,11 @@ import re
 from . import khdh_kho as KHO
 from . import mon_day as MD
 from . import ppct_tach as PT
+from . import doc_lich as DL
 
 TOI_DA_TEP = 25               # số tệp tối đa một lượt nhập PPCT cho môn
 DAI_TEP = 8 * 1024 * 1024     # dung lượng tối đa một tệp
-DUOI_OK = (".docx", ".xlsx", ".xlsm", ".xls", ".csv")
+DUOI_OK = (".docx", ".xlsx", ".xlsm", ".xls", ".csv") + DL.DUOI_OK
 
 
 def _gon(s):
@@ -256,23 +257,36 @@ def them_dong(db, uid, mon, khoi, tuan, tiet_pp, ten_bai, ghi_chu=""):
         return False, "Thiếu tên môn."
     if khoi not in KHO.KHOI:
         return False, "Thêm bài PPCT cần có khối (1–12)."
-    try:
-        tuan = int(tuan or 0)
-    except Exception:
-        tuan = 0
-    if tuan < 1 or tuan > 60:
-        return False, "Tuần phải từ 1 đến 60."
     if not ten_bai:
         return False, "Vui lòng nhập tên bài dạy."
-    try:
-        tiet = int(tiet_pp) if str(tiet_pp or "").strip() != "" else None
-    except Exception:
-        return False, "Tiết PPCT phải là số."
-    db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu) VALUES(?,?,?,?,?,?,?)",
-               (uid, khoi, mon, tuan, tiet, ten_bai, _gon(ghi_chu) or None))
+    ds = PT.no_rong_tuan_tiet([{"tuan": tuan, "tiet_pp": tiet_pp, "ten_bai": ten_bai,
+                                "ghi_chu": _gon(ghi_chu)}])
+    n = 0
+    tuan_dau = None
+    for r in ds:
+        try:
+            tuan_i = int(r.get("tuan") or 0)
+        except Exception:
+            tuan_i = 0
+        if tuan_i < 1 or tuan_i > 60:
+            return False, "Tuần phải từ 1 đến 60 (ô “1-2” / “1,2” / “1+2” sẽ tự tách)."
+        try:
+            tiet = int(r.get("tiet_pp")) if str(r.get("tiet_pp") or "").strip() != "" else None
+        except Exception:
+            return False, "Tiết PPCT phải là số (ô “1-2” hoặc “1,2” sẽ tự tách)."
+        db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu) VALUES(?,?,?,?,?,?,?)",
+                   (uid, khoi, mon, tuan_i, tiet, ten_bai, r.get("ghi_chu") or None))
+        n += 1
+        if tuan_dau is None:
+            tuan_dau = tuan_i
+    if not n:
+        return False, "Tuần phải từ 1 đến 60 (ô “1-2” / “1,2” / “1+2” sẽ tự tách)."
     db.commit()
     MD.them(db, uid, mon)
-    return True, "Đã thêm bài “%s” vào PPCT môn %s khối %s (tuần %d)." % (ten_bai, mon, khoi, tuan)
+    if n == 1:
+        return True, "Đã thêm bài “%s” vào PPCT môn %s khối %s (tuần %d)." % (ten_bai, mon, khoi, tuan_dau)
+    return True, ("Đã thêm bài “%s” vào PPCT môn %s khối %s — tách thành %d dòng tuần/tiết."
+                  % (ten_bai, mon, khoi, n))
 
 
 def sua_dong(db, uid, iid, tuan, tiet_pp, ten_bai, ghi_chu=""):
@@ -323,6 +337,125 @@ def xoa_ppct(db, uid, mon, khoi):
                   % (n, mon, (" khối " + khoi) if khoi else "")), n
 
 
+def _thieu_tuan(rows):
+    """True khi tệp chưa ghi tuần (hoặc mọi bài cùng một tuần) — lúc đó mới chia đều 35 tuần."""
+    tuans = set()
+    for r in rows or []:
+        try:
+            t = int(r.get("tuan") or 0)
+        except Exception:
+            t = 0
+        if t >= 1:
+            tuans.add(t)
+    return len(tuans) <= 1
+
+
+def chia_deu_35(rows, so_tuan=None):
+    """Gán tuần + tiết PPCT: chia đều tổng số bài cho 35 tuần (dư rải tuần đầu)."""
+    so_tuan = int(so_tuan or KHO.SO_TUAN) or KHO.SO_TUAN
+    so_tuan = max(1, min(60, so_tuan))
+    ds = []
+    for r in rows or []:
+        if not isinstance(r, dict):
+            continue
+        ten = _gon(r.get("ten_bai") or "")
+        if not ten:
+            continue
+        ds.append(r)
+    n = len(ds)
+    if not n:
+        return []
+    base, du = divmod(n, so_tuan)
+    ra, i, tiet = [], 0, 1
+    for tuan in range(1, so_tuan + 1):
+        k = base + (1 if tuan <= du else 0)
+        for _ in range(k):
+            r = dict(ds[i])
+            r["tuan"] = tuan
+            r["tiet_pp"] = tiet
+            r["ten_bai"] = _gon(r.get("ten_bai") or "")
+            ra.append(r)
+            i += 1
+            tiet += 1
+    return ra
+
+
+def sua_hang_loat(db, uid, mon, khoi, ids, tuans, tiets, tens, ghis):
+    """Lưu cả bộ PPCT từ các ô sửa trên trang — dòng trống tên bài thì xoá, dòng mới thì thêm."""
+    mon, khoi = _gon(mon), str(khoi or "").strip()
+    if not mon:
+        return False, "Thiếu tên môn."
+    if khoi not in KHO.KHOI:
+        return False, "Sửa PPCT cần có khối (1–12)."
+    ids = list(ids or [])
+    tuans = list(tuans or [])
+    tiets = list(tiets or [])
+    tens = list(tens or [])
+    ghis = list(ghis or [])
+    n = max(len(ids), len(tuans), len(tiets), len(tens), len(ghis))
+    if n > 500:
+        return False, "Quá nhiều dòng để lưu một lúc (tối đa 500)."
+    while len(ids) < n:
+        ids.append("")
+    while len(tuans) < n:
+        tuans.append("")
+    while len(tiets) < n:
+        tiets.append("")
+    while len(tens) < n:
+        tens.append("")
+    while len(ghis) < n:
+        ghis.append("")
+    hop_le = set()
+    for r in dong_ppct(db, uid, mon, khoi):
+        hop_le.add(int(r["id"]))
+    n_sua = n_them = n_xoa = 0
+    for iid, tuan, tiet_pp, ten_bai, ghi_chu in zip(ids, tuans, tiets, tens, ghis):
+        ten_bai = _gon(ten_bai)
+        iid_s = str(iid or "").strip()
+        try:
+            iid_i = int(iid_s) if iid_s else 0
+        except Exception:
+            iid_i = 0
+        if iid_i and iid_i not in hop_le:
+            continue
+        if iid_i and not ten_bai:
+            db.execute("DELETE FROM ppct WHERE id=? AND teacher_id=?", (iid_i, uid))
+            n_xoa += 1
+            continue
+        if not ten_bai:
+            continue
+        ds = PT.no_rong_tuan_tiet([{"tuan": tuan, "tiet_pp": tiet_pp, "ten_bai": ten_bai,
+                                    "ghi_chu": _gon(ghi_chu)}])
+        if not ds:
+            return False, "Tuần phải từ 1 đến 60 (ô “1-2” / “1,2” / “1+2” tự tách — bài “%s”)." % ten_bai[:80]
+        ghi = _gon(ghi_chu) or None
+        for j, r in enumerate(ds):
+            try:
+                tuan_i = int(r.get("tuan") or 0)
+            except Exception:
+                tuan_i = 0
+            if tuan_i < 1 or tuan_i > 60:
+                return False, "Tuần phải từ 1 đến 60 (ô “1-2” / “1,2” / “1+2” tự tách — bài “%s”)." % ten_bai[:80]
+            try:
+                tiet = int(r.get("tiet_pp")) if str(r.get("tiet_pp") or "").strip() != "" else None
+            except Exception:
+                return False, "Tiết PPCT phải là số (ô “1-2” / “1,2” / “1+2” tự tách — bài “%s”)." % ten_bai[:80]
+            if iid_i and j == 0:
+                db.execute("UPDATE ppct SET tuan=?, tiet_pp=?, ten_bai=?, ghi_chu=? WHERE id=? AND teacher_id=?",
+                           (tuan_i, tiet, ten_bai, ghi, iid_i, uid))
+                n_sua += 1
+            else:
+                db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu) VALUES(?,?,?,?,?,?,?)",
+                           (uid, khoi, mon, tuan_i, tiet, ten_bai, ghi))
+                n_them += 1
+    db.commit()
+    MD.them(db, uid, mon)
+    if not (n_sua or n_them or n_xoa):
+        return False, "Chưa có thay đổi nào để lưu."
+    return True, ("Đã lưu phân phối môn %s khối %s: sửa %d, thêm %d, xoá %d dòng."
+                  % (mon, khoi, n_sua, n_them, n_xoa))
+
+
 # ---------------------------------------------------------------- nhập PPCT cho môn
 def _doc_tep(f, mon_mac_dinh, khoi_mac_dinh, ds_mon=()):
     """Đọc một tệp thành các phần (môn + khối) với môn/khối mặc định là của dòng đang nhập."""
@@ -330,19 +463,24 @@ def _doc_tep(f, mon_mac_dinh, khoi_mac_dinh, ds_mon=()):
     if not ten:
         return None, "Tệp không có tên — thầy/cô chọn lại tệp."
     if not ten.lower().endswith(DUOI_OK):
-        return None, "Tệp “%s” không phải Word (.docx) hay bảng tính (.xlsx, .csv)." % ten
+        return None, "Tệp “%s” không phải Word, bảng tính, PDF hoặc ảnh." % ten
     try:
         data = f.read(DAI_TEP + 1)
     except Exception:
         return None, "Không đọc được tệp “%s”." % ten
     if len(data) > DAI_TEP:
         return None, "Tệp “%s” lớn hơn 8 MB — thầy/cô lưu gọn lại rồi thử lại." % ten
+    if DL.la_pdf(ten) or DL.la_anh(ten):
+        ok, tb, phan = DL.doc_ppct(data, ten, mon_mac_dinh, khoi_mac_dinh)
+        if not ok:
+            return None, tb
+        return phan, ""
     try:
         phan = PT.tach(data, ten, ds_mon, mon_mac_dinh, khoi_mac_dinh)
     except ValueError as exc:
         return None, str(exc)
     except Exception:
-        return None, "Không đọc được tệp “%s” (hãy lưu lại .docx / .xlsx rồi thử lại)." % ten
+        return None, "Không đọc được tệp “%s” (hãy lưu lại .docx / .xlsx / .pdf rồi thử lại)." % ten
     if not phan:
         return None, ("Không thấy bảng phân phối chương trình trong tệp “%s”. Tệp cần có bảng với cột"
                       " “Tên bài dạy” (hoặc các dòng bắt đầu bằng “Bài 1…”)." % ten)
@@ -379,6 +517,10 @@ def nhap_ppct(db, uid, ds_tep, mon, khoi, thay_cu=True, ds_mon=()):
                 db.execute("DELETE FROM ppct WHERE teacher_id=? AND lower(mon)=lower(?) AND COALESCE(khoi,'')=?",
                            (uid, mon, khoi))
                 da_xoa = True
+            p["rows"] = PT.no_rong_tuan_tiet(p["rows"])
+            if _thieu_tuan(p["rows"]):
+                p["rows"] = chia_deu_35(p["rows"])
+                dong["chia_deu"] = True
             for r in p["rows"]:
                 db.execute("INSERT INTO ppct(teacher_id,khoi,mon,tuan,tiet_pp,ten_bai,ghi_chu)"
                            " VALUES(?,?,?,?,?,?,?)",
@@ -391,3 +533,4 @@ def nhap_ppct(db, uid, ds_tep, mon, khoi, thay_cu=True, ds_mon=()):
         ket_qua.append(dong)
     db.commit()
     return ket_qua, so_dong, so_loi
+

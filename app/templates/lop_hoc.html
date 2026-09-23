@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block head %}Lớp học{% endblock %}
+{% block crumb %}Lớp lấy từ thời khoá biểu — tạo bài kiểm tra, gửi link cho học sinh{% endblock %}
+{% block body %}
+<div class="card">
+ <div class="chead"><h3>🏫 Lớp đang dạy</h3>
+  <a class="btn sec sm" href="{{url_for('core.tkb')}}">Mở thời khoá biểu</a></div>
+ <p class="sub">Lớp lấy từ thời khoá biểu. Trong từng lớp: soạn đề tay (nhiều dạng câu, chèn hình) hoặc tải Word/PDF → gửi link cho học sinh.</p>
+ {% if not lop %}
+ <div class="empty"><span class="e">🏫</span>Chưa có lớp nào.<br>
+  Hãy <a href="{{url_for('core.tkb')}}">tải thời khoá biểu</a> — hệ thống sẽ tạo lớp theo tên lớp trong TKB.</div>
+ {% else %}
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+  {% for l in lop %}
+  <a href="{{url_for('lop_hoc.chi_tiet', lop_id=l.id)}}" style="border:1px solid var(--line);border-radius:14px;padding:14px 16px;
+    background:linear-gradient(135deg,#fbfefd,#fff);display:flex;flex-direction:column;gap:6px">
+   <b style="font-size:16px">Lớp {{l.ten}}</b>
+   <span class="muted">{% if l.khoi %}Khối {{l.khoi}} · {% endif %}{{l.so_de}} bài kiểm tra</span>
+  </a>
+  {% endfor %}
+ </div>
+ {% endif %}
+</div>
+{% endblock %}

@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS teacher(
   role TEXT DEFAULT 'teacher',
   email TEXT,
   phone TEXT,                      -- so dien thoai nhan tin nhan ma kich hoat
+  mail_lich INTEGER DEFAULT 0,     -- 1 = nhan lich day qua email luc 6h sang (mac dinh tat)
   google_sub TEXT,
   avatar TEXT,
   used INTEGER DEFAULT 0,          -- so luot da dung
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS tkb(
   thu INTEGER,          -- 2..8 (8 = Chu nhat)
   buoi TEXT,            -- Sang / Chieu
   tiet INTEGER,
-  lop TEXT, mon TEXT, phong TEXT
+  lop TEXT, mon TEXT, phong TEXT, ghi_chu TEXT
 );
 CREATE TABLE IF NOT EXISTS khdh(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,6 +98,25 @@ CREATE TABLE IF NOT EXISTS bank_tx(
   trang_thai TEXT,                 -- da_kich_hoat | da_tao_ma | cho_doi_soat | bo_qua | trung
   ghi_chu TEXT, created TEXT
 );
+CREATE TABLE IF NOT EXISTS don_hang(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ma TEXT UNIQUE NOT NULL,         -- EGV + 8 so, duy nhat, ghi vao noi dung CK / VietQR
+  teacher_id INTEGER NOT NULL,
+  goi TEXT NOT NULL,               -- vip | luot
+  so_tien INTEGER NOT NULL,        -- VND dung bang gia luc tao don
+  trang_thai TEXT NOT NULL,        -- cho | da_thanh_toan | het_han | thieu_tien | sai_ma
+  het_han TEXT NOT NULL,
+  sepay_id TEXT UNIQUE,
+  created TEXT,
+  paid_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_don_hang_gv ON don_hang(teacher_id, goi, trang_thai);
+CREATE TABLE IF NOT EXISTS sepay_log(
+  sepay_id TEXT PRIMARY KEY,       -- id giao dich SePay, chong xu ly trung / dong thoi
+  payload TEXT,
+  kq TEXT,
+  created TEXT
+);
 CREATE TABLE IF NOT EXISTS sms_log(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   teacher_id INTEGER, phone TEXT, noi_dung TEXT, loai TEXT,
@@ -121,6 +141,32 @@ CREATE TABLE IF NOT EXISTS ml_da_hoc(
   du_lieu TEXT,                    -- JSON chi tiết
   cap_nhat TEXT
 );
+CREATE TABLE IF NOT EXISTS bai_kt(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  teacher_id INTEGER NOT NULL,
+  lop_id INTEGER NOT NULL,
+  tieu_de TEXT,
+  mon TEXT,
+  ma TEXT UNIQUE NOT NULL,
+  cau_hoi TEXT,
+  nguon TEXT,
+  dang_mo INTEGER DEFAULT 1,
+  created TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_bai_kt_lop ON bai_kt(teacher_id, lop_id);
+CREATE TABLE IF NOT EXISTS bai_kt_nop(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  bai_kt_id INTEGER NOT NULL,
+  ho_ten TEXT NOT NULL,
+  ten_chuan TEXT,
+  ho TEXT, lot TEXT, ten TEXT,
+  tra_loi TEXT,
+  diem REAL,
+  muc_do TEXT,
+  nhan_xet TEXT,
+  created TEXT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bai_kt_nop_ten ON bai_kt_nop(bai_kt_id, ten_chuan);
 """
 
 
@@ -164,7 +210,8 @@ def init_db():
     for name, ddl in [("email", "TEXT"), ("phone", "TEXT"), ("google_sub", "TEXT"), ("avatar", "TEXT"),
                       ("used", "INTEGER DEFAULT 0"), ("bought", "INTEGER DEFAULT 0"),
                       ("expires", "TEXT"), ("created", "TEXT"),
-                      ("subjects", "TEXT")]:        # (M17) một giáo viên dạy nhiều môn
+                      ("subjects", "TEXT"),        # (M17) một giáo viên dạy nhiều môn
+                      ("mail_lich", "INTEGER DEFAULT 0")]:
         if name not in cols:
             try:
                 con.execute(f"ALTER TABLE teacher ADD COLUMN {name} {ddl}")
@@ -186,7 +233,8 @@ def init_db():
     tcols = {r[1] for r in con.execute("PRAGMA table_info(tkb)")}
     for name, ddl in (("khoi", "TEXT"),
                       ("tuan_bd", "INTEGER DEFAULT 1"),   # (M32) tuần bắt đầu hiệu lực của phiên bản
-                      ("nam_hoc", "TEXT")):               # (M32) gắn đúng giáo viên + năm học
+                      ("nam_hoc", "TEXT"),                # (M32) gắn đúng giáo viên + năm học
+                      ("ghi_chu", "TEXT")):               # ghi chú lịch báo giảng (tách khỏi phòng)
         if name not in tcols:
             try:
                 con.execute(f"ALTER TABLE tkb ADD COLUMN {name} {ddl}")

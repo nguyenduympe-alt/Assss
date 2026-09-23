@@ -31,6 +31,53 @@ def _fonts():
 THU_NAME = {2: "Thứ Hai", 3: "Thứ Ba", 4: "Thứ Tư", 5: "Thứ Năm", 6: "Thứ Sáu", 7: "Thứ Bảy", 8: "Chủ Nhật"}
 
 
+def buoi_tt(r):
+    return 0 if str(r.get("buoi") or "Sáng").startswith("S") else 1
+
+
+def sap_hang(rows):
+    return sorted(rows or [], key=lambda r: (int(r.get("thu") or 9), buoi_tt(r), int(r.get("tiet") or 0)))
+
+
+def gop_hang(rows):
+    """Gán rowspan_thu / rowspan_buoi: số hàng gộp ở dòng đầu nhóm, 0 = ô bị gộp."""
+    ds = []
+    for r in sap_hang(rows):
+        try:
+            d = dict(r)
+        except Exception:
+            d = {k: r[k] for k in r.keys()}
+        d["rowspan_thu"] = 0
+        d["rowspan_buoi"] = 0
+        ds.append(d)
+    n = len(ds)
+    i = 0
+    while i < n:
+        thu = int(ds[i].get("thu") or 9)
+        j = i + 1
+        while j < n and int(ds[j].get("thu") or 9) == thu:
+            j += 1
+        ds[i]["rowspan_thu"] = j - i
+        k = i
+        while k < j:
+            b = buoi_tt(ds[k])
+            m = k + 1
+            while m < j and buoi_tt(ds[m]) == b:
+                m += 1
+            ds[k]["rowspan_buoi"] = m - k
+            k = m
+        i = j
+    return ds
+
+
+def _ghi_in(r):
+    ph = (r.get("phong") or "").strip()
+    gc = (r.get("ghi_chu") or "").strip()
+    if ph and ph not in gc:
+        return (ph + " · " + gc) if gc else ph
+    return gc
+
+
 def build_pdf(meta, rows):
     """meta: dict(truong, to, giao_vien, tuan, tu_ngay, den_ngay, noi_dung_khac)
     rows: list dict(thu, buoi, tiet, lop, mon, tiet_pp, ten_bai, ghi_chu)"""
@@ -61,11 +108,8 @@ def build_pdf(meta, rows):
     data = [[Paragraph(h, S("h", 9, True, 1)) for h in hdr]]
     spans = []
     nghi_rows = []
-    ordered = sorted(rows, key=lambda r: (int(r.get("thu") or 9),
-                                          0 if (r.get("buoi") or "Sáng").startswith("S") else 1,
-                                          int(r.get("tiet") or 0)))
+    ordered = gop_hang(rows)
     i = 1
-    group_start = {}
     for r in ordered:
         thu = int(r.get("thu") or 9)
         label = THU_NAME.get(thu, "") + (("\n" + r["ngay"]) if r.get("ngay") else "")
@@ -78,15 +122,15 @@ def build_pdf(meta, rows):
                      Paragraph(str(r.get("mon", "") or ""), S("x", 8.5)),
                      Paragraph(str(r.get("tiet_pp", "") or ""), S("x", 8.5, False, 1)),
                      Paragraph(str(r.get("ten_bai", "") or ""), S("x", 8.5)),
-                     Paragraph(str(r.get("ghi_chu", "") or ""), S("x", 8.5))])
-        group_start.setdefault(thu, i)
+                     Paragraph(_ghi_in(r), S("x", 8.5))])
         i += 1
-    for thu, start in group_start.items():
-        end = start
-        while end + 1 < len(data) and int(ordered[end]["thu"] or 9) == thu:
-            end += 1
-        if end > start:
-            spans.append(("SPAN", (0, start), (0, end)))
+    for idx, r in enumerate(ordered):
+        rs = int(r.get("rowspan_thu") or 0)
+        if rs > 1:
+            spans.append(("SPAN", (0, idx + 1), (0, idx + rs)))
+        rb = int(r.get("rowspan_buoi") or 0)
+        if rb > 1:
+            spans.append(("SPAN", (1, idx + 1), (1, idx + rb)))
     if len(data) == 1:
         data.append([Paragraph("(Chưa có dữ liệu thời khoá biểu)", S("x", 9, False, 1))] + [""] * 7)
         spans.append(("SPAN", (0, 1), (-1, 1)))

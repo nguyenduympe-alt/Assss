@@ -33,7 +33,7 @@ from ..modules import ai_giao_duc as AIGD
 from ..modules import ai_provider as AI
 from .digital import folder, load, save  # dùng lại nơi lưu tạm, có kiểm tra chủ sở hữu
 
-MENU = {'label': 'Giáo án, năng lực số & AI', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
+MENU = {'label': 'Giáo án, NLS, AI & STEM', 'endpoint': 'giao_an_nls.index', 'icon': '📝'}
 MAX_BYTES = 8 * 1024 * 1024
 AI_THOI_LUONG = 5          # phút lồng ghép giáo dục AI đề xuất mỗi tiết
 NHAN_NOI_BO = ("Xử lý ngay trên máy chủ của trường, KHÔNG gửi nội dung giáo án ra ngoài; "
@@ -72,6 +72,7 @@ def index():
             # giáo dục AI (Quyết định 2422/QĐ-BGDĐT + Công văn 5588/BGDĐT-GDPT)
             chon_ai, canh_bao_ai = TH.chon_muc_ai(doc, pt, toi_da=2,
                                                   thoi_luong=AI_THOI_LUONG, thiet_bi=thiet_bi)
+            chon_stem, canh_bao_stem = TH.chon_muc_stem(doc, pt, thoi_luong=8)
 
             token = save(
                 name=(file.filename or 'giao-an.docx')[:200],
@@ -85,6 +86,7 @@ def index():
                     'pt_canh_bao': pt.get('canh_bao', []),
                     'chon': chon, 'canh_bao': canh_bao,
                     'chon_ai': chon_ai, 'canh_bao_ai': canh_bao_ai, 'ai_thoi_luong': AI_THOI_LUONG,
+                    'chon_stem': chon_stem, 'canh_bao_stem': canh_bao_stem, 'stem_thoi_luong': 8,
                     'thiet_bi': thiet_bi, 'thoi_luong': thoi_luong, 'toi_da': toi_da,
                     'doan_goc': TH.trang_thai_mau_goc(doc),
                 })
@@ -131,7 +133,9 @@ def xuat(token):
     # Nội dung giáo dục AI: CHỈ chèn những mạch giáo viên tích ở trang duyệt
     ma_ai = [x for x in request.form.getlist('ma_ai')]
     chon_ai = [x for x in (c.get('chon_ai') or []) if x.get('id') in ma_ai]
-    if not chon_ma and not chi_ai:
+    ma_stem = [x for x in request.form.getlist('ma_stem')]
+    chon_stem = [x for x in (c.get('chon_stem') or []) if x.get('ma') in ma_stem or x.get('id') in ma_stem]
+    if not chon_ma and not chi_ai and not chon_stem:
         flash('Thầy/cô chưa tích tiêu chí năng lực số nào. Nếu bài này chỉ cần phần giáo dục AI, '
               'hãy tích ô “Chỉ chèn phần giáo dục AI cho bài này”; nếu vẫn cần phần năng lực số, '
               'hãy tích ít nhất một tiêu chí rồi tải lại file.', 'err')
@@ -152,7 +156,8 @@ def xuat(token):
             lop_ghi_de=c['lop'] or '', mon_ghi_de=c['mon'] or '',
             goc_doan=c['doan_goc'], chon_ma=chon_ma,
             chon_ai=chon_ai, ai_thoi_luong=c.get('ai_thoi_luong') or AI_THOI_LUONG,
-            chi_ai=chi_ai)
+            chi_ai=chi_ai, chon_stem=chon_stem,
+            stem_thoi_luong=c.get('stem_thoi_luong') or 8)
     except Exception:
         flash('Không tạo được bản Word. File gốc có thể đã hỏng — hãy lưu lại bằng Word rồi thử lại.', 'err')
         return redirect(url_for('giao_an_nls.duyet', token=token))

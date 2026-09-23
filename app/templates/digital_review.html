@@ -11,6 +11,7 @@
   đúng số bài thầy/cô đặt ({{ctx.tom_tat.so_bai_ai}} bài){% endif %}.
   {% if ctx.tom_tat.cung_bai %}Đang bật <b>năng lực số và AI cùng bài</b>: các bài này ghi cả hai cột.
   {% else %}Đang chọn <b>riêng từng cột</b>: năng lực số và AI có thể ở những bài khác nhau.{% endif %}
+  <b>{{ctx.tom_tat.so_de_xuat_stem or 0}}/{{ctx.tom_tat.so_dong}} bài</b> được tích hợp <b>STEM/STEAM</b>.
   Chỉ <b>{{ctx.tom_tat.so_phu_hop}} bài</b> có tựa bài phù hợp nên hệ thống <b>không gán thêm</b> cho đủ số.
   {% if ctx.tom_tat.tin_hoc %}Môn Tin học: để trống ô số bài thì tích hợp cả file như trước.{% endif %}
  Dòng nào chưa được đề xuất thì thầy/cô tự nhập nếu thấy phù hợp.</p>
@@ -20,9 +21,11 @@
  <p class="muted">Trong file Word tải về: ô <b style="color:#c00">Năng lực số tô ĐỎ</b>, ô
  <b style="color:#00f">Trí tuệ nhân tạo (AI) tô XANH DƯƠNG</b> (chỉ tô phần hệ thống đề xuất, nội dung thầy/cô
  tự nhập giữ nguyên màu đen).</p>
- <p class="muted">Cột <b>NLS</b> (năng lực số) và cột <b>AI</b> <b>chỉ ghi mã tiêu chí</b>
- (ví dụ <b>1.3.CB2</b>, <b>4.B2.MR1</b>). Nội dung giải thích, hoạt động gợi ý và căn cứ đọc tựa bài nằm ở
- <b>cột Ghi chú / Cách tổ chức và đánh giá</b> và ở các khối “Căn cứ” bên dưới.</p></div>
+ <p class="muted">Cột <b>NLS</b> và cột <b>AI</b> <b>chỉ ghi mã tiêu chí</b>
+ (ví dụ <b>1.3.CB2</b>, <b>4.A3.2</b>). Cột <b>STEM</b> <b>chỉ ghi mã hình thức</b>
+ (<b>STEM-BH</b>, <b>STEAM-BH</b>, <b>STEM-TN</b>, <b>STEM-NCKH</b> — Công văn 909/BGDĐT-GDTH).
+ <b>Cột ghi chú giữ nguyên file gốc</b> — hệ thống không ghi thêm nội dung gợi ý hay căn cứ vào đó.
+ Căn cứ đọc tựa bài hiện ở dòng “Đề xuất tích hợp” và khối “Căn cứ” bên dưới.</p></div>
 <form method="post">
  <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
  {% for row in ctx.rows %}{% set i=loop.index0 %}
@@ -49,6 +52,17 @@
    {% if row.canh_bao_ai %}<p class="muted">{{row.canh_bao_ai|join(' ')}}</p>{% endif %}
   </details>
   {% elif row.canh_bao_ai %}<p class="muted">{{row.canh_bao_ai|join(' ')}}</p>{% endif %}
+  {% if row.stem_chi_tiet and row.stem_chi_tiet.ma %}
+  <details style="margin:10px 0"><summary>Căn cứ STEM/STEAM (Công văn 909/BGDĐT-GDTH) — không ghi vào cột ghi chú</summary>
+   <p><b>{{row.stem_chi_tiet.ma}}</b> — {{row.stem_chi_tiet.hinh_thuc}}<br>
+    Quy trình: {{row.stem_chi_tiet.quy_trinh_ten}}<br>
+    Lĩnh vực: {{row.stem_chi_tiet.linh_vuc}} · Sản phẩm: {{row.stem_chi_tiet.san_pham}}<br>
+    Vấn đề: {{row.stem_chi_tiet.van_de}}<br>
+    Vật liệu: {{row.stem_chi_tiet.vat_lieu}}<br>
+    <small>{{row.stem_chi_tiet.ly_do}}</small></p>
+   {% if row.stem_chi_tiet.buoc %}<p>Tiến trình 5 hoạt động:
+    {% for b in row.stem_chi_tiet.buoc %}{{loop.index}}) {{b}}{% if not loop.last %}; {% endif %}{% endfor %}</p>{% endif %}
+  </details>{% endif %}
   <div class="g2" style="margin-top:16px">
    {% for key,label in [('digital','NLS — năng lực số'),('ai','AI — giáo dục trí tuệ nhân tạo'),('stem','STEM / STEAM'),('notes','Ghi chú / Cách tổ chức và đánh giá')] %}
    <label class="f">
