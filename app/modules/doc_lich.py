@@ -24,6 +24,12 @@ from . import mon_day as MD
 TOI_DA = 8 * 1024 * 1024
 TOI_DA_TIET = 80
 TOI_DA_PPCT = 400
+# Sheet "chỉ để xem" trong file mẫu — không đọc dữ liệu (Ví dụ, Hướng dẫn...)
+_BO_SHEET = re.compile(r"vi\s*du|example|khong\s*doc|huong\s*dan|guide|instructions")
+
+
+def _sheet_bo_qua(ten_s):
+    return bool(_BO_SHEET.search(_bo_dau(ten_s or "")))
 DUOI_ANH = (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff")
 DUOI_PDF = (".pdf",)
 DUOI_WORD = (".docx",)
@@ -177,9 +183,11 @@ def _excel_chu(data, ten=""):
     except Exception:
         return ""
     ra = []
-    for df in (sheets or {}).values():
+    for ten_s, df in (sheets or {}).items():
         if df is None or getattr(df, "empty", True):
             continue
+        if _sheet_bo_qua(ten_s):
+            continue  # sheet ví dụ/hướng dẫn trong file mẫu — không đọc
         for _, row in df.iterrows():
             d = _dong_o(row.tolist())
             if d:
@@ -573,7 +581,7 @@ def _phan_tich_luoi(chu, ds_mon, them):
 
 # ---------------- TKB bảng tính dạng LƯỚI (Buổi | Tiết | Thứ 2..7) ----------------
 def _luoi_bang_tinh(data, ten=""):
-    """Mỗi sheet → lưới ô chuỗi (list of list). Hỗ trợ .xlsx/.xlsm, .xls, .csv."""
+    """Mỗi sheet → (tên_sheet, lưới ô chuỗi). Hỗ trợ .xlsx/.xlsm, .xls, .csv."""
     ten = (ten or "").lower()
     if ten.endswith(".csv"):
         text = None
@@ -589,7 +597,7 @@ def _luoi_bang_tinh(data, ten=""):
             nl = csv.Sniffer().sniff(text[:4000], delimiters=",;\t")
         except Exception:
             nl = csv.excel
-        return [list(hang) for hang in csv.reader(io.StringIO(text), nl)]
+        return [("_", [list(hang) for hang in csv.reader(io.StringIO(text), nl)])]
     try:
         from openpyxl import load_workbook
         wb = load_workbook(io.BytesIO(data), data_only=True, read_only=True)
@@ -601,11 +609,12 @@ def _luoi_bang_tinh(data, ten=""):
         ra = []
         try:
             sheets = pd.read_excel(io.BytesIO(data), sheet_name=None, header=None, dtype=str)
-            for df in (sheets or {}).values():
-                ra.append([[_gon(v) for v in hang] for hang in df.fillna("").values.tolist()])
+            for ten_s, df in (sheets or {}).items():
+                ra.append((ten_s, [[_gon(v) for v in hang]
+                                   for hang in df.fillna("").values.tolist()]))
         except Exception:
             return []
-        return [g for g in ra if g]
+        return [(t, g) for t, g in ra if g]
     ra = []
     try:
         for ws in wb.worksheets:
@@ -614,7 +623,7 @@ def _luoi_bang_tinh(data, ten=""):
             while g and not any(any(x for x in h) for h in g[-1]):
                 g.pop()
             if g:
-                ra.append(g)
+                ra.append((ws.title, g))
     finally:
         wb.close()
     return ra
@@ -685,9 +694,11 @@ def phan_tich_luoi_oo(data, ds_mon=()):
     """Đọc TKB Excel THEO Ô LƯỚI: cột Buổi, Tiết, Thứ 2..7 — mỗi ô học là 1 tiết.
 
     Trả danh sách tiết đúng cột Thứ (không lệch cột như cách phân tích chữ).
-    Ô 'Mỹ Phước D' (điểm trường) và ô trống tự bỏ qua."""
+    Ô 'Mỹ Phước D' (điểm trường), ô trống và sheet 'Vi du' (chỉ để tham khảo) tự bỏ qua."""
     ra, seen = [], set()
-    for g in _luoi_bang_tinh(data):
+    for ten_sheet, g in _luoi_bang_tinh(data):
+        if _sheet_bo_qua(ten_sheet):
+            continue  # sheet ví dụ/hướng dẫn trong file mẫu — không đọc
         hi, thu_cot = _tim_hang_thu(g)
         if hi < 0:
             continue
@@ -717,14 +728,11 @@ def phan_tich_luoi_docx(data, ds_mon=()):
 
 
 def mau_xlsx_tkb():
-    """File mẫu Excel LƯỚI: Buổi | Tiết | Thứ 2…6 — như bảng TKB in của trường tiểu học."""
+    """File mẫu Excel LƯỚI: sheet 'TKB' trống để thầy/cô điền, sheet 'Vi du' tham khảo."""
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
 
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "TKB"
     thin = Border(*(Side(style="thin", color="64748B") for _ in range(4)))
     ctr = Alignment(horizontal="center", vertical="center", wrap_text=True)
     fill_h = PatternFill("solid", fgColor="DCE9F7")     # xanh nhạt: tiêu đề
@@ -733,13 +741,41 @@ def mau_xlsx_tkb():
     font_h = Font(bold=True, size=11)
     font_do = Font(color="C00000")
 
-    hdr = ["Buổi", "Tiết", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"]
-    for j, t in enumerate(hdr, 1):
-        c = ws.cell(1, j, t)
-        c.font, c.fill, c.alignment, c.border = font_h, fill_h, ctr, thin
-    ws.row_dimensions[1].height = 20
-
     DIEM = "Mỹ Phước D"  # ô điểm trường khác — web tự bỏ qua khi đọc
+
+    def ve_khung(ws, sang, chieu):
+        """Vẽ lưới Buổi × Tiết × Thứ 2..6; dict rỗng = khung trống để điền."""
+        for j, t in enumerate(["Buổi", "Tiết", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"], 1):
+            c = ws.cell(1, j, t)
+            c.font, c.fill, c.alignment, c.border = font_h, fill_h, ctr, thin
+        ws.row_dimensions[1].height = 20
+        r = 2
+        for ten_buoi, bang in (("Sáng", sang), ("Chiều", chieu)):
+            dau = r
+            for tiet in range(1, 6):
+                ws.cell(r, 2, tiet).alignment = ctr
+                cot = bang.get(tiet, {})
+                for thu in range(2, 7):
+                    nd = cot.get(thu, "")
+                    c = ws.cell(r, thu + 1, nd)
+                    if nd == DIEM:
+                        c.font = font_do
+                    elif nd:
+                        c.fill = fill_bt
+                for j in range(1, 8):
+                    cc = ws.cell(r, j)
+                    cc.border = thin
+                    if j <= 2:
+                        cc.fill = fill_hv
+                ws.row_dimensions[r].height = 30
+                r += 1
+            ws.cell(dau, 1, ten_buoi)
+            ws.merge_cells(start_row=dau, start_column=1, end_row=r - 1, end_column=1)
+            cb = ws.cell(dau, 1)
+            cb.font, cb.alignment = Font(bold=True), ctr
+        for i, w in enumerate((10, 7, 19, 19, 19, 19, 19), 1):
+            ws.column_dimensions[get_column_letter(i)].width = w
+        ws.freeze_panes = "C2"
 
     def o_hoc(lop, gv):
         return "Tin học\n%s — %s" % (lop, gv)
@@ -755,51 +791,47 @@ def mau_xlsx_tkb():
              3: {2: o_hoc("2B2", "P.Trường"), 3: o_hoc("3B2", "P.Thới A"), 5: DIEM},
              4: {}, 5: {}}
 
-    r = 2
-    for ten_buoi, bang in (("Sáng", sang), ("Chiều", chieu)):
-        dau = r
-        for tiet in range(1, 6):
-            ws.cell(r, 2, tiet)
-            cot = bang.get(tiet, {})
-            for thu in range(2, 7):
-                nd = cot.get(thu, "")
-                c = ws.cell(r, thu + 1, nd)
-                if nd == DIEM:
-                    c.font = font_do
-                elif nd:
-                    c.fill = fill_bt
-            ws.cell(r, 2).alignment = ctr
-            for j in range(1, 8):
-                cc = ws.cell(r, j)
-                cc.border = thin
-                if j <= 2:
-                    cc.fill = fill_hv
-            ws.row_dimensions[r].height = 30
-            r += 1
-        ws.cell(dau, 1, ten_buoi)
-        ws.merge_cells(start_row=dau, start_column=1, end_row=r - 1, end_column=1)
-        cb = ws.cell(dau, 1)
-        cb.font, cb.alignment = Font(bold=True), ctr
-    for i, w in enumerate((10, 7, 19, 19, 19, 19, 19), 1):
-        ws.column_dimensions[get_column_letter(i)].width = w
-    ws.freeze_panes = "C2"
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "TKB"
+    ve_khung(ws, {}, {})            # KHUNG TRỐNG — thầy/cô điền lịch của mình
+    vd = wb.create_sheet("Vi du")
+    ve_khung(vd, sang, chieu)       # ví dụ tham khảo — web KHÔNG đọc sheet này
 
     hd = wb.create_sheet("Huong dan")
     hd["A1"] = (
         "FILE MẪU THỜI KHÓA BIỂU (dạng lưới)\n"
-        "— Giữ nguyên khung: cột Buổi · Tiết · Thứ 2…Thứ 6 (tiêu đề hàng 1).\n"
-        "— Mỗi ô ghi: TÊN MÔN, xuống dòng, LỚP — Phòng/GV. Ví dụ: “Tin học 4B2 — P.Trường”\n"
+        "— Điền lịch của bạn vào sheet “TKB”: giữ nguyên hàng tiêu đề Buổi · Tiết · Thứ 2…Thứ 6.\n"
+        "— Mỗi ô có tiết dạy ghi: TÊN MÔN, xuống dòng, LỚP — Phòng/GV. Ví dụ: “Tin học 4B2 — P.Trường”\n"
         "  (ghi một dòng “Tin học 4B2 — P.Trường” cũng được; lớp kiểu 4B2, 3A, 10A1).\n"
-        "— Ô trống = không dạy. Ô đỏ “Mỹ Phước D” (điểm trường khác) web tự bỏ qua.\n"
-        "— Xoá dữ liệu ví dụ, điền lịch của mình, lưu .xlsx rồi tải lên trang Thời khoá biểu\n"
-        "  → bấm “Đọc từ tệp”. Cũng nhận Word/PDF lưới Thứ 2…6 và mẫu danh sách cũ\n"
-        "  (Thứ · Buổi · Tiết · Lớp · Môn · Phòng). Không gửi tệp ra ngoài.")
+        "— Ô trống = không dạy. Ô “Mỹ Phước D” (điểm trường khác) web tự bỏ qua khi đọc.\n"
+        "— Sheet “Vi du” chỉ ĐỂ XEM cách điền — web không đọc sheet này, có thể xoá đi.\n"
+        "— Lưu .xlsx rồi tải lên trang Thời khoá biểu → “Đọc từ tệp” → xem trước → Lưu.\n"
+        "  Cũng nhận Word/PDF lưới Thứ 2…6 và mẫu danh sách cũ (Thứ · Buổi · Tiết · Lớp · Môn · Phòng).\n"
+        "  Không gửi tệp ra ngoài.")
     hd["A1"].alignment = Alignment(wrap_text=True, vertical="top")
     hd.column_dimensions["A"].width = 95
-    hd.row_dimensions[1].height = 150
+    hd.row_dimensions[1].height = 160
     bio = io.BytesIO()
     wb.save(bio)
     return bio.getvalue()
+
+
+def _la_mau_tkb_trong(data):
+    """Là file mẫu TKB của web nhưng sheet 'TKB' chưa được điền lịch."""
+    wb = None
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+        if "TKB" not in wb.sheetnames:
+            return False
+        hang1 = [_gon(v) for v in next(wb["TKB"].iter_rows(values_only=True, max_row=1, max_col=7))]
+        return hang1[:3] == ["Buổi", "Tiết", "Thứ 2"]
+    except Exception:
+        return False
+    finally:
+        if wb is not None:
+            wb.close()
 
 
 def doc_tkb(data, ten="", ds_mon=()):
@@ -819,6 +851,12 @@ def doc_tkb(data, ten="", ds_mon=()):
         if rows_luoi:
             return True, ("Đọc được %d tiết từ thời khoá biểu (Excel — lưới Buổi × Tiết × Thứ)."
                           % len(rows_luoi)), rows_luoi, "Excel (lưới)"
+        try:
+            if _la_mau_tkb_trong(data):
+                return False, ("Đây là file mẫu chưa điền lịch — hãy điền tiết dạy vào sheet "
+                               "“TKB” (xem sheet “Vi du”) rồi tải lên lại."), [], "Excel (lưới)"
+        except Exception:
+            pass
     if la_word(ten):
         try:
             rows_w = phan_tich_luoi_docx(data, ds_mon)
