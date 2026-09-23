@@ -728,6 +728,12 @@ def phan_tich_luoi_docx(data, ds_mon=()):
     return ra
 
 
+def _lop_uan(lop):
+    """Lớp có chữ cái hợp lý — loại O/I/Y/J/Q/U (OCR rác hay sinh 3OY, 5Q1...)."""
+    m = re.match(r"^([0-9]{1,2})([A-Za-z])([A-Za-z0-9])?$", lop or "")
+    return bool(m) and m.group(2).upper() not in "OIYJQU"
+
+
 def phan_tich_anh_tkb(lines, ds_mon=()):
     """Dựng tiết dạy từ OCR tokens CÓ TỌA ĐỘ của ảnh TKB lưới Buổi × Tiết × Thứ 2..7.
 
@@ -838,6 +844,18 @@ def phan_tich_anh_tkb(lines, ds_mon=()):
             chu2 = re.sub(r"\b(\d{1,2})6(?=[0-9]\b)", lambda m: m.group(1) + "B", chu)
             if _tim_lop(chu2):
                 tk = _o_hoc(chu2, ds_mon)
+        if tk and not _lop_uan(tk.get("lop")):
+            # lớp kiểu OCR rác (3OY, 5Q1...) — tìm lớp khác hợp lý hơn trong cùng ô
+            for m in re.finditer(r"\b([0-9]{1,2}[A-Za-z][A-Za-z0-9]?)\b", chu):
+                lop2 = _lop_hop_le(m.group(1))
+                if lop2 and _lop_uan(lop2) and lop2 != tk.get("lop"):
+                    tk2 = _o_hoc(chu, ds_mon)
+                    tk2 = tk2 or dict(tk)
+                    tk2["lop"] = lop2
+                    tk = tk2
+                    break
+        if tk and not _lop_uan(tk.get("lop")):
+            tk = None
         if tk:
             dem_mon[tk.get("mon")] = dem_mon.get(tk.get("mon"), 0) + 1
             r = _dong_tkb(thu, buoi, tiet, tk.get("lop"), tk.get("mon"),
@@ -849,7 +867,7 @@ def phan_tich_anh_tkb(lines, ds_mon=()):
                     ra.append(r)
         else:
             lop = _tim_lop(chu)
-            if lop:
+            if lop and _lop_uan(lop):
                 con_thieu_mon.append((thu, buoi, tiet, lop, _tim_phong(chu)))
     # ô thiếu tên môn → mượn môn xuất hiện nhiều nhất trong chính bảng này
     if con_thieu_mon and dem_mon:
