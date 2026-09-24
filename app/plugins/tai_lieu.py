@@ -141,16 +141,18 @@ _KHOA_SOFFICE = threading.Lock()   # 1 lượt chuyển đổi cùng lúc — tr
 SOFFICE = shutil.which("soffice") or shutil.which("libreoffice") or ""
 
 
+def _pix_trang(trang):
+    """Pixmap trang đầu ở độ rộng ~1400px — đủ nét khi phóng to xem."""
+    import pymupdf
+    z = min(2.4, 1400.0 / max(trang.rect.width, 1.0))
+    return trang.get_pixmap(matrix=pymupdf.Matrix(z, z), alpha=False)
+
+
 def _pdf_sang_anh(pdf_path, out_path):
     """Render trang đầu của file PDF ra PNG ~700px ngang."""
     import pymupdf
     with pymupdf.open(str(pdf_path)) as doc:
-        trang = doc[0]
-        pix = trang.get_pixmap(matrix=pymupdf.Matrix(0.9, 0.9), alpha=False)
-        if pix.width > 700:
-            pix = trang.get_pixmap(matrix=pymupdf.Matrix(700 / pix.width,
-                                                         700 / pix.width), alpha=False)
-        pix.save(str(out_path))
+        _pix_trang(doc[0]).save(str(out_path))
     return True
 
 
@@ -190,12 +192,7 @@ def _tao_anh(blob, duoi, out_path, ten_goc):
         if duoi == "pdf":
             import pymupdf
             with pymupdf.open(stream=blob, filetype="pdf") as doc:
-                trang = doc[0]
-                pix = trang.get_pixmap(matrix=pymupdf.Matrix(0.9, 0.9), alpha=False)
-                if pix.width > 700:
-                    pix = trang.get_pixmap(matrix=pymupdf.Matrix(700 / pix.width,
-                                                                 700 / pix.width), alpha=False)
-                pix.save(str(out_path))
+                _pix_trang(doc[0]).save(str(out_path))
                 return 1
         if duoi in ("doc", "docx", "ppt", "pptx", "xls", "xlsx"):
             with tempfile.TemporaryDirectory() as tmp:
