@@ -12,7 +12,7 @@
   <tbody>
    {% if cu %}
    <tr><td><b>Bản đang dùng</b></td><td>{{cu['ten_file'] or 'KHDH.docx'}}</td>
-    <td class="muted">{{cu['updated'] or cu['created'] or '—'}}</td>
+    <td class="muted">{{(cu['updated'] or cu['created'] or '')|ngay_vn}}</td>
     <td>{{cu['so_dong'] or '—'}}</td>
     <td>{{cu['so_tiet_tuan'] or 'chưa xác định'}}{% if cu['tiet_tuan_tay'] %} <span class="muted">(nhập tay)</span>{% endif %}</td></tr>
    {% endif %}

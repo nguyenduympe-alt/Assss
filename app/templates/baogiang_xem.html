@@ -64,7 +64,7 @@ tr.nghi .bai{color:#be123c;font-weight:700}
    <div class="l">{{(meta.truong or '')|upper}}<div style="font-weight:400;margin-top:4px">Tổ: {{meta.to or ''}}</div></div>
    <div class="r">
     <h1>LỊCH BÁO GIẢNG</h1>
-    <div class="tuan">TUẦN {{meta.tuan}} (Từ ngày {{meta.tu_ngay}} đến ngày {{meta.den_ngay}})
+    <div class="tuan">TUẦN {{meta.tuan}} (Từ ngày {{meta.tu_ngay|ngay_vn}} đến ngày {{meta.den_ngay|ngay_vn}})
      {% if meta.ap_dung_tu_tuan %} · TKB áp dụng từ tuần {{meta.ap_dung_tu_tuan}}{% endif %}</div>
    </div>
   </div>
@@ -81,7 +81,7 @@ tr.nghi .bai{color:#be123c;font-weight:700}
    {% else %}
     {% for r in rows %}
      <tr class="{{'nghi' if r.nghi}}">
-      {% if r.rowspan_thu %}<td class="c" rowspan="{{r.rowspan_thu}}"><b>{{THU_NAME[r.thu]}}</b>{% if r.ngay %}<div>{{r.ngay}}</div>{% endif %}</td>{% endif %}
+      {% if r.rowspan_thu %}<td class="c" rowspan="{{r.rowspan_thu}}"><b>{{THU_NAME[r.thu]}}</b>{% if r.ngay %}<div>{{r.ngay|ngay_vn}}</div>{% endif %}</td>{% endif %}
       {% if r.rowspan_buoi %}<td class="c" rowspan="{{r.rowspan_buoi}}">{{r.buoi}}</td>{% endif %}
       <td class="c">{{r.tiet}}</td>
       <td class="c">{{r.lop}}</td>
@@ -98,7 +98,7 @@ tr.nghi .bai{color:#be123c;font-weight:700}
   {% if meta.noi_dung_khac %}<div class="note"><b>Nội dung công tác khác:</b> {{meta.noi_dung_khac}}</div>{% endif %}
   <div class="sign">
    <div><b>DUYỆT CỦA TỔ TRƯỞNG CM</b></div>
-   <div>{{meta.dia_danh or 'Sóc Trăng'}}, ngày {{meta.ngay_ky or '....'}} tháng {{meta.thang_ky or '....'}} năm {{meta.nam_ky or '......'}}
+   <div>{{meta.dia_danh or 'Sóc Trăng'}}, ngày {{(meta.ngay_ky or '....')|ngay_vn}} tháng {{meta.thang_ky or '....'}} năm {{meta.nam_ky or '......'}}
     <div style="margin-top:6px"><b>GIÁO VIÊN</b></div>
     <div class="ten">{{meta.giao_vien}}</div>
    </div>

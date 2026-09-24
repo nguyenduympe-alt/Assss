@@ -156,7 +156,7 @@
   <tbody>
   {% for b in de %}
   <tr>
-   <td><b>{{b.tieu_de}}</b><div class="muted">{{b.created}}</div></td>
+   <td><b>{{b.tieu_de}}</b><div class="muted">{{b.created|ngay_vn}}</div></td>
    <td>{{b.mon or '—'}}</td>
    <td>{{b.so_nop}}</td>
    <td>{% if b.dang_mo %}<span class="badge HT">Đang mở</span>{% else %}<span class="badge CHT">Đã đóng</span>{% endif %}</td>

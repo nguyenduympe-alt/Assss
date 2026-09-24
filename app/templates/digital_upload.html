@@ -57,7 +57,7 @@
       <span class="muted" style="font-size:11.5px">{% if r['tiet_tuan_tay'] %}thầy/cô nhập{% else %}tự suy ra từ KHDH{% endif %}</span>
      </form>
     </td>
-    <td class="muted">{{r['updated'] or r['created'] or '—'}}</td>
+    <td class="muted">{{(r['updated'] or r['created'] or '')|ngay_vn}}</td>
     <td style="text-align:right;white-space:nowrap">
      {% if r['luu'] %}
      <details style="display:inline-block;text-align:left">
@@ -82,7 +82,7 @@
      <details style="display:inline-block;text-align:left">
       <summary class="btn sec sm" style="cursor:pointer">{{k.khac|length}} phiên bản trước</summary>
       <table style="margin-top:6px;font-size:12.5px"><tbody>
-      {% for v in k.khac %}<tr><td>{{v['ten_file'] or 'không tên'}}<br><span class="muted">bản {{v['phien_ban']}} · {{v['updated'] or v['created']}}</span></td>
+      {% for v in k.khac %}<tr><td>{{v['ten_file'] or 'không tên'}}<br><span class="muted">bản {{v['phien_ban']}} · {{(v['updated'] or v['created'])|ngay_vn}}</span></td>
        <td style="white-space:nowrap">
         <form method="post" action="{{url_for('digital.kho_doi_ban', kid=v['id'])}}" style="display:inline">
          <input type="hidden" name="csrf_token" value="{{csrf_token()}}"><button class="btn sec sm">Dùng bản này</button></form>

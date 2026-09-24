@@ -17,7 +17,7 @@
   <thead><tr><th>Ngày</th><th>Học sinh</th><th>Lớp</th><th>Môn</th><th>HK</th><th>Điểm</th><th>Mức</th>
    <th style="width:44%">Nhận xét <span class="muted" style="text-transform:none">(bấm để sửa)</span></th></tr></thead>
   <tbody>{% for r in rows %}<tr data-k="{{ (r['ho_ten'] ~ ' ' ~ (r['lop'] or ''))|lower }}" data-m="{{r['muc_do'] or ''}}">
-   <td class="muted" style="white-space:nowrap">{{(r['created'] or '')[:10]}}</td>
+   <td class="muted" style="white-space:nowrap">{{r['created']|ngay_vn}}</td>
    <td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:8px">
     <span class="av" style="width:28px;height:28px;flex:0 0 28px;font-size:12px">{{r['ho_ten'][0]|upper}}</span>
     <b>{{r['ho_ten']}}</b></div></td>

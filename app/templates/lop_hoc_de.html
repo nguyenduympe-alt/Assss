@@ -39,7 +39,7 @@
    <td><b>{{r.diem}}</b></td>
    <td>{% if r.muc_do %}<span class="badge {{r.muc_do}}">{{r.muc_do}}</span>{% endif %}</td>
    <td class="muted">{{r.nhan_xet}}</td>
-   <td class="muted">{{r.created}}</td>
+   <td class="muted">{{r.created|ngay_vn}}</td>
   </tr>
   {% endfor %}
   </tbody>

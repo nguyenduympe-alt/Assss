@@ -171,7 +171,7 @@
   <ul class="sub" style="padding-left:18px;line-height:1.7">
     {% for x in kq.internet.tin_lien_quan[:10] %}
     <li><a href="{{x.url}}" rel="nofollow noopener" target="_blank">{{x.tieu_de[:110]}}</a>
-      <span class="muted">{% if x.ten_bao %}— {{x.ten_bao}}{% endif %}{% if x.ngay %} ({{x.ngay}}){% endif %}</span></li>
+      <span class="muted">{% if x.ten_bao %}— {{x.ten_bao}}{% endif %}{% if x.ngay %} ({{x.ngay|ngay_vn}}){% endif %}</span></li>
     {% endfor %}
   </ul>
   {% endif %}

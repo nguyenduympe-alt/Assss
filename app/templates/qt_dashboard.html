@@ -189,7 +189,7 @@
     <div style="flex:1"><b>{{ '{:,}'.format(t['so_tien']).replace(',','.') }}đ</b>
      <span class="muted">· {{ t['fullname'] or 'chưa rõ' }}</span>
      <div class="muted" style="font-size:11px">{{ t['noi_dung'][:46] }}</div></div>
-    <span class="muted" style="font-size:11px">{{ (t['created'] or '')[5:16]|replace('T',' ') }}</span>
+    <span class="muted" style="font-size:11px">{{ t['created']|ngay_vn }}</span>
    </div>{% endfor %}
   {% else %}<div class="empty">Chưa có giao dịch nào.</div>{% endif %}
  </div>

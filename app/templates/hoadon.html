@@ -23,7 +23,7 @@
   {% for r in ds %}
    <tr>
     <td><b>{{r.ma}}</b></td>
-    <td>{{r.ngay}}</td>
+    <td>{{r.ngay|ngay_vn}}</td>
     <td>{{r.goi}}{% if r.noi_dung %}<div class="muted" style="font-size:11.5px">{{r.noi_dung}}</div>{% endif %}</td>
     <td>{% if r.so_tien %}<b>{{'{:,}'.format(r.so_tien).replace(',','.')}}đ</b>{% else %}<span class="muted">—</span>{% endif %}</td>
     <td style="font-size:12.5px">{{r.hinh_thuc}}</td>

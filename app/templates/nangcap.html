@@ -191,7 +191,7 @@
  <div class="tbl-wrap"><table>
   <thead><tr><th>Thời gian</th><th>Loại</th><th>Chi tiết</th></tr></thead>
   <tbody>{% for l in logs %}<tr>
-   <td class="muted">{{ l['created'][8:10] }}/{{ l['created'][5:7] }} {{ l['created'][11:16] }}</td>
+   <td class="muted">{{ l['created']|ngay_vn }}</td>
    <td>{% if l['kind']=='pdf' %}<span class="badge HT">📄 PDF báo giảng</span>
        {% elif l['kind']=='word' %}<span class="badge HT">📝 Word báo giảng</span>
        {% elif l['kind']=='chinhta' %}<span class="badge HTT">🔤 Sửa chính tả</span>

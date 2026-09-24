@@ -91,7 +91,7 @@
   <tbody>{% for t in txs %}
   {% set st = t['trang_thai'] %}
   <tr>
-   <td class="muted" style="font-size:12px">{{ (t['created'] or '')[5:16]|replace('T',' ') }}
+   <td class="muted" style="font-size:12px">{{ t['created']|ngay_vn }}
     <div style="font-size:11px">{{t['nguon']}}</div></td>
    <td style="font-size:12.5px;max-width:280px">{{ t['noi_dung'][:90] }}
     <div class="muted" style="font-size:11px">Mã GD: {{t['ref'][:24]}}</div></td>
@@ -131,7 +131,7 @@
  <div class="tbl-wrap"><table>
   <thead><tr><th>Thời gian</th><th>Người nhận</th><th>Nội dung</th><th>Kết quả</th></tr></thead>
   <tbody>{% for m in smss %}
-  <tr><td class="muted" style="font-size:12px">{{ (m['created'] or '')[5:16]|replace('T',' ') }}</td>
+  <tr><td class="muted" style="font-size:12px">{{ m['created']|ngay_vn }}</td>
    <td style="font-size:12.5px">{{ m['fullname'] or '—' }}
     <div class="muted" style="font-size:11px">{{ SMS.mask(m['phone']) }} · {{m['loai']}}</div></td>
    <td style="font-size:12px;max-width:330px">{{ m['noi_dung'][:120] }}</td>

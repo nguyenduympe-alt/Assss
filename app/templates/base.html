@@ -226,4 +226,104 @@ hr.s{border:0;border-top:1px solid var(--line);margin:16px 0}
 {% for m in mon_day or [] %}<option value="{{m}}">{% endfor %}
 {% for m in GOI_Y_MON or [] %}<option value="{{m}}">{% endfor %}
 </datalist>
+<script>
+/* Thành phần chọn ngày kiểu Việt Nam: hiển thị + gõ theo ngày/tháng/năm,
+   nút 📅 mở lịch; giá trị gửi đi vẫn yyyy-mm-dd cho máy chủ. */
+(function () {
+  'use strict';
+  function ve(vn) { // yyyy-mm-dd[Thh:mm] -> dd/mm/yyyy[ hh:mm]
+    var m = (vn || '').match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}:\d{2}))?/);
+    return m ? (m[3] + '/' + m[2] + '/' + m[1] + (m[4] ? ' ' + m[4] : '')) : (vn || '');
+  }
+  function luu(vn) { // dd/mm/yyyy[ hh:mm] -> yyyy-mm-dd[Thh:mm] | null
+    var m = vn.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+    if (!m) return null;
+    var d = +m[1], mo = +m[2];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    var kt = new Date(+m[3], mo - 1, d);
+    if (kt.getDate() !== d || kt.getMonth() !== mo - 1) return null; // chặn 31/02...
+    return m[3] + '-' + ('0' + mo).slice(-2) + '-' + ('0' + d).slice(-2) +
+           (m[4] ? 'T' + ('0' + m[4]).slice(-2) + ':' + m[5] : '');
+  }
+  function nang_cap(inp) {
+    if (inp.dataset.vnDate) return;
+    inp.dataset.vnDate = '1';
+    var kieu = inp.type;                       // date | datetime-local
+    var la_dt = (kieu === 'datetime-local');
+    var hid = document.createElement('input');
+    hid.type = kieu;
+    hid.name = inp.name || '';
+    hid.required = inp.required;
+    hid.value = inp.value || '';
+    hid.setAttribute('tabindex', '-1');
+    hid.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0.01;border:0;padding:0';
+    inp.removeAttribute('name');
+    inp.required = inp.required;               // giữ cờ để báo lỗi ngay ô người dùng thấy
+    inp.type = 'text';
+    inp.autocomplete = 'off';
+    inp.placeholder = la_dt ? 'ngày/tháng/năm giờ:phút' : 'ngày/tháng/năm';
+    inp.style.paddingRight = '34px';
+    inp.value = ve(hid.value);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '📅';
+    btn.title = 'Mở lịch chọn ngày';
+    btn.style.cssText = 'margin-left:-30px;border:0;background:transparent;cursor:pointer;' +
+                        'font-size:15px;vertical-align:middle;position:relative;z-index:2';
+    inp.parentNode.insertBefore(hid, inp);
+    inp.insertAdjacentElement('afterend', btn);
+
+    function cap_nhat(vn) {
+      var gtri = luu(vn.trim());
+      if (vn.trim() === '') {
+        hid.value = '';
+        inp.style.borderColor = '';
+      } else if (gtri) {
+        hid.value = la_dt ? gtri : gtri.split('T')[0];
+        inp.style.borderColor = '';
+      } else {
+        inp.style.borderColor = '#dc2626';
+        hid.value = '';   // ngày sai → không gửi giá trị cũ lặng lẽ
+      }
+    }
+    inp.addEventListener('input', function () { cap_nhat(inp.value); });
+    inp.addEventListener('blur', function () {
+      if (hid.value) inp.value = ve(hid.value);
+    });
+    hid.addEventListener('change', function () { inp.value = ve(hid.value); inp.style.borderColor = ''; });
+    function mo_lich() {
+      try { hid.showPicker(); }
+      catch (e) { try { hid.style.display = 'inline-block'; hid.showPicker(); } catch (e2) { hid.focus(); } }
+    }
+    btn.addEventListener('click', mo_lich);
+    var form = inp.form || hid.form;
+    if (form && !form.dataset.vnDateGuard) {
+      form.dataset.vnDateGuard = '1';
+      form.addEventListener('submit', function (ev) {
+        var o = form.querySelectorAll('input[data-vn-date="1"]');
+        for (var i = 0; i < o.length; i++) {
+          var t = o[i], h = t.previousSibling;
+          if (h && h.type && h.type !== 'text' && !h.value &&
+              (h.required || t.required)) {
+            ev.preventDefault();
+            t.style.borderColor = '#dc2626';
+            t.focus();
+            alert('Hãy nhập ngày theo dạng ngày/tháng/năm, ví dụ 05/09/2026.');
+            return;
+          }
+        }
+      });
+    }
+    inp.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowDown' || (ev.key === ' ' && inp.readOnly)) { ev.preventDefault(); mo_lich(); }
+    });
+  }
+  function chay() {
+    var ds = document.querySelectorAll('input[type="date"], input[type="datetime-local"]');
+    for (var i = 0; i < ds.length; i++) nang_cap(ds[i]);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', chay);
+  else chay();
+})();
+</script>
 </body></html>

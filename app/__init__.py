@@ -4,8 +4,25 @@ from flask import Flask
 from .db import init_db, close_db
 
 
+def _ngay_vn(gia_tri):
+    """Định dạng ngày kiểu Việt Nam: 2026-09-24 / 2026-09-24T06:43 -> 24/09/2026 [06:43]."""
+    if gia_tri in (None, '', '—'):
+        return gia_tri or ''
+    s = str(gia_tri).strip()
+    if len(s) >= 10 and s[4] == '-' and s[7] == '-':
+        d, m, y = s[8:10], s[5:7], s[:4]
+        if d.isdigit() and m.isdigit() and y.isdigit():
+            kq = '%s/%s/%s' % (d, m, y)
+            if len(s) >= 16 and s[10] in ' T' and s[11:13].isdigit() and s[14:16].isdigit():
+                kq += ' ' + s[11:16]
+            return kq
+    return s
+
+
 def create_app():
     app = Flask(__name__)
+    # Ngày tháng hiển thị kiểu Việt Nam (dd/mm/yyyy) trên mọi template
+    app.add_template_filter(_ngay_vn, 'ngay_vn')
     # Khi deploy: đặt biến môi trường SECRET_KEY (chuỗi ngẫu nhiên dài)
     app.secret_key = os.environ.get("SECRET_KEY", "edu-dev-secret-change-me")
     app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
