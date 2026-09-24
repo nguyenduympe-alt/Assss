@@ -109,14 +109,14 @@
  function ap(){ img.style.transform='translate('+tx+'px,'+ty+'px) scale('+s+')';
    pct.textContent=Math.round(s*100)+'%'; }
  function fit(){ if(!iw) return; var vw=window.innerWidth,vh=window.innerHeight;
-   s=Math.min((vw-36)/iw,(vh-76)/ih,1); if(!(s>0)) s=1;
+   s=Math.min((vw-36)/iw,(vh-76)/ih,3); if(!(s>0)) s=1;
    tx=(vw-iw*s)/2; ty=(vh-ih*s)/2+16; ap(); }
  function mo(src,t){ ten.textContent=t||''; box.style.display='block';
    document.body.style.overflow='hidden'; img.onload=function(){
      iw=img.naturalWidth; ih=img.naturalHeight; fit(); }; img.src=src; }
  function dong(){ box.style.display='none'; document.body.style.overflow=''; }
  document.querySelectorAll('[data-zoom]').forEach(function(el){
-   el.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation();
+   el.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('a')) return; e.preventDefault(); e.stopPropagation();
      mo(el.getAttribute('data-zoom'), el.getAttribute('data-ten')); }); });
  document.getElementById('tlb-close').addEventListener('click',dong);
  document.getElementById('tlb-fit').addEventListener('click',fit);
