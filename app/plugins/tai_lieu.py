@@ -294,14 +294,15 @@ def chi_tiet(id_tl):
         (u["id"], id_tl, datetime.datetime.now().isoformat(timespec="seconds"))).fetchone()
     don = dict(don) if don else None
     qr_svg = noi_dung = tk_nhan = None
+    ma_nh = SP.ma_nh() or BL.BANK_CODE
     if don:
         tk_nhan = SP.so_tk_nhan() or BL.BANK_ACC
-        qr_svg = VQ.build_qr(SP.ma_nh() or BL.BANK_CODE, tk_nhan, int(don["so_tien"]),
+        qr_svg = VQ.build_qr(ma_nh, tk_nhan, int(don["so_tien"]),
                              don["ma"], SP.chu_tk())
         noi_dung = don["ma"]
     chu = db.execute("SELECT fullname FROM teacher WHERE id=?", (tl["teacher_id"],)).fetchone()
     return render_template("tailieu_ct.html", tl=tl, la_chu=la_chu, quyen=quyen,
-                           luot=_luot_thuong(db, u["id"]), don=don, qr_svg=qr_svg,
+                           luot=_luot_thuong(db, u["id"]), don=don, qr_svg=qr_svg, ma_nh=ma_nh,
                            noi_dung=noi_dung, tk_nhan=tk_nhan, gia=GIA_TAI,
                            chu=(dict(chu) if chu else {}))
 
