@@ -107,14 +107,16 @@
    <td>{% if r.muc_do %}<span class="badge {{r.muc_do}}">{{r.muc_do}}</span>{% endif %}</td>
    <td class="muted">{{r.xep_loai}}</td><td>{% if r.nhan_xet %}{{r.nhan_xet}}{% else %}<span class="muted">⏳ đang sinh…</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
  <div class="card" id="them-vao-lop" style="margin:14px">
-  <div class="chead"><h3>🏫 Thêm học sinh vào lớp</h3>
-   <span class="muted" style="font-size:12px">Trùng đủ họ + tên lót + tên sẽ tự bỏ qua</span></div>
+  <div class="chead"><h3>🏫 Học sinh đã có trong lớp chưa?</h3>
+   <span class="muted" style="font-size:12px">Báo từng em — so đủ họ + tên lót + tên với các lớp của bạn</span></div>
   {% if ds_lop %}
+  <div id="tvl_ds" style="display:flex;flex-direction:column;gap:6px;margin:4px 0 12px">
+   <span class="muted">Đang kiểm tra danh sách…</span></div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
    <select id="tvl_lop" style="min-width:210px">
     {% for l in ds_lop %}<option value="{{l.id}}">{{l.ten}}</option>{% endfor %}
    </select>
-   <button id="tvl_btn">➕ Thêm {{ result|length }} học sinh đang hiển thị vào lớp</button>
+   <button id="tvl_btn">➕ Thêm vào lớp</button>
    <span id="tvl_kq" class="muted" style="font-size:13px"></span>
   </div>
   {% else %}
@@ -145,22 +147,54 @@ function addRow(){const t=document.querySelector('#tb tbody');const r=t.insertRo
 {% if result and ds_lop %}
 (function(){
  var ds = {{ ds_ho_ten|tojson }};
- var b = document.getElementById('tvl_btn'); if(!b) return;
+ var b = document.getElementById('tvl_btn');
+ var kq = document.getElementById('tvl_kq');
+ var dsEl = document.getElementById('tvl_ds');
+ if(!b || !dsEl) return;
+ function esc(x){ var d=document.createElement('div'); d.textContent=x==null?'':String(x); return d.innerHTML; }
+ function kt(){
+   fetch("{{ url_for('core.nx_hs_trang_thai') }}", {method:'POST',
+     headers:{'Content-Type':'application/json'}, body: JSON.stringify({ds: ds})})
+   .then(function(r){ return r.json(); })
+   .then(function(d){
+     if(!d.ok || !d.ds){ dsEl.innerHTML = '<span class="muted">⚠️ Không kiểm tra được — thử tải lại trang.</span>'; return; }
+     var da_xem = {}, rows = [];
+     d.ds.forEach(function(x){ var k=(x.ho_ten||'').toLowerCase(); if(!da_xem[k]){ da_xem[k]=1; rows.push(x); } });
+     dsEl.innerHTML = rows.map(function(x){
+       return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;'
+         + 'border:1px solid #e2e8f0;border-radius:9px;padding:5px 11px">'
+         + '<b style="font-size:13.5px">'+esc(x.ho_ten)+'</b>'
+         + (x.lop ? '<span class="chip" style="background:#d1fae5;color:#065f46;white-space:nowrap">✓ đã có: '+esc(x.lop)+'</span>'
+                  : '<span class="chip" style="background:#fef3c7;color:#b45309;white-space:nowrap">✗ chưa có trong lớp</span>')
+         + '</div>';
+     }).join('');
+     var thieu = rows.filter(function(x){ return !x.lop; }).map(function(x){ return x.ho_ten; });
+     b._thieu = thieu;
+     if(!thieu.length){
+       b.textContent = '✅ Tất cả học sinh đã có trong lớp'; b.disabled = true;
+     } else {
+       b.textContent = '➕ Thêm ' + thieu.length + ' học sinh chưa có vào lớp'; b.disabled = false;
+     }
+   }).catch(function(){ dsEl.innerHTML = '<span class="muted">⚠️ Lỗi kết nối khi kiểm tra.</span>'; });
+ }
  b.addEventListener('click', function(){
    var sel = document.getElementById('tvl_lop');
-   var kq = document.getElementById('tvl_kq');
-   if(!sel.value){ kq.textContent = '⚠️ Bạn chưa có lớp nào.'; return; }
+   var dsGui = b._thieu || [];
+   if(!dsGui.length) return;
    b.disabled = true; kq.textContent = 'Đang thêm…';
    fetch("{{ url_for('core.nx_them_vao_lop') }}", {method:'POST',
      headers:{'Content-Type':'application/json'},
-     body: JSON.stringify({lop_id: parseInt(sel.value,10), ds: ds})})
+     body: JSON.stringify({lop_id: parseInt(sel.value,10), ds: dsGui})})
    .then(function(r){ return r.json(); })
    .then(function(d){
-     if(d.ok){ kq.innerHTML = '✅ Đã thêm <b>'+d.them+'</b> học sinh vào lớp <b>'+d.ten_lop+
-       '</b>, bỏ qua <b>'+d.bo_qua+'</b> tên trùng — lớp hiện có '+d.tong_lop+' học sinh.'; }
-     else { kq.textContent = '⚠️ '+(d.msg||'Không thêm được.'); b.disabled = false; }
+     if(d.ok){
+       kq.innerHTML = '✅ Đã thêm <b>'+d.them+'</b> học sinh vào lớp <b>'+esc(d.ten_lop)+
+         '</b> (bỏ qua '+d.bo_qua+' tên trùng) — lớp hiện có '+d.tong_lop+' học sinh.';
+       kt();
+     } else { kq.textContent = '⚠️ '+(d.msg||'Không thêm được.'); kt(); }
    }).catch(function(){ kq.textContent = '⚠️ Lỗi kết nối — thử lại.'; b.disabled = false; });
  });
+ kt();
 })();
 {% endif %}
 </script>

@@ -1227,6 +1227,28 @@ def nx_them_vao_lop():
                                        (lop_id,)).fetchone()[0])
 
 
+@bp.route("/nhan-xet/hs-trang-thai", methods=["POST"])
+@login_required
+def nx_hs_trang_thai():
+    """Báo từng học sinh trong danh sách đang hiển thị đã có trong lớp nào chưa.
+
+    So sánh ĐỦ họ + tên lót + tên (bỏ dấu, hoa/thường, khoảng trắng) với các
+    lớp của giáo viên. Trả {ds: [{ho_ten, lop}]} — lop=None nếu chưa có.
+    """
+    d = request.get_json(force=True, silent=True) or {}
+    db = get_db()
+    u = current_user()
+    ds = [re.sub(r"\s+", " ", str(x or "").strip()) for x in (d.get("ds") or [])]
+    ds = [x for x in ds if x]
+    dat = {}
+    for r in db.execute("""SELECT h.ho_ten, l.ten FROM hocsinh h
+                           JOIN lop l ON l.id = h.lop_id WHERE l.teacher_id=?""",
+                        (u["id"],)).fetchall():
+        dat.setdefault(_khoa_ho_ten(r["ho_ten"]), r["ten"])
+    kq = [{"ho_ten": x, "lop": dat.get(_khoa_ho_ten(x))} for x in ds]
+    return jsonify(ok=True, ds=kq)
+
+
 @bp.route("/nhan-xet/lich-su")
 @login_required
 def lich_su():
