@@ -29,8 +29,7 @@
 </div>
 {% else %}
 <style>
-.tl-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:10px}
-@media(max-width:1500px){.tl-grid{grid-template-columns:repeat(8,1fr)}}
+.tl-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
 @media(max-width:1200px){.tl-grid{grid-template-columns:repeat(6,1fr)}}
 @media(max-width:900px){.tl-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:560px){.tl-grid{grid-template-columns:repeat(3,1fr)}}
@@ -47,8 +46,7 @@
   </div>
   <div style="padding:8px 9px 9px;display:flex;flex-direction:column;gap:3px;flex:1">
    <a href="{{url_for('tai_lieu.chi_tiet', id_tl=t.id)}}" title="Vào trang chi tiết để tải về"
-      style="font-weight:700;font-size:12px;line-height:1.3;color:inherit;text-decoration:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{t.tieu_de}}</a>
-   <span class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{t.fullname}}{% if t.mon %} · {{t.mon}}{% endif %}</span>
+      style="font-weight:700;font-size:12px;line-height:1.35;color:inherit;text-decoration:none">{{t.tieu_de}}</a>
    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;align-items:center">
     <span class="chip" style="font-size:10px">⬇️ {{t.luot_tai or 0}}</span>
     <span class="chip" style="font-size:10px">{{t.duoi|upper}}</span>
