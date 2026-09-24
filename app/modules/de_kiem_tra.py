@@ -283,12 +283,28 @@ def _loc_nhieu(dung, ung_vien, cau_hoi, can, seed):
     return ra
 
 
-def _nhieu_lua_chon(cau, dung, sai, seed, so_dap_an=4):
+def _nhieu_lua_chon(cau, dung, sai, seed, so_dap_an=4, bo_luc=None):
     so_dap_an = max(2, min(6, int(so_dap_an or 4)))
     can = so_dap_an - 1
-    uniq = _loc_nhieu(dung, sai, cau, can, seed)
+    ung = list(sai or [])
+    # BĐỦ nhiễu từ mảnh câu THẬT khác trong bài (độ dài gần đáp án) — đủ số đáp án
+    # theo yêu cầu mà không bịa nội dung ngoài tài liệu.
+    if bo_luc and len(ung) < can + 2:
+        tu_dung = len(_tu_noi_dung(dung)) or 6
+        kd_d = _khong_dau(dung)[:40]
+        for st in bo_luc:
+            st = re.sub(r'\s+', ' ', str(st).strip().rstrip('.'))
+            if not st or _khong_dau(st)[:40] == kd_d:
+                continue
+            tu = _tu_noi_dung(st)
+            mien = ' '.join(tu[:max(4, min(12, tu_dung))])
+            if len(mien) >= 6:
+                ung.append(mien)
+            if len(ung) >= can + 6:
+                break
+    uniq = _loc_nhieu(dung, ung, cau, can, seed)
     i = 0
-    pad = ['Ý trái với nội dung bài', 'Chi tiết không có trong bài', 'Kết luận ngược với bài học']
+    pad = ['Ý trái với nội dung bài', 'Chi tiết không có trong bài']
     while len(uniq) < can and i < len(pad):
         if _khong_dau(pad[i]) != _khong_dau(dung):
             uniq.append(pad[i])
@@ -423,25 +439,46 @@ def sinh_tu_tai_lieu(text, so=10, so_dap_an=4):
     for u in y:
         dung_theo_kieu.setdefault(u['kieu'], []).append(u['dung'])
 
-    def them(cau_hoi, dung, sai, seed, kieu=''):
+    KHUON = {
+        'dinh_nghia': ('{chu} là gì?', '{chu} có nghĩa là gì?'),
+        'gom': ('{chu} gồm những gì?', 'Theo bài, {chu} gồm gì?'),
+        'muc_dich': ('Theo bài, {chu} để làm gì?', 'Mục đích của {chu} là gì?',
+                     '{chu} nhằm điều gì?'),
+        'nguyen': ('Nguyên nhân / điều kiện của {chu} là gì?',),
+        'noi': ('{chu} xảy ra ở đâu / khi nào?',),
+        'y_dung': ('Ý nào sau đây đúng theo bài học?', 'Nhận định nào dưới đây đúng?',
+                   'Theo bài, câu nào sau đây đúng?', 'Câu nào dưới đây đúng với bài học?',
+                   'Nhận định nào sau đây đúng với bài học?'),
+    }
+    dem_khuon = {}
+
+    def _khuon(kieu, chu=None, cau_goc=None):
+        mau = KHUON.get(kieu) or ('{chu}',)
+        i = dem_khuon.get(kieu, 0)
+        dem_khuon[kieu] = i + 1
+        return mau[i % len(mau)].format(chu=chu) if chu is not None else mau[i % len(mau)]
+
+    def them(cau_hoi, dung, sai, seed, kieu='', bo_luc=None):
         if len(ra) >= so:
             return
-        if any(_khong_dau(cau_hoi)[:50] == _khong_dau(x['cau'])[:50] for x in ra):
+        khoa = _khong_dau(cau_hoi)[:40] + '|' + _khong_dau(dung)[:40]
+        if any(khoa == (_khong_dau(x['cau'])[:40] + '|' +
+                        _khong_dau(x['lua_chon'][x['dap_an']])[:40]) for x in ra):
             return
-        lc, da = _nhieu_lua_chon(cau_hoi, dung, sai, seed, so_dap_an)
+        lc, da = _nhieu_lua_chon(cau_hoi, dung, sai, seed, so_dap_an, bo_luc=bo_luc)
         q = {'id': len(ra) + 1, 'cau': cau_hoi, 'lua_chon': lc, 'dap_an': da,
              'kieu': kieu}
         if _hoc_sinh_kiem(q) and _gop_lua_chon(q, so_dap_an):
             ra.append(q)
 
+    # Gom ứng viên rồi XEN KẼ các dạng câu — đề không dồn một khuôn
+    uc_v = []
     for u in y:
         sai = list(dung_theo_kieu.get(u['kieu']) or [])
         sai += [x['dung'] for x in y if x is not u]
-        them(u['cau'], u['dung'], sai, hash(u['cau'] + u['dung']) & 0xFFFFFFFF, u['kieu'])
+        uc_v.append((u['kieu'], u['chu'], u['dung'], sai))
 
     for i, c in enumerate(cau):
-        if len(ra) >= so:
-            break
         c0 = c.strip()
         if not (30 <= len(c0) <= 120) or c0.endswith('?'):
             continue
@@ -449,8 +486,23 @@ def sinh_tu_tai_lieu(text, so=10, so_dap_an=4):
         if kd0.startswith(('thu ', 'bai ')):
             continue
         sai = [x.strip().rstrip('.') for j, x in enumerate(cau) if j != i]
-        them('Ý nào sau đây đúng theo bài học?', _goc_chu(c0.rstrip('.')), sai,
-             hash(c0) & 0xFFFFFFFF, 'y_dung')
+        uc_v.append(('y_dung', None, _goc_chu(c0.rstrip('.')), sai))
+
+    con = {}
+    for i, u in enumerate(uc_v):
+        con.setdefault(u[0], []).append(i)
+    thu_tu = []
+    while any(con.values()):
+        for k in list(con):
+            if con[k]:
+                thu_tu.append(uc_v[con[k].pop(0)])
+        if len(thu_tu) > len(uc_v):
+            break
+    for (kieu, chu, dung, sai) in thu_tu:
+        if len(ra) >= so:
+            break
+        cau_h = _khuon(kieu, chu=chu) if chu is not None else _khuon(kieu)
+        them(cau_h, dung, sai, hash(cau_h + dung) & 0xFFFFFFFF, kieu, bo_luc=cau)
 
     for i, q in enumerate(ra, 1):
         q['id'] = i
