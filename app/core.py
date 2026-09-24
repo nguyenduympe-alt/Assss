@@ -1167,7 +1167,64 @@ def nhan_xet():
                       "là MẪU NHANH, không phải AI." % (tt.get("ly_do") or "không rõ lý do"), "err")
     return render_template("nhanxet.html", result=result, cols=cols,
                            dang_cho=len([r for r in (result or []) if not (r.get("nhan_xet") or "")]),
-                           nx_goc=session.get("nx_goc"), nx_ten=session.get("nx_ten") or "")
+                           nx_goc=session.get("nx_goc"), nx_ten=session.get("nx_ten") or "",
+                           ds_lop=[dict(r) for r in get_db().execute(
+                               "SELECT id, ten FROM lop WHERE teacher_id=? ORDER BY ten COLLATE NOCASE",
+                               (current_user()["id"],)).fetchall()],
+                           ds_ho_ten=[(r.get("ho_ten") or "") for r in (result or [])])
+
+
+def _khoa_ho_ten(s):
+    """Khoá so sánh học sinh theo ĐỦ họ + tên lót + tên: bỏ dấu, thường, 1 khoảng trắng.
+
+    "Nguyễn Văn  An" và "nguyen van an" là một; thiếu/thêm tên lót thì là NGƯỜI KHÁC
+    (tránh nhầm "Nguyễn An" với "Nguyễn Văn An").
+    """
+    import unicodedata
+    kd = unicodedata.normalize("NFD", str(s or ""))
+    kd = "".join(ch for ch in kd if not unicodedata.combining(ch))
+    kd = kd.replace("đ", "d").replace("Đ", "D")
+    return " ".join(kd.lower().split())
+
+
+@bp.route("/nhan-xet/them-vao-lop", methods=["POST"])
+@login_required
+def nx_them_vao_lop():
+    """Thêm các học sinh vừa đưa lên bảng nhận xét vào một lớp (mục Lớp học).
+
+    Lớp đã có học sinh trùng ĐỦ họ + tên lót + tên → bỏ qua; chưa có → thêm mới.
+    """
+    d = request.get_json(force=True, silent=True) or {}
+    db = get_db()
+    u = current_user()
+    try:
+        lop_id = int(d.get("lop_id") or 0)
+    except (TypeError, ValueError):
+        lop_id = 0
+    lop = db.execute("SELECT * FROM lop WHERE id=? AND teacher_id=?",
+                     (lop_id, u["id"])).fetchone()
+    if not lop:
+        return jsonify(ok=False, msg="Lớp không tồn tại hoặc không thuộc về bạn."), 400
+    ds = [re.sub(r"\s+", " ", str(x or "").strip()) for x in (d.get("ds") or [])]
+    ds = [x for x in ds if x]
+    da = {_khoa_ho_ten(r["ho_ten"]) for r in db.execute(
+        "SELECT ho_ten FROM hocsinh WHERE lop_id=?", (lop_id,)).fetchall()}
+    them, bo_qua, da_xem = [], 0, set()
+    for ten in ds:
+        k = _khoa_ho_ten(ten)
+        if not k or k in da or k in da_xem:
+            bo_qua += 1
+            continue
+        da_xem.add(k)
+        them.append(ten)
+    for ten in them:
+        db.execute("INSERT INTO hocsinh(lop_id,ho_ten,ma_hs) VALUES(?,?,?)",
+                   (lop_id, ten, ""))
+    db.commit()
+    return jsonify(ok=True, them=len(them), bo_qua=bo_qua,
+                   ten_lop=lop["ten"],
+                   tong_lop=db.execute("SELECT COUNT(*) FROM hocsinh WHERE lop_id=?",
+                                       (lop_id,)).fetchone()[0])
 
 
 @bp.route("/nhan-xet/lich-su")

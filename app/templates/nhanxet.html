@@ -106,6 +106,22 @@
    <td>{{ '%g'|format(r.diem) if r.diem is not none else '—' }}</td>
    <td>{% if r.muc_do %}<span class="badge {{r.muc_do}}">{{r.muc_do}}</span>{% endif %}</td>
    <td class="muted">{{r.xep_loai}}</td><td>{% if r.nhan_xet %}{{r.nhan_xet}}{% else %}<span class="muted">⏳ đang sinh…</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+ <div class="card" id="them-vao-lop" style="margin:14px">
+  <div class="chead"><h3>🏫 Thêm học sinh vào lớp</h3>
+   <span class="muted" style="font-size:12px">Trùng đủ họ + tên lót + tên sẽ tự bỏ qua</span></div>
+  {% if ds_lop %}
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+   <select id="tvl_lop" style="min-width:210px">
+    {% for l in ds_lop %}<option value="{{l.id}}">{{l.ten}}</option>{% endfor %}
+   </select>
+   <button id="tvl_btn">➕ Thêm {{ result|length }} học sinh đang hiển thị vào lớp</button>
+   <span id="tvl_kq" class="muted" style="font-size:13px"></span>
+  </div>
+  {% else %}
+  <p class="sub" style="margin:0">Bạn chưa có lớp nào — tạo lớp ở mục <b>Lớp học</b> trước, sau đó
+   quay lại đây để lưu danh sách học sinh vào lớp.</p>
+  {% endif %}
+ </div>
  {% else %}<div class="empty"><span class="e">🤔</span>Không đọc được dòng nào. Hãy kiểm tra cột <b>Họ và tên</b> trong file.</div>{% endif %}
 </div>
 {% endif %}
@@ -125,5 +141,27 @@ fetch('{{ url_for("core.nx_ai_trang_thai") }}').then(r=>r.json()).then(d=>{
 }).catch(()=>{const el=document.getElementById('ai-tt');if(el)el.textContent='⚠️ Không kết nối được dịch vụ AI cục bộ — vẫn dùng được các chế độ mẫu nhanh.';});
 function addRow(){const t=document.querySelector('#tb tbody');const r=t.insertRow(-1);
  r.innerHTML='<td><input name="ten[]" style="width:100%"></td><td><input name="diem[]" type="number" step="0.1" style="width:96px"></td><td><select name="md[]"><option value="">Tự động theo điểm</option><option>CHT</option><option>HT</option><option>HTT</option></select></td>';}
+</script>
+{% if result and ds_lop %}
+(function(){
+ var ds = {{ ds_ho_ten|tojson }};
+ var b = document.getElementById('tvl_btn'); if(!b) return;
+ b.addEventListener('click', function(){
+   var sel = document.getElementById('tvl_lop');
+   var kq = document.getElementById('tvl_kq');
+   if(!sel.value){ kq.textContent = '⚠️ Bạn chưa có lớp nào.'; return; }
+   b.disabled = true; kq.textContent = 'Đang thêm…';
+   fetch("{{ url_for('core.nx_them_vao_lop') }}", {method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body: JSON.stringify({lop_id: parseInt(sel.value,10), ds: ds})})
+   .then(function(r){ return r.json(); })
+   .then(function(d){
+     if(d.ok){ kq.innerHTML = '✅ Đã thêm <b>'+d.them+'</b> học sinh vào lớp <b>'+d.ten_lop+
+       '</b>, bỏ qua <b>'+d.bo_qua+'</b> tên trùng — lớp hiện có '+d.tong_lop+' học sinh.'; }
+     else { kq.textContent = '⚠️ '+(d.msg||'Không thêm được.'); b.disabled = false; }
+   }).catch(function(){ kq.textContent = '⚠️ Lỗi kết nối — thử lại.'; b.disabled = false; });
+ });
+})();
+{% endif %}
 </script>
 {% endblock %}
