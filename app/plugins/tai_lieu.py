@@ -10,6 +10,10 @@
 import datetime
 import os
 import re
+import shutil
+import subprocess
+import tempfile
+import threading
 from pathlib import Path
 
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, \
@@ -133,8 +137,54 @@ def _tao_bia_mac_dinh(out, duoi, ten_goc):
     img.save(out, "PNG")
 
 
+_KHOA_SOFFICE = threading.Lock()   # 1 lượt chuyển đổi cùng lúc — tránh ngốn RAM
+SOFFICE = shutil.which("soffice") or shutil.which("libreoffice") or ""
+
+
+def _pdf_sang_anh(pdf_path, out_path):
+    """Render trang đầu của file PDF ra PNG ~700px ngang."""
+    import pymupdf
+    with pymupdf.open(str(pdf_path)) as doc:
+        trang = doc[0]
+        pix = trang.get_pixmap(matrix=pymupdf.Matrix(0.9, 0.9), alpha=False)
+        if pix.width > 700:
+            pix = trang.get_pixmap(matrix=pymupdf.Matrix(700 / pix.width,
+                                                         700 / pix.width), alpha=False)
+        pix.save(str(out_path))
+    return True
+
+
+def _soffice_sang_pdf(blob, duoi, tmp):
+    """Dùng LibreOffice headless chuyển Word/PPT/Excel → PDF (bất đồng bộ, có hạn thời gian).
+
+    Trả đường dẫn PDF trong thư mục tạm `tmp`, hoặc None nếu thất bại.
+    """
+    if not SOFFICE:
+        return None
+    src = Path(tmp) / ("tai-lieu." + duoi)
+    src.write_bytes(blob)
+    env = dict(os.environ, HOME="/tmp", SAL_USE_VCLPLUGIN="svp")
+    try:
+        with _KHOA_SOFFICE:
+            subprocess.run(
+                [SOFFICE, "--headless", "--norestore", "--nolockcheck",
+                 "-env:UserInstallation=file:///tmp/lo_profile_ea",
+                 "--convert-to", "pdf", "--outdir", tmp, str(src)],
+                timeout=90, env=env,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+    except subprocess.TimeoutExpired:
+        subprocess.run(["pkill", "-f", "soffice"], check=False,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return None
+    pdf = src.with_suffix(".pdf")
+    if pdf.exists() and pdf.stat().st_size > 200:
+        return pdf
+    return None
+
+
 def _tao_anh(blob, duoi, out_path, ten_goc):
-    """Ảnh đại diện = trang đầu (PDF render thật); loại khác vẽ bìa mặc định.
+    """Ảnh đại diện = TRANG ĐẦU TÀI LIỆU: PDF render trực tiếp; Word/PPT/Excel
+    chuyển PDF bằng LibreOffice headless trước. Loại khác / lỗi → bìa mặc định.
     Trả 1 nếu render được nội dung, 0 nếu dùng bìa mặc định."""
     try:
         if duoi == "pdf":
@@ -147,8 +197,13 @@ def _tao_anh(blob, duoi, out_path, ten_goc):
                                                                  700 / pix.width), alpha=False)
                 pix.save(str(out_path))
                 return 1
+        if duoi in ("doc", "docx", "ppt", "pptx", "xls", "xlsx"):
+            with tempfile.TemporaryDirectory() as tmp:
+                pdf = _soffice_sang_pdf(blob, duoi, tmp)
+                if pdf:
+                    return 1 if _pdf_sang_anh(pdf, out_path) else 0
     except Exception:  # noqa: BLE001
-        current_app.logger.warning("Render PDF trang đầu thất bại: %s", ten_goc)
+        current_app.logger.warning("Render trang đầu thất bại: %s", ten_goc)
     _tao_bia_mac_dinh(out_path, duoi, ten_goc)
     return 0
 
