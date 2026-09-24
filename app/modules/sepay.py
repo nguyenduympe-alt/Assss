@@ -290,7 +290,31 @@ def _ghi_tx(db, gd, kq):
          kq.get("code"), kq.get("trang_thai"), (kq.get("ghi_chu") or "")[:500], now))
 
 
-def _kich_hoat(db, u, goi):
+def _kich_hoat(db, u, goi, don=None):
+    if goi == "tailieu":
+        # Mua lượt tải TÀI LIỆU: mở khoá 1 tài liệu + cộng 1 lượt thưởng cho người chia sẻ.
+        # Gói VIP/khác KHÔNG liên quan — quyền tài liệu tính riêng từng cặp (người, tài liệu).
+        tl_id = int((don or {}).get("tailieu_id") or 0)
+        if not tl_id:
+            raise RuntimeError("Đơn tài liệu thiếu tailieu_id")
+        now = datetime.datetime.now().isoformat(timespec="seconds")
+        db.execute("""CREATE TABLE IF NOT EXISTS tl_quyen(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            teacher_id INTEGER NOT NULL, tai_lieu_id INTEGER NOT NULL,
+            nguon TEXT DEFAULT 'mua', created TEXT,
+            UNIQUE(teacher_id, tai_lieu_id))""")
+        db.execute("""CREATE TABLE IF NOT EXISTS tl_luot(
+            teacher_id INTEGER PRIMARY KEY, so_luot INTEGER DEFAULT 0)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS tai_lieu(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            teacher_id INTEGER NOT NULL, tieu_de TEXT NOT NULL,
+            mo_ta TEXT DEFAULT '', mon TEXT DEFAULT '', ten_goc TEXT NOT NULL,
+            duoi TEXT NOT NULL, kich_thuoc INTEGER NOT NULL,
+            anh INTEGER DEFAULT 0, luot_tai INTEGER DEFAULT 0, created TEXT)""")
+        db.execute("INSERT OR IGNORE INTO tl_quyen(teacher_id,tai_lieu_id,nguon,created) "
+                   "VALUES(?,?, 'mua', ?)", (u["id"], tl_id, now))
+        msg = "Đã mở khoá tài liệu #%d — tải về tại mục Tài liệu." % tl_id
+        return msg, None
     luot = BL.LUOT_MOI_GOI if goi == "luot" else 0
     note = "SePay — đơn đối soát tự động"
     code = BL.create_codes(db, 1, 12 if goi == "vip" else 0, note, goi, luot, commit=False)[0]
@@ -419,7 +443,7 @@ def xu_ly(db, data, _truot=None):
         if not u:
             raise RuntimeError("Không tìm thấy tài khoản gắn đơn")
 
-        msg, code = _kich_hoat(db, u, don["goi"])
+        msg, code = _kich_hoat(db, u, don["goi"], don)
         kq["code"] = code
         kq["ghi_chu"] = msg
         kq["trang_thai"] = "da_kich_hoat"

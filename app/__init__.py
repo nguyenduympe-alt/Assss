@@ -25,7 +25,7 @@ def create_app():
     app.add_template_filter(_ngay_vn, 'ngay_vn')
     # Khi deploy: đặt biến môi trường SECRET_KEY (chuỗi ngẫu nhiên dài)
     app.secret_key = os.environ.get("SECRET_KEY", "edu-dev-secret-change-me")
-    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
+    app.config["MAX_CONTENT_LENGTH"] = 60 * 1024 * 1024  # cho phép tải lên tài liệu 50MB
     # (LOGO-B) tệp nhận diện (logo, favicon) cho trình duyệt nhớ 7 ngày — đổi logo thì đổi số ?v= trong template
     app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 7
     if os.environ.get("HTTPS_ONLY", "").lower() in ("1", "true", "yes"):

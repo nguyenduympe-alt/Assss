@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block head %}{{tl.tieu_de}}{% endblock %}
+{% block crumb %}Chi tiết tài liệu{% endblock %}
+{% block body %}
+<div class="card" style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+ <div style="flex:0 0 240px;max-width:240px;background:#f1f5f9;border:1px solid var(--line);border-radius:14px;overflow:hidden">
+  <img src="{{url_for('tai_lieu.anh', id_tl=tl.id)}}" alt="Ảnh bìa" style="width:100%;display:block">
+ </div>
+ <div style="flex:1;min-width:260px">
+  <h3 style="margin:0 0 6px">{{tl.tieu_de}}</h3>
+  <div class="muted" style="margin-bottom:10px">
+   Người chia sẻ: <b>{{chu.fullname or 'Ẩn danh'}}</b>{% if tl.mon %} · Môn: <b>{{tl.mon}}</b>{% endif %}
+   · Định dạng: <b>{{tl.duoi|upper}}</b> · Dung lượng: <b>{{'%.1f'|format(tl.kich_thuoc/1048576)}} MB</b>
+   · Đã tải: <b>{{tl.luot_tai or 0}} lượt</b></div>
+  {% if tl.mo_ta %}<p style="white-space:pre-line">{{tl.mo_ta}}</p>{% endif %}
+
+  {% if la_chu %}
+   <div class="flash ok" style="margin-top:8px"><span>📌</span>
+    <div>Đây là tài liệu của bạn — <b>tải về miễn phí</b> bất cứ lúc nào.</div></div>
+   <a class="btn" href="{{url_for('tai_lieu.tai_ve', id_tl=tl.id)}}">⬇️ Tải về (miễn phí)</a>
+  {% elif quyen %}
+   <div class="flash ok" style="margin-top:8px"><span>✅</span>
+    <div>Tài liệu đã mở khoá cho bạn{% if quyen.nguon == 'thuong' %} (dùng lượt miễn phí){% else %} (đã thanh toán){% endif %}
+     — tải lại không tốn thêm.</div></div>
+   <a class="btn" href="{{url_for('tai_lieu.tai_ve', id_tl=tl.id)}}">⬇️ Tải về</a>
+  {% else %}
+   <div class="card" style="margin:10px 0;padding:14px 16px;background:#fffbeb;border-color:#f59e0b">
+    <b>Tải tài liệu này: {{ '%d'|format(gia/1000) }}.000₫/lượt</b>
+    <div class="muted" style="font-size:12.5px;margin:4px 0 10px">Gói VIP 1 năm <b>không bao gồm</b> tải tài liệu.
+     Nếu còn <b>lượt miễn phí</b> (nhận từ việc chia sẻ tài liệu) bạn có thể dùng thay trả tiền.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+     {% if luot > 0 %}
+     <form method="post" action="{{url_for('tai_lieu.dung_luot', id_tl=tl.id)}}">
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+      <button>🎁 Dùng 1 lượt miễn phí (còn {{luot}})</button>
+     </form>
+     {% else %}
+     <span class="chip" style="background:#f1f5f9;color:#475569">🎁 Lượt miễn phí: 0</span>
+     {% endif %}
+     {% if don %}
+     <a class="btn" href="#qr">💳 Thanh toán {{ '%d'|format(don.so_tien/1000) }}.000₫ (đang chờ)</a>
+     {% else %}
+     <a class="btn" href="{{url_for('tai_lieu.mua', id_tl=tl.id)}}">💳 Lấy mã thanh toán 10.000₫</a>
+     {% endif %}
+    </div>
+   </div>
+  {% endif %}
+
+  <p class="muted" style="font-size:12px;margin-top:14px">Mỗi lượt tải của người khác, người chia sẻ
+   được cộng <b>+1 lượt tải miễn phí</b>. Ảnh đại diện là trang đầu của PDF; loại file khác hiển thị
+   bìa mô tả.</p>
+ </div>
+</div>
+
+{% if don and not quyen and not la_chu %}
+<div class="card" id="qr" style="margin-top:16px">
+ <div class="chead"><h3>💳 Chuyển khoản {{ '%d'|format(don.so_tien/1000) }}.000₫ — tự mở khoá</h3>
+  <span class="chip" id="tt-don" style="background:#fff7ed;color:#c2410c">Đang chờ thanh toán</span></div>
+ <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start">
+  <div style="width:236px;height:236px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px">{{qr_svg|safe}}</div>
+  <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+   <div style="border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#f7fdfb">
+    <div class="lb" style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b">Ngân hàng</div>
+    <b>{{SP.ma_nh()|upper if SP.ma_nh() else BL.BANK_CODE|upper}}</b></div>
+   <div style="border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#f7fdfb">
+    <div class="lb" style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b">Số tài khoản</div>
+    <b>{{tk_nhan}}</b></div>
+   <div style="border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#fef9c3">
+    <div class="lb" style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#854d0e">Nội dung chuyển khoản (bắt buộc đúng)</div>
+    <b style="font-size:17px">{{noi_dung}}</b></div>
+   <div class="muted" style="font-size:12.5px">Chuyển <b>đúng số tiền</b> và <b>đúng nội dung</b> trên —
+    hệ thống tự đối soát trong vài giây và trang này tự cập nhật. Đơn có hiệu lực 24 giờ.</div>
+  </div>
+ </div>
+</div>
+<script>
+(function () {
+  var n = 0;
+  function kt() {
+    fetch("{{url_for('tai_lieu.trang_thai', id_tl=tl.id)}}").then(function (r) { return r.json(); })
+      .then(function (d) {
+        if ((d.quyen) || (d.don && d.don.trang_thai === 'da_thanh_toan')) { location.reload(); return; }
+        if (++n < 75) setTimeout(kt, 4000);
+      }).catch(function () { if (++n < 75) setTimeout(kt, 4000); });
+  }
+  setTimeout(kt, 4000);
+})();
+</script>
+{% endif %}
+{% endblock %}
