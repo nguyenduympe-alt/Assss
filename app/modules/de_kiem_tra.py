@@ -28,7 +28,7 @@ RE_PA = re.compile(
 RE_DAP = re.compile(
     r'(?:đáp\s*án|dap\s*an|câu\s*trả\s*lời)\s*[:\-–]?\s*[\(\[]?([A-Fa-f])\b', re.I)
 RE_LA = re.compile(
-    r'([A-ZÀ-ỴĐ][^.]{2,70}?)\s+(?:là|chính là|được gọi là|có nghĩa là)\s+([^.]{8,180})\.',
+    r'([^\s.!?:;,\u201c\u2026\u00ab\u00bb()\[\]][^.]{2,70}?)\s+(?:là|chính là|được gọi là|có nghĩa là)\s+([^.]{8,180})\.',
     re.I)
 RE_CAU_VAN = re.compile(r'[^.!?…\n]+[.!?…]?')
 
@@ -300,34 +300,67 @@ def _nhieu_lua_chon(cau, dung, sai, seed, so_dap_an=4):
 
 
 RE_TAI = re.compile(
-    r'([A-ZÀ-ỴĐ][^.]{2,55}?)\s+(?:xảy ra|diễn ra|diễn ra chủ yếu)\s+'
-    r'(?:ở|tại|trong)\s+([^.]{3,80})\.', re.I)
+    r'([^\s.!?:;,\u201c\u2026\u00ab\u00bb()\[\]][^.]{2,55}?)\s+(?:xảy ra|diễn ra|diễn ra chủ yếu)\s+'
+    r'(?:ở|tại|trong)\s+([^.]{3,80})\.')
 RE_GOM = re.compile(
-    r'([A-ZÀ-ỴĐ][^.]{2,55}?)\s+gồm\s+([^.]{6,120})\.', re.I)
+    r'([^\s.!?:;,\u201c\u2026\u00ab\u00bb()\[\]][^.]{2,55}?)\s+gồm\s+([^.]{6,120})\.')
 RE_DE = re.compile(
-    r'([A-ZÀ-ỴĐ][^.]{2,55}?)\s+(?:để|nhằm|giúp)\s+([^.]{6,100})\.', re.I)
+    r'([^\s.!?:;,\u201c\u2026\u00ab\u00bb()\[\]][^.]{2,55}?)\s+(?:để|nhằm|giúp)\s+([^.]{6,100})\.')
 RE_NG = re.compile(
     r'(?:nguyên liệu|nguyên nhân|điều kiện)\s+(?:của|cho)?\s*([^.]{3,40}?)\s+là\s+([^.]{6,100})\.',
-    re.I)
+    )
+
+
+_DAU_CAU_BO = ('thu nhat', 'thu hai', 'thu ba', 'thu tu', 'thu nam', 'thu sau', 'thu bay',
+               'thu tam', 'thu chin', 'thu muoi', 'cuoi cung', 'tuy nhien', 'ngoai ra',
+               'ben canh do', 'do do', 'vi vay', 'hai trong the', 'bo phan')
+
+
+def _goc_chu(s):
+    """Làm sạch cụm chủ ngữ rút từ bài: bỏ 'Thứ hai,', 'Cuối cùng,', 'Bài 9:'...
+    và gọn khoảng trắng — để câu hỏi bám ý, không bám vị trí đoạn."""
+    s = re.sub(r'\s+', ' ', str(s or '')).strip(' .,:;–-')
+    kd = _khong_dau(s).lower()
+    for dau in _DAU_CAU_BO:
+        if kd.startswith(dau + ' ') or kd.startswith(dau + ','):
+            s = s.split(',', 1)[1].strip() if ',' in s else s
+            break
+    s = re.sub(r'^[Bb]à[i]\s*\d+\s*[:\.\-–]\s*', '', s)
+    s = re.sub(r'\s+', ' ', s).strip(' .,:;–-')
+    return (s[:1].upper() + s[1:]) if s else s
+
+
+def _chu_hoa_dau(s):
+    """Ký tự đầu là chữ HOA thật (phân biệt hoa-thường) — chủ ngữ đầu câu."""
+    c = (s or ' ')[:1]
+    return c != c.lower()
 
 
 def _giao_vien_rut_y(text):
     """Bước 1 — teacher reasoning: rút đơn vị kiến thức bám văn bản."""
     y = []
     for m in RE_LA.finditer(text):
+        if not _chu_hoa_dau(m.group(1)):
+            continue
         chu, nghia = m.group(1).strip(' :-–'), m.group(2).strip(' :-–')
         if 3 <= len(chu) <= 70 and 8 <= len(nghia) <= 180:
             y.append({'kieu': 'dinh_nghia', 'chu': chu, 'dung': nghia,
                       'cau': '%s là gì?' % chu.rstrip('?')})
     for m in RE_TAI.finditer(text):
+        if not _chu_hoa_dau(m.group(1)):
+            continue
         chu, noi = m.group(1).strip(), m.group(2).strip()
         y.append({'kieu': 'noi', 'chu': chu, 'dung': noi,
                   'cau': '%s xảy ra ở đâu / khi nào?' % chu.rstrip('?')})
     for m in RE_GOM.finditer(text):
+        if not _chu_hoa_dau(m.group(1)):
+            continue
         chu, gom = m.group(1).strip(), m.group(2).strip()
         y.append({'kieu': 'gom', 'chu': chu, 'dung': gom,
                   'cau': '%s gồm những gì?' % chu.rstrip('?')})
     for m in RE_DE.finditer(text):
+        if not _chu_hoa_dau(m.group(1)):
+            continue
         chu, de = m.group(1).strip(), m.group(2).strip()
         y.append({'kieu': 'muc_dich', 'chu': chu, 'dung': de,
                   'cau': 'Theo bài, %s để làm gì?' % chu.rstrip('?')})
@@ -368,10 +401,23 @@ def sinh_tu_tai_lieu(text, so=10, so_dap_an=4):
     so = max(1, min(40, int(so or 10)))
     so_dap_an = max(2, min(6, int(so_dap_an or 4)))
     text = re.sub(r'[ \t]+', ' ', (text or '').replace('\r', '\n')).strip()
+    # bỏ dòng tiêu đề ngắn không kết thúc câu (dính vào câu đầu gây chủ ngữ rác)
+    text = '\n'.join(d.strip() for d in text.split('\n')
+                      if len(d.strip()) >= 60 or d.strip()[-1:] in '.!?')
     if len(text) < 80:
         return []
-    cau = [c.strip() for c in RE_CAU_VAN.findall(text) if len(c.strip()) >= 20]
-    y = _giao_vien_rut_y(text)
+    cau = [re.sub(r'\s+', ' ', c.strip()) for c in RE_CAU_VAN.findall(text)
+           if len(c.strip()) >= 20]
+    text_san = re.sub(r'\s+', ' ', text)
+    y = _giao_vien_rut_y(text_san)
+    for u in y:
+        cu = u['chu']
+        u['chu'] = _goc_chu(u['chu'])
+        # dựng lại câu hỏi từ chủ ngữ ĐÃ làm sạch (bỏ 'Thứ hai,', 'Bài 9:'...)
+        if u['chu'] and cu in u['cau']:
+            u['cau'] = u['cau'].replace(cu, u['chu'])
+        u['cau'] = re.sub(r'\s+', ' ', u['cau'])
+    y = [u for u in y if len(u['chu']) >= 3]
     ra = []
     dung_theo_kieu = {}
     for u in y:
@@ -397,10 +443,13 @@ def sinh_tu_tai_lieu(text, so=10, so_dap_an=4):
         if len(ra) >= so:
             break
         c0 = c.strip()
-        if len(c0) < 25 or c0.endswith('?'):
+        if not (30 <= len(c0) <= 120) or c0.endswith('?'):
+            continue
+        kd0 = _khong_dau(c0).lower()
+        if kd0.startswith(('thu ', 'bai ')):
             continue
         sai = [x.strip().rstrip('.') for j, x in enumerate(cau) if j != i]
-        them('Ý nào sau đây đúng theo bài học?', c0.rstrip('.'), sai,
+        them('Ý nào sau đây đúng theo bài học?', _goc_chu(c0.rstrip('.')), sai,
              hash(c0) & 0xFFFFFFFF, 'y_dung')
 
     for i, q in enumerate(ra, 1):
@@ -429,12 +478,181 @@ def _tach_json_llm(s):
         return None
 
 
-def sinh_cau_hoi_llm(text, so=10, so_dap_an=4):
-    """Sinh câu hỏi trắc nghiệm bằng AI cục bộ (Qwen2.5, chạy trên máy chủ).
+_TU_BIA = ('tac gia', 'nam xuat ban', 'ten sach', 'ten tac gia')  # so sánh không dấu
+_RE_VI_TRI = re.compile(
+    r'^(thu\s*(nhat|hai|ba|tu|nam|sau|bay|tam|chin|muoi)|cuoi\s*cung)$', re.I)
 
-    Sinh 1 câu/lần gọi (JSON ngắn — model nhỏ bám nội dung tốt hơn), chặn lặp,
-    tổng thời gian có hạn. Trả LIST câu hỏi (rỗng nếu AI không dùng được →
-    caller tự bù bằng sinh_tu_tai_lieu, nguồn hiển thị 'tai_lieu').
+
+def _luc_hoa(s):
+    """Chuẩn hoá chuỗi để so sánh: không dấu, chữ thường, 1 khoảng trắng."""
+    return ' '.join(_khong_dau(str(s or '')).lower().split())
+
+
+def _dap_an_co_that(dung, text_kd):
+    """Chống bịa: đáp án phải là nguyên văn (hoặc một cụm) có trong bài.
+
+    Chuẩn hoá không dấu cả hai phía; đáp án dài chấp nhận khớp theo đầu
+    10/8/6 từ hoặc nửa đầu/cuối — paraphrase sâu sẽ bị loại.
+    """
+    d = _luc_hoa(dung).strip(' .,;:!?')
+    if not d:
+        return False
+    if d in text_kd:
+        return True
+    tu = d.split()
+    for kich in (10, 8, 6):
+        if len(tu) > kich and ' '.join(tu[:kich]) in text_kd:
+            return True
+    if len(tu) >= 4:
+        nua = len(tu) // 2
+        return (' '.join(tu[:nua]) in text_kd) or (' '.join(tu[nua:]) in text_kd)
+    return False
+
+
+def _tach_dong(raw):
+    """Tách câu hỏi từ FORMAT DÒNG phẳng — model nhỏ tuân thủ tốt hơn JSON.
+
+    Mẫu mỗi câu:
+        CÂU: <câu hỏi?>
+        A) ...   B) ...   C) ...   D) ...
+        ĐÚNG: A
+    (cũng nhận "1. câu hỏi", "Đáp án: A", JSON nếu model tự trả JSON — fallback)
+    """
+    kq, muc = [], None
+    for dong in (raw or '').replace('```json', '```').replace('```', '').splitlines():
+        d = re.sub(r'\*+', '', dong).strip()
+        if not d:
+            continue
+        m = re.match(r'^c[âa]u\s*(?:\d+\s*)?[:\.\)]\s*(.+)$', d, re.I)
+        if m:
+            if muc and muc.get('cau') and muc.get('lua_chon'):
+                kq.append(muc)
+            muc = {'cau': m.group(1).strip(), 'lua_chon': {}, 'dap_an': ''}
+            continue
+        if re.match(r'^\d+[\)\.]\s+.{15,}$', d) and ('?' in d or '___' in d):
+            if muc and muc.get('cau') and muc.get('lua_chon'):
+                kq.append(muc)
+            muc = {'cau': re.sub(r'^\d+[\)\.]\s*', '', d).strip(), 'lua_chon': {}, 'dap_an': ''}
+            continue
+        if muc is None:
+            continue
+        m2 = re.match(r'^[\(\[]?([A-Da-d])[\)\.\:]\s*(.+)$', d)
+        if m2:
+            chu = m2.group(1).upper()
+            if chu not in muc['lua_chon']:
+                muc['lua_chon'][chu] = m2.group(2).strip()
+            continue
+        m3 = re.match(r'^(?:đ[úu]ng|đ[áa]p[ á]?[áa]n|dap an|answer)\s*[:\-–]?\s*[\(\[]?([A-Da-d])[\)\]]?\s*\.?$', d, re.I)
+        if m3:
+            muc['dap_an'] = m3.group(1).upper()
+    if muc and muc.get('cau') and muc.get('lua_chon'):
+        kq.append(muc)
+    return kq
+
+
+def _tach_ds_cau(raw):
+    """Cứu MỌI object câu hỏi hoàn chỉnh trong văn bản AI (kể cả JSON bị cắt cụt).
+
+    Model nhỏ hay hết token giữa đường — tổng thể mất '}' đóng nhưng các câu
+    đã sinh xong vẫn bóc được: quét mọi cặp ngoặc {} cân bằng (đếm cả trong
+    chuỗi), parse từng đoạn, giữ object có 'cau' + lựa chọn/đáp án.
+    """
+    raw = (raw or '').replace('```json', '```').replace('```', '')
+    kq, stack = [], []
+    trong_chuoi = escape = False
+    for i, ch in enumerate(raw):
+        if trong_chuoi:
+            if escape:
+                escape = False
+            elif ch == '\\':
+                escape = True
+            elif ch == '"':
+                trong_chuoi = False
+            continue
+        if ch == '"':
+            trong_chuoi = True
+        elif ch == '{':
+            stack.append(i)
+        elif ch == '}' and stack:
+            dau = stack.pop()
+            try:
+                muc = json.loads(raw[dau:i + 1])
+            except Exception:  # noqa: BLE001
+                muc = None
+            if (isinstance(muc, dict) and str(muc.get('cau') or '').strip()
+                    and (muc.get('lua_chon') or muc.get('dap_an'))):
+                kq.append(muc)
+    return kq
+
+
+def _loc_cau_ai(obj, text_kd, so_dap_an):
+    """Kiểm chất lượng 1 câu AI trả về; đạt → dict câu, không đạt → None.
+
+    Loại: câu quá ngắn/dài hoặc không có dấu "?" / chỗ trống "___"; hỏi vị trí
+    đoạn ("Thứ hai…"); LỰA CHỌN TRÙNG NHAU; đáp án kiểu "tất cả các ý"; và
+    tuyệt đối đáp án không có thật trong bài (chống bịa).
+    """
+    if not isinstance(obj, dict):
+        return None
+    cau = re.sub(r'\s+', ' ', str(obj.get('cau') or '').strip())
+    if not (14 <= len(cau) <= 300) or ('?' not in cau and '___' not in cau):
+        return None
+    cau_kd = _luc_hoa(cau)
+    if any(t in cau_kd for t in _TU_BIA):
+        return None
+    goc = obj.get('lua_chon') or {}
+    if isinstance(goc, dict):
+        cap = [(str(k).strip().upper()[:1], v) for k, v in goc.items()]
+    elif isinstance(goc, list):
+        cap = []
+        for item in goc:
+            m = re.match(r'^\s*([A-Fa-f])[\.\)\:\-–]\s*(.+)$', str(item or '').strip())
+            cap.append((m.group(1).upper(), m.group(2)) if m else (None, None))
+    else:
+        cap = []
+    da = str(obj.get('dap_an') or '').strip().upper()[:1]
+    lc, thay = {}, {}
+    for chu, v in cap:
+        if chu not in CHU or not str(v or '').strip():
+            continue
+        v = re.sub(r'\s+', ' ', str(v).strip()).lstrip('A-Fa-f.):–- ').strip()
+        v_kd = _luc_hoa(v)
+        if len(v_kd) < 2 or _RE_VI_TRI.match(v_kd):
+            continue
+        if v_kd in thay:  # lựa chọn trùng nhau → giữ bản đầu
+            continue
+        thay[v_kd] = chu
+        lc[chu] = v
+    if da not in lc:
+        da = sorted(lc)[0] if lc else ''
+    if len(lc) < 3 or not da:
+        return None
+    # lựa chọn "con–bộ" (một lựa chọn là tiền tố của lựa chọn khác) → mơ hồ, loại
+    ds_kd = sorted(thay)
+    for i, a in enumerate(ds_kd):
+        for b in ds_kd[i + 1:]:
+            if b.startswith(a) or a.startswith(b):
+                return None
+    dung = lc[da]
+    dung_kd = _luc_hoa(dung)
+    if re.search(r'\btat ca\b|\bkhong co (y|dap an)\b|\bcau a va\b|\bca y\b', dung_kd):
+        return None
+    if not _dap_an_co_that(dung, text_kd):
+        return None
+    q = {'cau': cau, 'lua_chon': lc, 'dap_an': da, 'loai': 'tn', 'nguon_cau': 'ai'}
+    if not _gop_lua_chon(q, so_dap_an):
+        return None
+    return q
+
+
+def sinh_cau_hoi_llm(text, so=10, so_dap_an=4):
+    """Sinh câu hỏi bám bài: BỘ LUẬT dựng khung (không bao giờ bịa) → AI Qwen 1.5B
+    làm 2 việc phù hợp năng lực model nhỏ:
+      1) TỰ TRẢ LỜI từng câu theo bài — câu AI trả khác đáp án nguyên văn bị loại
+         (câu mơ hồ/kém rõ ràng), câu AI trả đúng được giữ;
+      2) VIẾT LẠI câu hỏi cho tự nhiên, ngắn gọn (đáp án giữ nguyên văn trong bài).
+    Câu qua cả 2 bước có nguon_cau='ai'. Trả list (có thể ít hơn `so` — caller bù
+    bằng sinh_tu_tai_lieu và ghi nguồn 'noi_bo' để giáo viên nhận biết).
     """
     try:
         from . import llm_cuc_bo as LB
@@ -444,60 +662,75 @@ def sinh_cau_hoi_llm(text, so=10, so_dap_an=4):
     if len(text) < 80:
         return []
     text = text[:6000]
+    text_kd = ' '.join(_khong_dau(text).lower().split())
     so = max(1, min(40, int(so or 10)))
     so_dap_an = max(2, min(6, int(so_dap_an or 4)))
-    p_he = ('Bạn là giáo viên tiểu học tạo câu hỏi trắc nghiệm tiếng Việt bám bài học. '
-            'CHỈ trả về MỘT object JSON, không giải thích, dạng: '
-            '{"cau": "câu hỏi", "lua_chon": {"A": "...", "B": "...", "C": "...", "D": "..."}, '
-            '"dap_an": "A"}. Đáp án đúng phải có thật trong bài học.')
-    ds, da_co = [], set()
-    vong = 0
-    from time import time as _now
-    bat_dau = _now()
-    while len(ds) < so and vong < so * 3 and _now() - bat_dau < 95:
-        vong += 1
-        p_user = ('Bài học:\n"""\n%s\n"""\n\nTạo 1 câu hỏi trắc nghiệm %s đáp án bám sát bài trên. '
-                  'Các câu đã có (tránh lặp): %s'
-                  % (text, so_dap_an, ' | '.join(sorted(da_co)[:8]) or '(chưa có)'))
-        kq = LB.sinh(p_he, p_user, toi_da_token=280, nhiet_do=0.7, han=25)
-        if not kq.get('ok'):
-            if kq.get('loai_loi') in ('het_ram', 'ban', 'loi_dich_vu', 'het_han'):
-                break
-            continue
-        obj = _tach_json_llm(kq.get('text') or '')
-        if not obj or not str(obj.get('cau') or '').strip():
-            continue
-        cau = re.sub(r'\s+', ' ', str(obj['cau']).strip())
-        if len(cau) < 12 or cau.lower().startswith(('xin chào', 'i ')):
-            continue
-        khoa = _khong_dau(cau)[:50]
-        if khoa in da_co:
-            continue
-        # lua_chon: nhận cả dict {A:..} lẫn list ["A. ..", ...]
-        goc = obj.get('lua_chon') or {}
-        lc = {}
-        if isinstance(goc, dict):
-            for k, v in goc.items():
-                chu = str(k).strip().upper()[:1]
-                if chu in CHU and str(v or '').strip():
-                    lc[chu] = re.sub(r'\s+', ' ', str(v).strip()).lstrip('A-Fa-f.):–- ')
-        elif isinstance(goc, list):
-            for item in goc:
-                m = re.match(r'^\s*([A-Fa-f])[\.\)\:\-–]\s*(.+)$', str(item or '').strip())
-                if m:
-                    lc[m.group(1).upper()] = re.sub(r'\s+', ' ', m.group(2).strip())
-        da = str(obj.get('dap_an') or '').strip().upper()[:1]
-        if not da or da not in CHU:
-            da = 'A' if 'A' in lc else (sorted(lc)[0] if lc else '')
-        if len(lc) < 2 or not da:
-            continue
-        q = {'cau': cau, 'lua_chon': lc, 'dap_an': da, 'loai': 'tn'}
-        if _gop_lua_chon(q, so_dap_an):
-            da_co.add(khoa)
-            q['id'] = len(ds) + 1
-            ds.append(q)
-    return ds
 
+    # 1) Bộ luật over-generate ứng viên (bám bài tuyệt đối) + lọc hình thức
+    ucv = []
+    for q in sinh_tu_tai_lieu(text, so=so * 2, so_dap_an=so_dap_an):
+        qq = _loc_cau_ai({'cau': q.get('cau'), 'lua_chon': q.get('lua_chon') or {},
+                          'dap_an': q.get('dap_an')}, text_kd, so_dap_an)
+        if qq:
+            ucv.append(qq)
+    ucv = ucv[:16]
+    if not ucv:
+        return []
+
+    def _lb(p_he, p_user, tokens, han):
+        try:
+            return LB.sinh(p_he, p_user, toi_da_token=tokens, nhiet_do=0.2, han=han)
+        except Exception:  # noqa: BLE001
+            return {}
+
+    # 2) AI TỰ TRẢ LỜI — loại câu mơ hồ (AI trả khác đáp án nguyên văn)
+    exam_he = ('Bạn là học sinh làm bài trắc nghiệm theo bài học. Với mỗi câu chọn đáp án đúng. '
+               'CHỈ trả lời theo mẫu, mỗi dòng một câu: "1. A" (số câu, chấm, chữ cái). Không giải thích.')
+    cac_cau = []
+    for i, q in enumerate(ucv, 1):
+        cac_cau.append('%d. %s\n%s' % (i, q['cau'],
+                          '\n'.join('%s. %s' % (k, q['lua_chon'][k]) for k in sorted(q['lua_chon']))))
+    kq = _lb(exam_he, 'Bài học:\n"""\n%s\n"""\n\nCâu hỏi:\n%s' % (text, '\n\n'.join(cac_cau)),
+             200, 60)
+    tra_loi = {}
+    if kq.get('ok'):
+        for dong in (kq.get('text') or '').splitlines():
+            m = re.match(r'^\s*(\d+)\s*[\.\)\:]\s*\(?([A-Da-d])\)?\s*\.?\s*$', dong)
+            if m:
+                tra_loi[int(m.group(1))] = m.group(2).upper()
+    # Loại câu chỉ khi AI CHỌN RÕ một đáp án khác (phản bác rõ: câu mơ hồ);
+    # AI không trả lời được câu nào thì câu đó KHÔNG bị loại vì thế.
+    qua = [q for i, q in enumerate(ucv, 1) if tra_loi.get(i, q['dap_an']) == q['dap_an']]
+    if not qua:
+        qua = ucv[:so]
+    qua = qua[:so]
+
+    # 3) AI VIẾT LẠI câu hỏi cho tự nhiên (đáp án giữ nguyên)
+    kq2 = _lb('Viết lại các câu hỏi sau cho tự nhiên, ngắn gọn (dưới 20 từ), giữ NGUYÊN ý chính '
+              'và từ khoá quan trọng. CHỈ trả lời, mỗi dòng: "1. câu hỏi mới có dấu ?" — không thêm gì khác.',
+              '\n'.join('%d. %s' % (i + 1, q['cau']) for i, q in enumerate(qua)), 260, 55)
+    if kq2.get('ok'):
+        da_dung = {q['cau'] for q in qua}
+        for dong in (kq2.get('text') or '').splitlines():
+            m = re.match(r'^\s*(\d+)\s*[\.\)]\s*(.+)$', dong)
+            if not m:
+                continue
+            try:
+                i = int(m.group(1))
+            except ValueError:
+                continue
+            cau_moi = re.sub(r'\s+', ' ', m.group(2)).strip()
+            if not (1 <= i <= len(qua)) or not (14 <= len(cau_moi) <= 160):
+                continue
+            if ('?' not in cau_moi and '___' not in cau_moi) or cau_moi in da_dung:
+                continue
+            kd = _luc_hoa(cau_moi)
+            if not any(t in kd for t in _TU_BIA):
+                qua[i - 1]['cau'] = cau_moi
+    for i, q in enumerate(qua, 1):
+        q['id'] = i
+        q['nguon_cau'] = 'ai'
+    return qua
 
 def chuan_so(so_cau, so_dap_an):
     try:
@@ -509,6 +742,28 @@ def chuan_so(so_cau, so_dap_an):
     except (TypeError, ValueError):
         so_dap_an = 4
     return max(1, min(40, so_cau)), max(2, min(6, so_dap_an))
+
+
+def _tao_de_tu_van_ban(text, so_cau, so_dap_an):
+    """(gen, nguon_gen) từ văn bản thô: AI trước → bù luật, GHI RÕ nguồn từng câu.
+
+    Câu AI có `nguon_cau='ai'`; câu bù bằng bộ luật nội bộ có `nguon_cau='noi_bo'`
+    để giao diện hiển thị trung thực cho giáo viên kiểm tra trước khi lưu.
+    """
+    gen, nguon_gen = sinh_cau_hoi_llm(text, so=so_cau, so_dap_an=so_dap_an), 'ai_cuc_bo'
+    if gen and len(gen) < so_cau:
+        for q in sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an):
+            if len(gen) >= so_cau:
+                break
+            if all(_khong_dau(q['cau'])[:50] != _khong_dau(x['cau'])[:50] for x in gen):
+                q['nguon_cau'] = 'noi_bo'
+                gen.append(q)
+    if not gen:
+        gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
+        nguon_gen = 'tai_lieu'
+    for i, q in enumerate(gen, 1):
+        q['id'] = i
+    return gen, nguon_gen
 
 
 def doc_file(blob, ten_tep, so_cau=10, so_dap_an=4):
@@ -525,20 +780,9 @@ def doc_file(blob, ten_tep, so_cau=10, so_dap_an=4):
         for t in doc.tables:
             for row in t.rows:
                 text += '\n' + ' '.join(c.text for c in row.cells)
-        gen, nguon_gen = sinh_cau_hoi_llm(text, so=so_cau, so_dap_an=so_dap_an), 'ai_cuc_bo'
-        if gen and len(gen) < so_cau:
-            for q in sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an):
-                if len(gen) >= so_cau:
-                    break
-                if all(_khong_dau(q['cau'])[:50] != _khong_dau(x['cau'])[:50] for x in gen):
-                    gen.append(q)
-        if not gen:
-            gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
-            nguon_gen = 'tai_lieu'
+        gen, nguon_gen = _tao_de_tu_van_ban(text, so_cau, so_dap_an)
         if gen:
-            for i, q in enumerate(gen, 1):
-                q['id'] = i
-            return gen[:so_cau] if so_cau else gen, nguon_gen, ''
+            return gen, nguon_gen, ''
         if ds:
             thieu = [q['id'] for q in ds if not q.get('dap_an')]
             if thieu:
@@ -556,25 +800,22 @@ def doc_file(blob, ten_tep, so_cau=10, so_dap_an=4):
         ds = _phan_tich_dong(dong)
         if len(ds) >= 2 and all(q.get('dap_an') for q in ds):
             return ds[:so_cau], 'file_cau_hoi', ''
-        gen, nguon_gen = sinh_cau_hoi_llm(text, so=so_cau, so_dap_an=so_dap_an), 'ai_cuc_bo'
-        if gen and len(gen) < so_cau:
-            for q in sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an):
-                if len(gen) >= so_cau:
-                    break
-                if all(_khong_dau(q['cau'])[:50] != _khong_dau(x['cau'])[:50] for x in gen):
-                    gen.append(q)
-        if not gen:
-            gen = sinh_tu_tai_lieu(text, so=so_cau, so_dap_an=so_dap_an)
-            nguon_gen = 'tai_lieu'
+        gen, nguon_gen = _tao_de_tu_van_ban(text, so_cau, so_dap_an)
         if gen:
-            for i, q in enumerate(gen, 1):
-                q['id'] = i
-            return gen[:so_cau] if so_cau else gen, nguon_gen, ''
+            return gen, nguon_gen, ''
         if ds:
             return [], '', ('PDF câu hỏi cần dòng “Đáp án: A” (PDF không giữ in đậm/gạch chân). '
                             'Nên dùng file Word.')
         return [], '', 'Không đọc được đề từ PDF này.'
-    return [], '', 'Chỉ nhận file Word .docx hoặc PDF.'
+    if ten.endswith(('.txt', '.md')):
+        text = blob.decode('utf-8', errors='replace').strip()
+        if len(text) < 80:
+            return [], '', 'File văn bản quá ngắn để tạo câu hỏi.'
+        gen, nguon_gen = _tao_de_tu_van_ban(text, so_cau, so_dap_an)
+        if gen:
+            return gen, nguon_gen, ''
+        return [], '', 'Không đủ nội dung trong file để tạo câu hỏi.'
+    return [], '', 'Chỉ nhận file Word .docx, PDF hoặc .txt.'
 
 
 LOAI_CAU = ('tn', 'ds', 'dk', 'tl', 'gc')

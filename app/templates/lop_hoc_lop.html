@@ -43,7 +43,8 @@
   <form method="post" enctype="multipart/form-data">
    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
    <p class="sub">Tải <b>file câu hỏi</b> (.docx): đáp án đúng <b>in đậm</b> hoặc <u>gạch chân</u>.
-    Hoặc tải <b>tài liệu bài học</b> — máy sinh đề trên máy chủ, không gửi file ra ngoài.</p>
+    Hoặc tải <b>tài liệu bài học</b> (.docx / .pdf / .txt) — AI trên máy chủ sinh đề,
+    câu không đạt chất lượng bị loại hoặc ghi rõ ⚙ nội bộ; không gửi file ra ngoài.</p>
    <div class="row">
     <label class="f">Tiêu đề bài<input name="tieu_de" placeholder="Kiểm tra 15 phút — bài 3" style="min-width:240px"></label>
     <label class="f">Môn<input name="mon" list="goi_y_mon" placeholder="Toán" style="width:140px"></label>
@@ -53,7 +54,7 @@
      <select name="so_dap_an" style="width:90px">
       {% for n in [2,3,4,5,6] %}<option value="{{n}}" {{'selected' if n==4}}>{{n}}</option>{% endfor %}
      </select></label>
-    <label class="f">File Word / PDF<input type="file" name="file" accept=".docx,.pdf" required></label>
+    <label class="f">File Word / PDF / TXT<input type="file" name="file" accept=".docx,.pdf,.txt" required></label>
     <button>Đọc file → xem đề</button>
    </div>
   </form>
@@ -63,7 +64,8 @@
 {% if preview %}
 <div class="card">
  <div class="chead"><h3>Xem trước {{preview.so}} câu
-  {% if preview.nguon=='ai_cuc_bo' %}<span class="chip" style="background:#d1fae5;color:#065f46">🤖 AI cục bộ Qwen (offline)</span>
+  {% if preview.nguon=='ai_cuc_bo' and preview.so_noi_bo %}<span class="chip" style="background:#fef9c3;color:#854d0e">🤖 AI cục bộ Qwen + ⚙ {{ preview.so_noi_bo }} câu nội bộ (nên xem lại câu ⚙)</span>
+  {% elif preview.nguon=='ai_cuc_bo' %}<span class="chip" style="background:#d1fae5;color:#065f46">🤖 AI cục bộ Qwen (offline)</span>
   {% elif preview.nguon=='file_cau_hoi' %}<span class="chip">Từ file câu hỏi</span>
   {% elif preview.nguon=='tai_lieu' %}<span class="chip" style="background:#e0e7ff;color:#3730a3">Bộ sinh nội bộ (không phải AI)</span>
   {% elif preview.nguon=='soan_tay' %}<span class="chip" style="background:#fef3c7;color:#b45309">Soạn tay</span>
@@ -73,6 +75,14 @@
   {% for q in preview.cau %}
   <li style="margin-bottom:14px">
    <span class="chip">{{ {'tn':'Trắc nghiệm','ds':'Đúng / Sai','dk':'Điền khuyết','tl':'Tự luận','gc':'Ghép cột'}.get(q.loai or 'tn') }}</span>
+   {% if q.nguon_cau=='noi_bo' %}<span class="chip" style="background:#e0e7ff;color:#3730a3">⚙ nội bộ — nên xem lại</span>{% endif %}
+   <form method="post" style="display:inline;float:right;margin-left:8px">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <input type="hidden" name="act" value="bo_cau">
+    <input type="hidden" name="idx" value="{{loop.index0}}">
+    <button style="border:none;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:1px 9px;cursor:pointer;font-size:12px"
+      onclick="return confirm('Bỏ câu này khỏi đề xem trước?')" title="Bỏ câu này">✕ bỏ</button>
+   </form>
    <b>{{q.cau}}</b>
    {% if q.anh %}<div style="margin:8px 0"><img src="{{url_for('lop_hoc.anh', ten=q.anh)}}" alt=""
      style="max-width:100%;max-height:240px;border-radius:10px;border:1px solid var(--line)"></div>{% endif %}

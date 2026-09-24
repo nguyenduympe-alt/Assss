@@ -241,6 +241,30 @@ def chi_tiet(lop_id):
     preview = None
     if request.method == 'POST':
         act = request.form.get('act') or 'doc'
+        if act == 'bo_cau':
+            # GV bỏ 1 câu yếu khỏi phần xem trước (đánh số lại, cập nhật đếm nội bộ)
+            try:
+                idx = int(request.form.get('idx', '-1'))
+            except ValueError:
+                idx = -1
+            pv = _doc_preview(u['id'], lop_id) or {}
+            ds_pv = pv.get('cau') or []
+            if 0 <= idx < len(ds_pv):
+                ds_pv.pop(idx)
+                for i2, q2 in enumerate(ds_pv, 1):
+                    q2['id'] = i2
+                pv['cau'] = ds_pv
+                pv['so'] = len(ds_pv)
+                pv['so_noi_bo'] = sum(1 for q2 in ds_pv if q2.get('nguon_cau') == 'noi_bo')
+                if ds_pv:
+                    _luu_preview(u['id'], pv)
+                    flash('Đã bỏ 1 câu. Xem lại rồi bấm Lưu bài.', 'ok')
+                else:
+                    _xoa_preview(u['id'])
+                    flash('Đã bỏ câu cuối — chưa còn câu nào trong xem trước.', 'ok')
+            else:
+                flash('Không bỏ được câu này (danh sách đã thay đổi).', 'err')
+            return redirect(url_for('lop_hoc.chi_tiet', lop_id=lop_id))
         if act in ('luu', 'tron'):
             pv = _doc_preview(u['id'], lop_id) or {}
             ds = pv.get('cau') or []
@@ -256,6 +280,7 @@ def chi_tiet(lop_id):
                     ds = DE.tron_de(ds, tron_cau=tron_cau, tron_dap=tron_dap)
                     pv['cau'] = ds
                     pv['so'] = len(ds)
+                    pv['so_noi_bo'] = sum(1 for q in ds if q.get('nguon_cau') == 'noi_bo')
                     _luu_preview(u['id'], pv)
                     preview = pv
                     flash('Đã trộn đề. Xem lại rồi bấm Lưu bài.', 'ok')
@@ -291,7 +316,7 @@ def chi_tiet(lop_id):
             mon = (request.form.get('mon') or '').strip()[:80]
             so_cau, so_dap_an = DE.chuan_so(request.form.get('so_cau'), request.form.get('so_dap_an'))
             if not f or not (f.filename or '').strip():
-                flash('Hãy chọn file Word .docx hoặc PDF (bài học hoặc đề có đáp án đậm/gạch chân).', 'err')
+                flash('Hãy chọn file Word .docx, PDF hoặc .txt (bài học hoặc đề có đáp án đậm/gạch chân).', 'err')
             else:
                 data = f.read(MAX_BYTES + 1)
                 if len(data) > MAX_BYTES:
@@ -307,6 +332,7 @@ def chi_tiet(lop_id):
                             'cau': ds, 'nguon': nguon, 'ten_file': (f.filename or '')[:120],
                             'tieu_de': tieu or ((f.filename or 'Bài kiểm tra').rsplit('.', 1)[0][:80]),
                             'mon': mon, 'so': len(ds),
+                            'so_noi_bo': sum(1 for q in ds if q.get('nguon_cau') == 'noi_bo'),
                         }
                         _luu_preview(u['id'], preview)
     de = [dict(r) for r in db.execute(
